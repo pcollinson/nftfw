@@ -1,0 +1,43 @@
+These scripts are called from within python to generate text
+lines for the nftables setup. So job of the code is to echo add rule commands
+Each is called twice, once for ip and once of ip6
+
+The environment is set up as follows:
+DIRECTION incoming | outgoing
+PROTO - values ip|ip6
+TABLE - usually filter
+CHAIN - chain to add the rule to
+PORTS - ports to use (can be empty)
+COUNTER - set to counter or empty
+IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets)
+LOGGER - logger statement
+       To replace this in a script use
+       LOGGER='log prefix "STRING "'
+       the space at the end of the string is needed
+       to add a space in the log file
+       
+Files:
+allowtcpreset.sh       - allow tcp resets
+accept.sh              - general default accept ruleset
+drop.sh                - use as a default reject rule to drop packets
+essential-icmpv6.sh    - accept necessary IPv6 ICMP
+established.sh         - accept established connections
+                       - Symbiosis compatibility, rules to do this
+		       - are in nftfw_init.nft
+ftp-helper.sh          - Add ftp helper for the ftp
+http-meter.sh          - replace http and https by a metering
+                       - call to stop http(s) flooding
+                       - needs load-http-meter
+load-http-meter.sh     - establish chain for http(s) metering
+ping.sh                - allow pings, editable to add limit
+reject-www-data.sh     - for outbound use, prevent packets from
+		         the webserver which is user "www-data"
+			 from sending anything other than domain requests
+reject.sh              - general default reject rule
+related.sh             - accept related connections
+                       - Symbiosis compatibility, rules to do this
+		       - are in nftfw_init.nft
+syn-ack-flood-protection.sh
+                       - Symbiosis compatibility, rules to do this
+		       - are in nftfw_init.nft
+

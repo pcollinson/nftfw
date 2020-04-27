@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFTFWLS(1) | Nftfw documentation</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw.css" />
+</head>
+<body>
+<header>
+<h1 class="title">NFTFWLS(1) | Nftfw documentation</h1>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>nftfwls</strong> — list <strong>nftfw</strong> blacklist database</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<div class="line-block"><strong>nftfwls</strong> [<strong>-h</strong>] [<strong>-c</strong> <em>config</em>] [<strong>-p</strong> yes|no ] [<strong>-a |-r | -m | -i | -n | -w | -q | -v </strong>]</div>
+<h1 id="description">DESCRIPTION</h1>
+<p><strong>nftfwls</strong> displays the status of the database storing the state of the <strong>nftfw</strong> firewall. The default output only displays the IP addresses found in <em>/usr/local/etc/nftfw/blacklist.d</em>. The <strong>-a</strong> option shows all entries in the database, and ignores the contents of the <em>blacklist.d</em> directory. HTML output is also possible.</p>
+<p><strong>nftfwls</strong> ‘pretty prints’ a table with these headings:</p>
+<ul>
+<li>IPs: The blocked IP address</li>
+<li>Port: The port list used in the firewall for the IP</li>
+<li>Ct/Incd: The number of matches in log files triggered by this IP; a / and the number of reported distinct incidents</li>
+<li>Latest: The date and time of the latest incident. The <em>date_fmt</em> key in <em>config.ini</em> can alter date formats from the default.</li>
+<li>First: The date and time of the first incident (or a minus sign ‘-’ if it’s the same as Latest)</li>
+<li>Duration: The time difference between the two times</li>
+<li>Pattern: The pattern or patterns that reported the incident or incidents</li>
+</ul>
+<p>If the <em>geoip2</em> country database is available, the IP address is preceded by the ISO two letter country code of te site where the IP is located.</p>
+<h2 id="text-output">Text output</h2>
+<p>Text output uses the Python ‘prettytable’ module. When piping the output into another program, it’s helpful to remove the column separators, adding <strong>-n</strong> option make this happen.</p>
+<h2 id="html-output">HTML output</h2>
+<p>The <strong>-w</strong> option selects HTML output. It prints an HTML table suitable for inclusion on a web page. Classes in the table allow styling.</p>
+<ul>
+<li>Class: ‘nftfwls’ - for &lt;table&gt;</li>
+<li>Class: ‘heading’ for the heading &lt;tr&gt;</li>
+<li>Class; ‘content’ for the remaining &lt;tr&gt; lines</li>
+<li>Class: ‘col1’, ‘col2’, up to ‘col7’ for the appropriate &lt;td&gt; cells.</li>
+</ul>
+<p>If the <em>geoip2</em> country database is available, the IP address is preceded by the ISO two letter country code of te site where the IP is located. Mouse over the code to get the full country name.</p>
+<h2 id="options">Options</h2>
+<dl>
+<dt><strong>-h</strong>, <strong>--help</strong></dt>
+<dd><p>Prints brief usage information.</p>
+</dd>
+<dt><strong>-w</strong>, <strong>--web</strong></dt>
+<dd><p>Print output as an HTML table, enabling integration into a web page.</p>
+</dd>
+<dt><strong>-a </strong>, <strong>--all</strong></dt>
+<dd><p>Prints all the informarion in the database, ignoring entries in <em>blacklist.d</em></p>
+</dd>
+<dt><strong>-p </strong>, <strong>--pattern_split</strong> yes|no</dt>
+<dd><p>If ‘yes’, splits the pattern column at any comma, making separate lines for entries with more than one stored pattern; if ‘no’ prints a single line for the pattern column. The <em>pattern_split</em> value in the config.ini file sets the usual default value.</p>
+</dd>
+<dt><strong>-r</strong>, <strong>--reverse</strong></dt>
+<dd><p>Reverse sorting order</p>
+</dd>
+<dt><strong>-m</strong>, <strong>--matchcount</strong></dt>
+<dd><p>Sort by match count</p>
+</dd>
+<dt><strong>-i</strong>, <strong>--incidents</strong></dt>
+<dd><p>Sort by incidents</p>
+</dd>
+<dt><strong>-n</strong>, <strong>--noborder</strong></dt>
+<dd><p>Don’t print a border to the table.</p>
+</dd>
+<dt><strong>-c </strong>, <strong>--config</strong> CONFIG</dt>
+<dd><p>Supply a configuration file, overriding any values from the default system settings.</p>
+</dd>
+<dt><strong>-q</strong>, <strong>--quiet</strong></dt>
+<dd><p>Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal</p>
+</dd>
+<dt><strong>-v</strong>, <strong>--verbose</strong></dt>
+<dd><p>Change the default logging settings to INFO to show all errors and information messages.</p>
+</dd>
+</dl>
+<h1 id="files">FILES</h1>
+<p>Files can be located in <em>/</em> or <em>/usr/local</em>.</p>
+<dl>
+<dt><em>/usr/local/etc/nftfw</em></dt>
+<dd><p>Location of control files</p>
+</dd>
+<dt><em>/usr/local/var/lib/nftfw/</em></dt>
+<dd><p>Location of <em>build</em>, <em>install</em>, lock file and sqlite3 databases storing file positions and blacklist information</p>
+</dd>
+</dl>
+<h1 id="bugs">BUGS</h1>
+<p>See GitHub Issues: <a href="https://github.com/pcollinson/nftfw/issues" class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<h1 id="author">AUTHOR</h1>
+<p>Peter Collinson (huge credit to the ideas from Patrick Cherry’s work for the firewall for the Symbiosis hosting system).</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p><strong>nft(1)</strong>, <strong>nftfw(1)</strong>, <strong>nftfwedit(1)</strong>, <strong>nftfwadm(1)</strong>, <strong>nftfw-config(5)</strong>, <strong>nftfw-files(5)</strong></p>
+</body>
+</html>

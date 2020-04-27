@@ -1,0 +1,53 @@
+/*
+ * Simple Page style
+ */
+body{
+    font-family: arial,sans-serif;
+}
+h1 {
+    text-align: center;
+}    
+main {
+    width: 100%;
+}
+/*
+ * nftfwls css
+ */
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+}
+.nftfwls tr:nth-child(odd) {
+    background-color: #fff;
+    }
+.nftfwls tr:nth-child(even) {
+    background-color: #eee;
+    }
+td {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    }
+tr.heading {
+    font-weight: bold;
+}
+tr.heading td {
+    border-bottom: 1px solid #000;
+    margin-bottom: 10px;
+}
+tr.heading td {
+    text-align: center
+}
+tr.content td.col1,
+tr.content td.col2,
+tr.content td.col4,
+tr.content td.col5,
+tr.content td.col7 {
+    text-align: left
+}
+tr.content td.col3,
+tr.content td.col6 {
+    text-align: right;
+    }

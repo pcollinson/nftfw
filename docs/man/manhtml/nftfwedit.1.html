@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFTFWEDIT(1) | Nftfw documentation</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw.css" />
+</head>
+<body>
+<header>
+<h1 class="title">NFTFWEDIT(1) | Nftfw documentation</h1>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>nftfwedit</strong> — command line to add, delete and blacklist IPs and IP information print</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<div class="line-block"><strong>nftfwedit</strong> [<strong>-h</strong>] [** -d | -a | -b <strong>] [</strong>-p** <em>PORT</em>] [<strong>-n</strong> <em>PATTERN</em>] [** -q <strong>] [</strong> -v <strong>] [</strong> ipaddress [ ipaddress … ]**]</div>
+<h1 id="description">DESCRIPTION</h1>
+<p><em>nftfwedit</em> is a command line tool to add or remove IP addresses from the <em>nftfw</em> blacklist database, and also optionally from the <em>blacklist.d</em> directory affecting the running firewall. Options on the command line are followed by one of more IP addresses.</p>
+<p>If one of the <strong>delete</strong> (<strong>-d</strong>) , <strong>add</strong> (<strong>-a</strong>) or <strong>blacklist</strong> (<strong>-b</strong>) options is not supplied, <em>nftfwedit</em> prints information about its ip address arguments. Information from the blacklist database is printed if available, along with the country of origin (if <em>geoip2</em> is installed) and output from any DNS blocklists, if specified in <em>config.ini</em>.</p>
+<p>These are the available options to the program:</p>
+<dl>
+<dt><strong>-h</strong>, <strong>--help</strong></dt>
+<dd><p>Prints brief usage information.</p>
+</dd>
+<dt><strong>-d</strong>, <strong>--delete</strong></dt>
+<dd><p>The nominated IP addresses are deleted from the blacklist database, and if present, the file is removed from the <em>blacklist.d</em> directory. Requires root access.</p>
+</dd>
+<dt><strong>-a</strong>, <strong>--add</strong></dt>
+<dd><p>The nominated IP addresses are added to the blacklist database. The port (<strong>-p</strong>) and pattern (<strong>-n</strong>) options must be supplied to create a valid database entry. Requires root access.</p>
+</dd>
+<dt><strong>-b</strong>, <strong>--blacklist</strong></dt>
+<dd><p>The nominated IP addresses are added to the <em>blacklist.d</em> directory. If an address to be added is present in the blacklist database, then the installation uses that information to create the file. When the database doesn’t contain the address, it’s added to the database, and in this case the port and pattern options must be supplied. Requires root access.</p>
+</dd>
+<dt><strong>-p</strong>,<strong>--port</strong> PORT</dt>
+<dd><p>Supply the ports used when blocking the IP address. The PORT value can be <em>all</em>, a single numeric port number or a comma separated list of ports.</p>
+</dd>
+<dt><strong>-n</strong>,<strong>--pattern</strong> PATTERN</dt>
+<dd><p>Supply the pattern name stored in the database and used to indicate the source of the blacklist entry when listed by <em>nftfwls</em>.</p>
+</dd>
+<dd><p>Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal</p>
+</dd>
+<dt><strong>-q</strong>, <strong>--quiet</strong></dt>
+<dd><p>Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal</p>
+</dd>
+<dt><strong>-v</strong>, <strong>--verbose</strong></dt>
+<dd><p>Change the default logging settings to INFO to show all errors and information messages.</p>
+</dd>
+</dl>
+<h1 id="files">FILES</h1>
+<p>Files can be located in <em>/</em> or <em>/usr/local</em>.</p>
+<dl>
+<dt><em>/usr/local/etc/nftfw</em></dt>
+<dd><p>Location of control files and directories</p>
+</dd>
+<dt><em>/usr/local/etc/nftfw/nftfw_init.nft</em></dt>
+<dd><p><strong>nftables</strong> basic framework</p>
+</dd>
+<dt><em>/usr/local/etc/nftfw/config.ini</em></dt>
+<dd><p>ini file with basic settings for <em>nftfw</em>, overriding built-in values</p>
+</dd>
+<dt><em>/usr/local/var/lib/nftfw/</em></dt>
+<dd><p>Location of <em>build.d</em>, <em>test.d</em>, <em>install.d</em>, lock files and the sqlite3 databases storing file positions and blacklist information</p>
+</dd>
+</dl>
+<h1 id="bugs">BUGS</h1>
+<p>See GitHub Issues: <a href="https://github.com/pcollinson/nftfw/issues" class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<h1 id="author">AUTHOR</h1>
+<p>Peter Collinson (huge credit to the ideas from Patrick Cherry’s work for the firewall for the Symbiosis hosting system).</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p><strong>nft(1)</strong>, <strong>nftfw(1)</strong>, <strong>nftfwls(1)</strong>, <strong>nftfwadm(1)</strong>, <strong>nftfw-config(5)</strong>, <strong>nftfw-files(5)</strong></p>
+</body>
+</html>

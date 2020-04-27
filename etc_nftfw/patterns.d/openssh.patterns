@@ -1,0 +1,24 @@
+##
+#
+#  This file contains patterns for matching failed logins via OpenSSH
+#
+##
+###
+
+#
+#  The logfile we look for matches within.
+#
+file = /var/log/auth.log
+
+#
+#  Any matches will be denied access to these ports.
+#
+#  Comma-separated values are expected.
+#
+ports = 22
+
+#
+#  Patterns we'll match upon.
+#
+Failed \S+ for .* from __IP__ port \d+ ssh2$
+

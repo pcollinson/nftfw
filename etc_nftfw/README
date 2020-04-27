@@ -1,0 +1,8 @@
+These files should live in
+
+/etc/nftfw
+or
+/usr/local/etc/nftfw
+
+depending on your system.
+

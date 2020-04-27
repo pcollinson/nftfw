@@ -1,0 +1,5 @@
+This is a sample init file for nftfw which I am using on my
+gateway machine that talks to my router and my local network
+
+It has two interfaces, and uses a Static IP (but allowing access
+on that interface to the local IP of my Broadband router)

@@ -1,0 +1,31 @@
+#
+#	Crontab entry for nftfw
+#	Install in /etc/cron.d/nftfw
+#
+#
+# Run blacklist test every 15 minutes
+# allowing time for logs to accrue
+5,20,35,50 * * * * root /usr/local/bin/nftfw -q blacklist
+
+# Run whitelist to check on logins
+10,25,40,55 * * * * root /usr/local/bin/nftfw -q whitelist
+
+# check on firewall changes
+# incron does some of this, but can miss events
+# if many happen at once
+@hourly root /usr/local/bin/nftfw -q load
+
+# Keep firewall database under control
+02 10 * * * root /usr/local/bin/nftfw -q tidy
+
+# On Buster, The currently installed incron is
+# version 0.5.12-1
+# It has a nasty bug. When it runs a script it leaves
+# a process running, and these eventually fill up
+# the process table. Version 0.5.12-2 apparently
+# fixes this problem. But Debian releases are slow
+# and it seems to be stuck in the system.
+# This is a work-around. Every day restart incron
+# which drops all the dead processes and starts afresh.
+# reset incron
+03 01 * * * root systemctl restart incron

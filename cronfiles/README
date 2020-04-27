@@ -1,0 +1,24 @@
+cronfiles contains sample entries for cron to run
+nftfw automatically to load blacklists, whitelists
+and the main table builder regularly during the day.
+
+1)   Check that the paths in the cron-nftfw file and
+incron-nftfw to reflect the locations on your system.
+
+2)    Install cron-nftfw in /etc/cron.d/nftfw as root
+      Make sure that the file is owned by root and
+      read-only to root.      
+      sudo cp cron-nftfw /etc/cron.d/nftfw
+      sudo chmod 644 /etc/cron.d/nftfw
+
+3)   To make the firewall change when files alter in the
+       control directories  use incron
+
+      a)      install incron
+      	      sudo apt install incron
+
+      b)      Copy into place
+              sudo cp incron-nftfw /etc/incron.d/nftfw
+      	      sudo chmod 644 /etc.incron.d/nftfw
+
+See the entry in the cron-nftfw about incron.

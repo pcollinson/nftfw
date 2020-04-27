@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFTFWADM(1) | Nftfw documentation</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw.css" />
+</head>
+<body>
+<header>
+<h1 class="title">NFTFWADM(1) | Nftfw documentation</h1>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>nftfwadm</strong> — support for installation of the Nftfw firewall generator</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<div class="line-block"><strong>nftfwadm</strong> [<strong>-h</strong>] [<strong>-c</strong> <em>config</em>] [<strong>-o</strong> <em>option</em>] [<strong>-x | -f | -i | -q | -v </strong>] [<strong><em>save|restore|clean</em></strong>]</div>
+<h1 id="description">DESCRIPTION</h1>
+<p><strong>nftfw(1)</strong> generates firewalls based on information derived from control files. It creates a new set of command files ready for loading in the kernel and tests them using <em>nft(1)</em>. If the test succeeds, it makes a backup of the kernel settings before installing the new rule set into the kernel. If installation fails, <strong>nftfw</strong> loads the kernel tables from the backup and deletes it, restoring the running system to the known safe version. <strong>nftfw</strong> deletes the backup file if installation succeeds.</p>
+<p>When testing a new firewall setup, it can be useful to be able to backtrack to a known working version, so <strong>nftfw</strong> will not create a new backup file if one already exists. The <strong>nftfwadm</strong> command provides the <strong>save</strong> action to preload the backup file so that <strong>nftfw</strong> can revert to a known working version on any failure. The <strong>restore</strong> action reloads the saved backup settings into the kernel and deletes the backup file. The <strong>clean</strong> command deletes the backup file.</p>
+<p>These are the available options to the program:</p>
+<dl>
+<dt><strong>-h</strong>, <strong>--help</strong></dt>
+<dd><p>Prints brief usage information.</p>
+</dd>
+<dt><strong>-c</strong>, <strong>--config</strong> CONFIG</dt>
+<dd><p>Supply a alternate configuration file, overriding any values from the default system settings.</p>
+</dd>
+<dt><strong>-i</strong>, <strong>--info</strong></dt>
+<dd><p>List all the configuration names and settings</p>
+</dd>
+<dt><strong>-o</strong>, <strong>--option</strong> OPTION</dt>
+<dd><p>OPTION is keyword=value and may be comma separated list of configuration options. The values override any settings in the configuration file.</p>
+</dd>
+<dt><strong>-q</strong>, <strong>--quiet</strong></dt>
+<dd><p>Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal</p>
+</dd>
+<dt><strong>-v</strong>, <strong>--verbose</strong></dt>
+<dd><p>Change the default logging settings to INFO to show all errors and information messages.</p>
+</dd>
+</dl>
+<h1 id="files">FILES</h1>
+<p>Files can be located in <em>/</em> or <em>/usr/local</em>.</p>
+<dl>
+<dt><em>/usr/local/etc/nftfw</em></dt>
+<dd><p>Location of control files.</p>
+</dd>
+<dt><em>/usr/local/var/lib/nftfw/</em></dt>
+<dd><p>Location of the backup file, <em>build.d</em>, <em>test.d</em>, <em>install.d</em>, lock files and the sqlite3 databases storing file positions and blacklist information</p>
+</dd>
+</dl>
+<h1 id="bugs">BUGS</h1>
+<p>See GitHub Issues: <a href="https://github.com/pcollinson/nftfw/issues" class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<h1 id="author">AUTHOR</h1>
+<p>Peter Collinson (huge credit to the ideas from Patrick Cherry’s work for the firewall for the Symbiosis hosting system).</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p><strong>nft(1)</strong>, <strong>nftfwls(1)</strong>, <strong>nftfwedit(1)</strong>, <strong>nftfw-config(5)</strong>, <strong>nftfw-files(5)</strong></p>
+</body>
+</html>

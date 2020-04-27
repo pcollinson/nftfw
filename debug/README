@@ -1,0 +1,5 @@
+These files are debugging tools for the various modules in nftfw.
+
+They are mostly here to act as a pdb access point.
+
+

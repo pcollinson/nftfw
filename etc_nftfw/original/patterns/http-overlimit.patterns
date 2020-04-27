@@ -1,0 +1,13 @@
+#  Blacklist feedback pattern
+#
+#  The file we scan for patterns
+#
+file  = /var/log/syslog
+#  Http/Https
+ports = 80,443
+
+#
+#  The patterns we use
+#  depends on load-http-meter and http_meter in
+#  incoming
+.*kernel.*HTTP Overlimit.*SRC=__IP__.*$

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFTFW-FILES(1) | Nftfw documentation</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw.css" />
+</head>
+<body>
+<header>
+<h1 class="title">NFTFW-FILES(1) | Nftfw documentation</h1>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>nftfw-files</strong> — documentation of file formats used in nftfw</p>
+<h1 id="description">DESCRIPTION</h1>
+<p>This page documents the file formats used in the <strong>nftfw</strong> firewall system. The system stores various control files in <em>/etc/nftfw</em> or <em>/usr/local/etc/nftfw</em> depending on the installation. You can find a manual page for the configuration file <em>config.ini</em> living in the directory in nftfw-config(5).</p>
+<p>The <em>etc/nftfw</em> directory contains:</p>
+<ul>
+<li><em>incoming.d</em> - contains rules controlling access to services on the system;</li>
+<li><em>outbound.d</em> - sets any rules controlling packets leaving the system;</li>
+<li><em>whitelist.d</em> - contains IP addresses that have full access to the system;</li>
+<li><em>blacklist.d</em> - specifies IP addresses and ports in the inbound packets that should not have access;</li>
+<li><em>patterns.d</em> - contain pattern files for matching lines in log files for blacklist; and</li>
+<li><em>rule.d</em> - hold files for generating <strong>nft</strong> commands from rule names.</li>
+</ul>
+<p>Distributed files can be found in <em>etc/nftfw/original</em>.</p>
+<h2 id="incoming-and-outbound">incoming and outbound</h2>
+<p>Files in these directories specify rules for the firewall. File names have the format:</p>
+<blockquote>
+<p>number-description</p>
+</blockquote>
+<p>where ‘number’ is a pair of digits used as a sequence number and ‘description’ specifies the action name needed to created the nftables commands for the rule.</p>
+<p>Descriptions can be:</p>
+<ul>
+<li>a port number inserted into the firewall rule</li>
+<li>the name of a service found in <em>/etc/services</em>.</li>
+<li>the name of a rule found in the rules directories (with the .sh suffix removed)</li>
+</ul>
+<p>When port numbers appear in the filename, the directory name dictates the action file applied for the rule. The <em>config.ini</em> file contains variables that select the default rule based on the directory name (see nftfw-config(1)).</p>
+<p>To allow rules to have the same name as services and replace the default action, <strong>nftfw</strong> searches the rule directory for name matches before querying the service file.</p>
+<p>Files are usually empty, but can contain a list of IP addresses (one per line) that <strong>nftfw</strong> uses to specify the source IP or IPs for an incoming rule, or the destination IP or IPs for the outbound rule. For example, supplying a list of known IP addresses for the standard ssh(1) service will prevent tiresome exhaustive attempts to get passwords. Local users can access ssh(1) from unknown addresses using the knowledge of a random port number given by another rule.</p>
+<h2 id="blacklist-and-whitelist">blacklist and whitelist</h2>
+<p>Files in these directories make nftables rules permitting access in the whitelist or blocking access in the blacklist. Whitelisted rules appear before blacklisted ones in the firewall.</p>
+<p>Filenames are simply IP addresses. The whitelist or blacklist scanners will create files in these directories, and will add a suffix of <em>.auto</em>. Files added ‘by hand’ should just be the IP address.</p>
+<p>IPv6 addresses are added in /64 form, with the ‘/’ replaced by a vertical bar ‘|’. Install IPv4 address groups with network masking using the same convention.</p>
+<p>Empty files mean that the rule applies to all ports. File contents are lists, one per line, with the following contents:</p>
+<ul>
+<li>all - a ‘special’ keyword meaning that the rule applies to all ports.</li>
+<li>a numeric port number</li>
+</ul>
+<p>Firewall rules with ‘all’ ports appear in the ruleset before any rules containing specific ports.</p>
+<p>The system has no way of distinguishing between TCP and UDP protocols and the system generates two rules for each rule it finds.</p>
+<p>Administrators can disable the blacklist and whitelist systems separately by creating a file called ‘disabled’ in the relevant directory.</p>
+<p>When building the firewall from these two directories, <strong>nftfw</strong> writes the IP addresses into nftables sets. The program writes the information into two separate files and uses file comparison with the last loaded files to see If it can update the sets of IP addresses without reloading the whole firewall.</p>
+<h2 id="patterns.d">patterns.d</h2>
+<p>Patterns define rules for the <strong>blacklist</strong> module containing the log file (or files) for scanning, the port numbers for the blocking firewall rules, and a list of regular expressions matching lines in the log file.</p>
+<p>Pattern files are text files named <em>name.pattern</em>. The files support comments when the first character of the line contains ‘#’.</p>
+<p>The files contain two ‘equals’ statements that should always be present:</p>
+<blockquote>
+<p>file = filename ports = port specification</p>
+</blockquote>
+<p>Filename is the full path to a logfile that the pattern will used to scan. The filename can also contain shell ‘glob’ characters (’*‘,’?’ and single character ranges) allowing for the rule set to match a range of files. The blacklist system will ignore the pattern file (and complain) if the file (or files) that it nominates doesn’t exist.</p>
+<p>The port specification is usually a comma separated list of port numbers. A firewall rule uses the port list to ban access to specific services on the system. The ports statement has three ‘special’ values:</p>
+<ul>
+<li>‘all’ will ban access to all ports for any matching IP;</li>
+<li>‘update’ allows us to get feedback from the firewall. The ‘update’ value will not create any firewall rules, it will only increment counts in the system’s sqlite3(1) database for any IP that matches. The option provides feedback from the firewall that log continued attempts to access the machine from blocked IP addresses.</li>
+<li>‘test’ marks the file as a testing pattern file. The normal scan from the blacklist system will ignore files with <em>ports=test</em>. Using the <strong>-p</strong> <em>patternname</em> option with the blacklist command will consider only files with <em>ports=test</em> and the pattern file name without the <em>.pattern</em> suffix must match <em>patternname</em>.</li>
+</ul>
+<p>The remainder of the pattern file is a set of regular expressions, placed one per line, that match offending lines in the log files. The rules all contain the string <code>__IP__</code> (two underscores at end) used to match and capture the IPv4 or IPv6 address from the line.</p>
+<p>The <strong>blacklist</strong> action for <strong>nftfw</strong> uses the patterns to scan log files for matching lines and finds IP addresses that it adds to an sqlite3(1) database. IP addresses exhibiting activity levels over a threshold will cause the script to add the IP address file to the blacklist directory (see nftfw(1)).</p>
+<p>Setting <em>ports=test</em> in a pattern file enables testing to see if regular expressions pick up offending IP addresses. Set up a pattern test file pointing to the file you want to scan, and set <em>port=test</em>, add the regular expression you wish to test. Then running</p>
+<blockquote>
+<p>sudo nftfw -x -p pattern-test blacklist</p>
+</blockquote>
+<p>will use data from <em>pattern-test.pattern</em> and will scan the named log file (or files). The <em>-x</em> flag scans the log file from the beginning and will not update the stored file position. The command will print a table with any matching IP addresses, along with a match count. The command can be re-run if matches fail after adjusting the regular expression in the pattern file.</p>
+<h2 id="rule.d">rule.d</h2>
+<p>The <em>rule</em> directory contains small shell scripts that translate firewall actions named in the <em>incoming.d</em> and <em>outgoing.d</em> directories into nftables command lines. Default rules are also used for the whitelist and blacklist generation. Note the coding and management of these files are different from Symbiosis, but the same idea is there, a shell file allows easy additions by users. The files do not run any commands, they output <em>nftables</em> statements to <em>nftfw</em> which stores them and passes the file into the <em>nft</em> command.</p>
+<p>Filenames have the format:</p>
+<blockquote>
+<p>actionname.sh</p>
+</blockquote>
+<p><strong>nftfw</strong> runs the scripts though the shell and captures the output text, appending it to an nftables command file. The system calls each action file twice, once for IPv4 and again for IPv6. The processing script uses environment variables to pass parameters into the shell. The parameters are:</p>
+<blockquote>
+<p>DIRECTION - incoming | outgoing<br />
+PROTO - values ip|ip6<br />
+TABLE - usually filter<br />
+CHAIN - table to add the rule to<br />
+PORTS - ports to use (can be empty)<br />
+COUNTER - set to counter or empty<br />
+IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets)<br />
+LOGGER - logger statement</p>
+</blockquote>
+<p>The pattern script uses the DIRECTION parameter in both incoming and outgoing contexts and must set directional keywords in <strong>nft</strong> commands correctly. For an incoming rule, an IP address (if present) will be a ‘source’ address. For an outgoing rule, an IP address (if present) will be a ‘destination’ address.</p>
+<p>A rule script will usually create a simpler version of the command when called with no ports.</p>
+<h2 id="other-files-in-etcnftfw">Other files in <em>etc/nftfw</em></h2>
+<p>The <em>etc</em> directory contains the config.ini file for <strong>nftfw</strong>. nftfw_config(5) contains a description</p>
+<p>The file <em>nftfw_init.nft</em> contains the basic rule set for nftables, it’s used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. <strong>nftfw</strong> copies the file into the build directory at the start of the build process. The basic setup assumes that it’s running on a system with a single network connection attached to the internet, however, it’s been successfully changed to support a router system with local and remote networks attached.</p>
+<p>Finally, the <em>original</em> directory contains the starting point for all control files, and some examples.</p>
+<h2 id="files-in-varlibnftfw">Files in <em>var/lib/nftfw</em></h2>
+<p>The <em>lib/nftfw</em> directory provides working space for the system. It contains three directories and several working files.</p>
+<ul>
+<li><em>build.d</em> - The <em>build</em> directory provides an initial build space for <strong>nftfw</strong>, it creates a new file set in the directory from the information available to it. The <strong>nft</strong> checking function validates the newly installed files, and the update process will stop for any errors.</li>
+<li><em>install.d</em> - The <em>install</em> directory is the source for the <strong>nft</strong> command to load the tested file set into the system. On the next run, <strong>nftfw</strong> will compare the newly generated files in <em>build</em> with that last used set in <em>install</em>. The comparison determines whether to run a complete or partial reinstall, or perhaps whether there has been no change. The intention is to only update blacklist and whitelist set information if this is possible.</li>
+<li><em>test.d</em> - <strong>nftfw -x</strong> runs the build process up to the point of validating the files and will use this directory as a target for the build.</li>
+<li><em>firewall.db</em> - is an sqlite3(1) database used by the blacklist command to store state on the IP’s it detects, when and why. The nftfwls(1) command prints its contents.</li>
+<li><em>filepos.db</em> - is an sqlite3(1) database used by the blacklist command to store the last known position in the log files that it scans.</li>
+<li><em>whitelist_scan</em> - is an empty file, the whitelist command sets its modification date registering the last run time that the system was run. The command uses the time to skip over processed entries in the <em>wmtp</em> file</li>
+<li><em>sched.lock</em> - is a lock file used as master lock. <strong>nftfw</strong> locks the file to prevent other instances from running. If another instance of the command starts, it will fail to get the lock, and the queues the intended action before exiting.</li>
+<li><em>sched.queue</em> - stores queued actions. The queuing system permits the storage of only one action of any one type (load, blacklist, whitelist or tidy). When the master lock owner finishes its task, it inspects the queue file and performs the job without relinquishing the master lock. On the last action, lock owner deletes the queue file.</li>
+<li><em>queue.lock</em> - is a lock file controlling access to the queue file.</li>
+</ul>
+<p>Contents of build etc</p>
+<h1 id="files">FILES</h1>
+<p>Files can be located in <em>/usr/local</em>.</p>
+<dl>
+<dt><em>/etc/nftfw</em></dt>
+<dd><p>Location of control files</p>
+</dd>
+</dl>
+<h1 id="bugs">BUGS</h1>
+<p>See GitHub Issues: <a href="https://github.com/pcollinson/nftfw/issues" class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<h1 id="author">AUTHOR</h1>
+<p>Peter Collinson (huge credit to the ideas from Patrick Cherry’s work for the firewall for the Symbiosis hosting system).</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p><strong>nft(1)</strong>, <strong>nftfw(1)</strong>, <strong>nftfwls(1)</strong>, <strong>nftfwadm(1)</strong>, <strong>nftfw-config(5)</strong></p>
+</body>
+</html>

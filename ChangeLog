@@ -1,0 +1,74 @@
+v0.1.9  Add some frequency stats to nftfwedit and log values from
+	blacklist - puts some of the number into context
+
+v0.1.8	Redo the management of Debian logger and how config.py interacts
+	with other modules. New module loggermanager.py does this, and
+	provides better control of what is happening.
+
+	Large name changes to bring the code up to pylint standard, except
+	I allow 1 and 2 character variable names, which are extremely
+	local.
+	argument-rgx=[a-z_][a-z0-9_]{0,30}$
+	attr-rgx=[a-z_][a-z0-9_]{0,30}$
+	also add 'log' to good-names otherwise it complains a lot
+	about the log calls
+
+	Revise commenting strategy to make is somewhat more formal
+
+
+v0.1.7  Redo set naming algorithm.
+	Change default blacklist action to drop which
+	causes less traffic.
+	Remove .patterns from argument to nftfw -p
+	Fix a misconception in the nftfw_init.nft
+	file.
+
+v0.1.6	Blacklist won't blacklist addresses or networks
+	in whitelist.d
+	Reworked IP address checking into one place
+
+v0.1.5  Fix typos in code highlighted by the installation
+	on a vanilla Sympl system
+	Update Installation document to incorporate things
+ 	learnt from the installation exercise
+
+v0.1.4  Ensure glob in pattern match resolves to
+	unique set of canonical files.
+	Some amount of pythonification
+	Add to installation documentation
+
+v0.1.3 	Add nftfwedit to print info on IPs, and provide
+	command line access to add, delete and blacklist
+	ips.
+	Documentation update
+
+v0.1.2  Amend logging for blacklist detection to give an indication
+	of what pattern triggered it.
+	Add sample web page for nftfwls -w
+	Add user control: files automatically created in etc/nftfw
+	will be owned by user nominated in config.ini, this follows
+	Symbiosis/Sympl practice of making files in etc/nftfw
+	accessible to a non-root admin user
+	Install.sh now asks for user name
+
+v0.1.1 	Tidy links in documents
+	Flatten distribution - removing original file tree for system.
+	Replace 'dist' in etc_nftfw by 'original' to avoid
+	problems with python package names.
+	Seems like a good idea to have a ChangeLog.
+	Change blacklist algorithm somewhat, realising
+	that the update option needs to update times on
+	files in blacklist.d, otherwise they expire because
+	expiry uses file mtimes.
+	Change nftfw_init.nft to add related accepts
+	to the output chain, needed to be able to make
+	sensible decisions about blocking connections
+	later. Also tidy some of the extra packet output,
+	and ensure that the lookback interface is handled
+	properly.
+	Documentation fix to How_do_i.
+	Make Install delete files in etc/nftfw/original
+	Add dropcounter to drop rules
+	Add HTML output for nftfwls
+
+v0.1.0  Move to github
