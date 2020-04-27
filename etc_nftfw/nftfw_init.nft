@@ -92,7 +92,7 @@ table ip6 filter {
 
 	chain output {
 		type filter hook output priority 0; policy accept;
-		iif "lo" counter accept
+		oif "lo" counter accept
 		ct state {established,related} counter accept
 		ct state invalid counter drop
 		counter jump outgoing

@@ -1,3 +1,9 @@
+v0.2.1  Just when it looked fine, noticed an omission in the ipv6
+	setup.
+
+v0.2.0  Make a release - it seems to be functioning as expected
+
+
 v0.1.9  Add some frequency stats to nftfwedit and log values from
 	blacklist - puts some of the number into context
 
