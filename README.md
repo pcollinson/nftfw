@@ -35,13 +35,13 @@ Files in the incoming directory provides information to allow or deny inbound co
 
   Actions are small shell scripts stored in _rule.d_  generating _nftables_ commands appended to setup files. Some actions are default rules like 'reject' or 'drop'. Some actions provide specific settings, for example, _ftp_helper_ adds the necessary extra rules to include the _ftp_ connection helper. The use of shell scripts makes it easy to add local action rules.
 
-  A file in _incoming.d_ is usually empty, but can contain a list of IP addresses to restrict the scope of the rule set it contains. 
+  A file in _incoming.d_ is usually empty, but can contain a list of IP addresses to restrict the scope of the rule set it contains.
 
 - _outgoing.d_
   The outgoing directory behaves in the same way as the incoming rule set except that the default action is to reject the matching pattern.
 
 - _whitelist.d_
-  The whitelist directory contains files named for IP addresses. IPv6 addresses are usually expressed using /64, with | replacing the / character. 
+  The whitelist directory contains files named for IP addresses. IPv6 addresses are usually expressed using /64, with | replacing the / character.
 
   The files are also generally empty, but can contain specific ports used in the rules. The system provides a whitelist scanner that looks in the system's _wtmp_ file for logins and automatically whitelists the IPs of the users fortunate enough to have a login. Automatically generated files have _.auto_ appended that flags the rule for expiry after some period.
 
@@ -50,7 +50,7 @@ Files in the incoming directory provides information to allow or deny inbound co
 
 - _patterns.d_
   The patterns directory drives the blacklist scanner. It contains a set of files, each file names a log file for scanning and the specific ports placed in the firewall for the pattern. The file statement can specify several files using shell _glob_ syntax. Most of the file contains a set of regular expressions used to match lines in the log file, ```__IP__``` (two underscores at each end) in the regex picks out the IP address. When the scanner finds a match, it records the IP address in a database. When taking a decision whether to blacklist the IP, it compares the total number of matches with a threshold value, and if greater, creates a file in the _blacklist.d_ directory.
-  
+
 ## Other documents
 
 See documents in the _docs_ directory:
@@ -59,6 +59,12 @@ See documents in the _docs_ directory:
 - [How do I.. or Quick User's Guide](docs/How_do_I.md)
 - [User's Guide](docs/Users_Guide.md)
 - [Manual Page index](docs/man/index.md)
+
+## Update your mail system
+
+I've add a repository that steps through the changes I make to the standard exim4/dovecot systems on Sympl to improve feedback and detection of bad IPs. Find that here:
+
+- [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
 
 ## Request for help
 
