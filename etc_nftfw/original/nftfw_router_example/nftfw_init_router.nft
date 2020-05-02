@@ -110,7 +110,11 @@ table ip nat {
 		oif $gateif counter snat to $gateip
 	}
 }
-
+table ip myhelpers {
+	chain prerouting {
+		type filter hook prerouting priority 0;
+	}
+      }
 #
 # Don't have ipv6 from outside
 # but some internal systems use it
@@ -176,7 +180,11 @@ table ip6 filter {
 	chain outgoing {
 	}
 }
-
+table ip6 myhelpers {
+	chain prerouting {
+		type filter hook prerouting priority 0;
+	}
+      }
 #
 # The plan is put firewall, blacklist and whitelist
 # into separate files. These files will use the 'incremental' syntax

@@ -67,6 +67,12 @@ table ip filter {
 	}
 }
 
+table ip myhelpers {
+	chain prerouting {
+		type filter hook prerouting priority 0;
+	}
+      }
+
 table ip6 filter {
 	chain input {
 		type filter hook input priority 0; policy drop;
@@ -123,7 +129,11 @@ table ip6 filter {
 	chain outgoing {
 	}
 }
-
+table ip6 myhelpers {
+	chain prerouting {
+		type filter hook prerouting priority 0;
+	}
+      }
 #
 # The plan is put firewall, blacklist and whitelist
 # into separate files. These files will use the 'incremental' syntax.

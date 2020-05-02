@@ -1,0 +1,11 @@
+#
+#  This is a scanner for the test system
+#  Just has a list of IPs
+#
+file = sys/testlogfile.log
+
+ports = 1000,1002,1003
+#
+# re
+#
+__IP__$

@@ -97,6 +97,9 @@ def parsefile(cf, filename, contents):
              pattern name for reference
         ports : str
             comma separated ports to match (may be 'all')
+            numeric values are checked here, but multiple
+            values and order is checked and normalised
+            in blacklist.py
         file : str
             logfile to scan
         regex : List[compiled regex]
@@ -116,12 +119,15 @@ def parsefile(cf, filename, contents):
     if not file:
         log.error('Pattern: missing file = statement in %s', filename)
         return None
-    if file[0] != '/':
+    if not hasattr(cf, 'TESTING') \
+       and file[0] != '/':
         log.error('Pattern: use full path to file in %s', filename)
         return None
 
     # validate port
-    if ports is not None:
+    if ports is None:
+        ports = 'all'
+    else:
         pchk = re.compile(r'(all|update|test|(?:\d+(?:\s*,\s*\d+)*))$')
         if not pchk.match(ports):
             err = 'ports= must be all, test, ' \
@@ -144,6 +150,11 @@ def parsefile(cf, filename, contents):
         # if the ports value is test ignore it
         if ports == 'test':
             return None
+
+    # if we have no regexes - then return None
+    if not any(regex):
+        log.error('Pattern: %s - no test expressions, file ignored', filename)
+        return None
 
     # generate output
     res = {'pattern':filename,

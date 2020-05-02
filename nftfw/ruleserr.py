@@ -4,4 +4,3 @@
 
 class RulesReaderError(Exception):
     """ Local exception class """
-    pass

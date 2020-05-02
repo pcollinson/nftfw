@@ -7,6 +7,9 @@ IPV6: make address into /64
 is_white is address of fn to check if the ip is in the whitelist.
 When present and returning true ignore the address
 
+Uses cf.TESTING as a flag to allow ip addresses defined as local
+to pass as OK
+
 """
 
 import ipaddress
@@ -75,7 +78,7 @@ class NormaliseAddress:
         proto : {'ip', 'ip6'}
         ipstr : str
             ip address to check
-        is_white: function reference to is_White in
+        is_white: function reference to is_white in
             whitelistcheck.py - if wanted
             Checks of the ipaddress is in the whitelist
 
@@ -84,6 +87,13 @@ class NormaliseAddress:
         str
             return string or None if it should be ignored
         """
+
+        if hasattr(self.cf, 'TESTING'):
+            return self._normal_ipaddr_test(proto, ipstr, is_white)
+        return self._normal_ipaddr_prod(proto, ipstr, is_white)
+
+    def _normal_ipaddr_prod(self, proto, ipstr, is_white=None):
+        """ Production version, ignores non global addresses"""
 
         ipaddr = self.make_ipaddr(proto, ipstr)
         if ipaddr is None:
@@ -99,6 +109,20 @@ class NormaliseAddress:
             return None
 
         return ipaddr
+
+    def _normal_ipaddr_test(self, proto, ipstr, is_white=None):
+        """ Testing version to allow local addresses to be used for testing """
+
+        ipaddr = self.make_ipaddr(proto, ipstr)
+        if ipaddr is None:
+            return None
+        if is_white is not None \
+           and is_white(proto, ipaddr):
+            log.info('%sWhitelisted address %s ignored', self.error_name, ipaddr)
+            return None
+
+        return ipaddr
+
 
     def make_ipaddr(self, proto, ipstr):
         """Given a string, proto (ip|ip6) create an ipaddress object

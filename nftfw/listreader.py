@@ -174,10 +174,13 @@ class ListReader:
         if 'all' in ptstr.casefold():
             return 'all'
         # make an array of ints so we can sort them
-        # also lose any whitespace
-        li = [n.strip() for n in ptstr.split("\n") \
+        # shouldn't have commas, but people may type them
+        pt = ptstr.replace(',', '\n')
+        # split at newlines also lose any whitespace
+        li = [n.strip() for n in pt.split("\n") \
               if n.strip().isnumeric()]
         if any(li):
+            li = list(set(li))
             li = sorted(li, key=int)
             return ','.join(li)
         return 'all'
