@@ -5,25 +5,20 @@ You may need to install pytest-3 and pylint3
 apt install python3-pytest
 apt install pylint3
 
-The tests need a symlink to the nftfw package, this may not survive
-github.
+The tests need a symlink to the nftfw package.
 
-ln -s ../nftfw
+Step 1:
+Create files needed for comparison - only needed once - see below
+$ make init
 
-will do that.
+Step 2:
+Run tests
+$ make
 
-Then
-
-make
-
-will run the test suite and
-
-make lint
-
-will run pylint on all the sources, or for example
-
-make configsetup.lint
-
+You can use
+$ make lint
+to run pylint on all the sources, or for example
+$ make configsetup.lint
 will run pylint on configsetup.py
 
 
@@ -38,11 +33,14 @@ Tests are designed to be re-entrant, so should leave the 'sys'
 directory as they found it.
 
 Several tests compare program output with static data files living in
-'data', if the contents of 'sys' are changed, this can make tests break.
+'data', if the contents of 'sys' are changed, this can make tests
+break.
 
 Tests that use stored data will also create a new file in 'newdata'
 when they run. The relevant file can be copied to 'data' so that
-the next run will be using the correct comparison data.
+the next run will be using the correct comparison data. Alternatively,
+$ make init
+can be used to create the files.
 
 Some things cannot be tested - for example, the current nftables on
 the system are not touched.

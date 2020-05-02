@@ -125,6 +125,9 @@ def have_files(files, path):
         fpath = path / f
         if not fpath.exists():
             return False
+    fpath = path / 'nftfw_init.nft'
+    if not fpath.exists():
+        return False
     return True
 
 def remove_files(files, path):
@@ -134,6 +137,9 @@ def remove_files(files, path):
         fpath = path / f
         if fpath.exists():
             fpath.unlink()
+    fpath = path / 'nftfw_init.nft'
+    if fpath.exists():
+        fpath.unlink()
 
 def append_comment(path, file):
     """ Append a comment to a file to fake set only changes """

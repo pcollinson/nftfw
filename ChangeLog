@@ -2,6 +2,7 @@ v0.2.2  Added a set of pytest tests, which pulled out some omissions
 	in checking, rather than actual bugs. See README files in
 	the test directory. Added a Makefile to make linting the main
 	source simpler.
+	Tests needed a standalone bootstrap system, added to makefile
 	Changed the way that ftp-helper is implemented
 
 v0.2.1  Just when it looked fine, noticed an omission in the ipv6
