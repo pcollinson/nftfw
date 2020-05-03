@@ -1,3 +1,6 @@
+v0.2.3	Small change to the Installation document
+	Added extra tests to test_04
+
 v0.2.2  Added a set of pytest tests, which pulled out some omissions
 	in checking, rather than actual bugs. See README files in
 	the test directory. Added a Makefile to make linting the main

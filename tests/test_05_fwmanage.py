@@ -114,6 +114,33 @@ def test_step4(cf):
     # so we should now get a None
     result = fwmanage.step4(cf, buildpath, installpath, hashdict)
     assert result is None
+
+    # Do the same for incoming.nft
+    # Now make some changes to get a set install
+    # add a comment to the blacklist_sets.nft file in install.d
+    append_comment(installpath, 'incoming.nft')
+    result = fwmanage.step4(cf, buildpath, installpath, hashdict)
+    assert result == 'full'
+    assert have_files(files, installpath)
+
+    # but it will have re-written the file that was changed
+    # so we should now get a None
+    result = fwmanage.step4(cf, buildpath, installpath, hashdict)
+    assert result is None
+
+    # Do the same for outgoing.nft
+    # Now make some changes to get a set install
+    # add a comment to the blacklist_sets.nft file in install.d
+    append_comment(installpath, 'outgoing.nft')
+    result = fwmanage.step4(cf, buildpath, installpath, hashdict)
+    assert result == 'full'
+    assert have_files(files, installpath)
+
+    # but it will have re-written the file that was changed
+    # so we should now get a None
+    result = fwmanage.step4(cf, buildpath, installpath, hashdict)
+    assert result is None
+
     # tidy up
     remove_files(files, installpath)
     remove_files(files, buildpath)

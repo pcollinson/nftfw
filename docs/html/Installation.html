@@ -173,11 +173,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>and now you need to re-educate yourself to run:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
 <p>You are now ready to create firewall to suit your needs.</p>
-<h3 id="setting-cron-and-incron">Setting <em>cron</em> and <em>incron</em></h3>
-<p>Like Symbiosis/Sympl, <em>nftfw</em> uses <em>cron</em> to drive regular polls by the firewall loader, and blacklist and whitelist scanners. <em>nftfw</em> will rebuild its tables when triggered from <em>incron</em> monitoring the four control directories in <em>/usr/local/etc/nftfw</em>. You’ll find sample <em>cron</em> and <em>incron</em> control files in the <em>cronfiles</em> directory in the distribution. I recommend that you wait to install these files until you are satisfied that the firewall will work.</p>
-<p>If you run the Symbiosis/Sympl firewall and want to switch to <em>nftfw</em>, then all you need to do is to move the current <em>cron</em> and <em>incron</em> files to a safe place - and then install the replacements.</p>
 <h3 id="paying-attention-to-usrlocaletcnftfwconfig.ini">Paying attention to <em>/usr/local/etc/nftfw/config.ini</em></h3>
-<p>I suggest that you take a quick scan through <em>nftfw</em>’s <em>config.ini</em> file, and also scan the manual page for it.</p>
+<p>First, I suggest that you take a quick look through <em>nftfw</em>’s <em>config.ini</em> file, and also scan the manual page for it.</p>
 <p>Debian expects systems using <em>nftables</em> to keep a configuration file in <em>/etc/nfttables.conf</em>. The file sets up <em>nftables</em> when the system reboots, or when <em>systemctl</em> restarts the <em>nftables</em> service. <em>nftfw</em> will write this file after creating its rule set but depends on configuration in its <em>config.ini</em> file to set its location. As distributed, the value of <em>nftables_conf</em> in <em>config.ini</em> is relative to the installation root. This means you need to take different actions depending on where your <em>nftfw</em> is installed:</p>
 <ul>
 <li><p>For <em>nftfw</em> installed in <em>/usr/local</em>: The default setting will be <em>/usr/local/etc/nftables.conf</em>, which is the ‘wrong’ location, but is safe for now. You will eventually need to change the <em>nftables_conf</em> setting in <em>config.ini</em> to <em>/etc/nftables.conf</em>. Once you are happy with <em>nftfw</em>, you will then change the setting to its correct location in <em>/etc</em>.</p></li>
@@ -242,10 +239,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Tell <em>systemctl</em> to enable and start its <em>nftables</em> service.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb29-1" title="1">$ <span class="fu">sudo</span> systemctl enable nftables</a>
 <a class="sourceLine" id="cb29-2" title="2">$ <span class="fu">sudo</span> systemctl start nftables</a>
-<a class="sourceLine" id="cb29-3" title="3">$ <span class="fu">sudo</span> systemctl status nftables </a></code></pre></div>
+<a class="sourceLine" id="cb29-3" title="3">$ <span class="fu">sudo</span> systemctl status nftables</a></code></pre></div>
 <p>On a boot of a Symbiosis or Sympl system, the firewall starts at network up time and closes at network down time. Change into <em>/etc/network</em> and delete <em>if-up.d/{symbiosis|sympl}-firewall</em> and <em>if-down.d/{symbiosis|sympl}-firewall}</em>. The file is a symbolic link to the firewall script. This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the <em>nftables</em> settings are loaded before the Symbiosis/Sympl ones.</p>
+<h3 id="setting-cron-and-incron">Setting <em>cron</em> and <em>incron</em></h3>
+<p>Like Symbiosis/Sympl, <em>nftfw</em> uses <em>cron</em> to drive regular polls by the firewall loader, and blacklist and whitelist scanners. <em>nftfw</em> will rebuild its tables when triggered from <em>incron</em> monitoring the four control directories in <em>/usr/local/etc/nftfw</em>. You’ll find sample <em>cron</em> and <em>incron</em> control files in the <em>cronfiles</em> directory in the distribution. Hopefully, by now, you’ve moved the Symbiosis or Sympl versions to somewhere where they are not activ4.</p>
 <p>Look in <em>cronfiles</em> in the <em>nftfw</em> distribution. The files there have <em>/usr/local/</em> in them, if your system is installed from root, you’ll need to edit both files to point to the correct locations. Install <em>cron.d-nftfw</em> in <em>/etc/cron.d/nftfw</em>, and if you are using <em>incron</em>, install <em>incron-nftfw</em> in <em>/etc/incron.d/nftfw</em> (if not, remember to edit <em>config.ini</em> to tell <em>nftfw</em>).</p>
-<p>You are there.</p>
+<h2 id="you-are-there">You are there</h2>
 <p>Now look at: - <a href="Users_Guide.md">User’s Guide to nftfw</a> - <a href="How_do_I.md">How do I.. or a User’s Quick Guide</a></p>
 <h2 id="acknowledgement">Acknowledgement</h2>
 <p>All of this is made possible by shamelessly borrowing ideas from Patrick Cherry who created the Symbiosis hosting package for Bytemark of which the firewall system is part.</p>

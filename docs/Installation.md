@@ -43,7 +43,7 @@ Well, what you need to do depends on what's running in your system. Buster comes
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-if your version output looks like that, then you are OK and can just skip over what follows. 
+if your version output looks like that, then you are OK and can just skip over what follows.
 
 If the words in brackets says _legacy_ then you need to swap to the _nf_tables_ version. Here's what you do:
 
@@ -135,7 +135,7 @@ Successfully installed nftfw-<version>
 ```
 To uninstall, ```sudo pip3 uninstall nftfw```.
 
-_pip3_ installs four commands: _nftfw_, _nftfwls_, _nftfwedit_ and _nftfwadm_ in _/usr/local/bin_. Since these are system commands, they ought to be in _/usr/local/sbin_, but the Python installation system doesn't allow that. 
+_pip3_ installs four commands: _nftfw_, _nftfwls_, _nftfwedit_ and _nftfwadm_ in _/usr/local/bin_. Since these are system commands, they ought to be in _/usr/local/sbin_, but the Python installation system doesn't allow that.
 
 Take a moment to see if  the installation worked by asking _nftfw_ for help:
 
@@ -144,7 +144,7 @@ $ nftfw -h
 ...
 ```
 
-The next step is to install the basic control files in _/usr/local/etc/nftfw_, the working directories in _/usr/local/var/lib/nftfw_, and the manual pages in _/usr/local/share/man_. 
+The next step is to install the basic control files in _/usr/local/etc/nftfw_, the working directories in _/usr/local/var/lib/nftfw_, and the manual pages in _/usr/local/share/man_.
 
 The _Install.sh_ script will copy files from the distribution into their correct places. It asks several questions and permits you to control the installation phases. It's safe to run the script again, it will not replace the contents of any directory ending with _.d_, or the two control files in _/usr/local/etc/nftfw_.  The script uses the standard system _install_ program to do its work.
 
@@ -158,7 +158,7 @@ $ sudo sh Install.sh
 ```
 In _/usr/local/etc/nftfw_, you will find two files: _config.ini_ and _nftfw_init.nft_. _config.ini_ provides configuration information overriding coded settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. _nftfw_init.nft_ is the framework template file for the firewall. It's copied into the build system whenever a _nftfw_ creates a firewall. Also, you'll find the  _original_ directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.
 
-_install.sh_ also creates the necessary directories into _/usr/local/var/lib/nftfw_.  
+_install.sh_ also creates the necessary directories into _/usr/local/var/lib/nftfw_.
 
 The final stage of the installation is to copy manual pages into _/usr/local/share/man_.  There are six pages:
 
@@ -181,18 +181,11 @@ and now you need to re-educate yourself to run:
 ``` sh
 $ sudo nft list ruleset
 ```
-You are now ready to create  firewall to suit your needs. 
-
-### Setting _cron_ and _incron_
-
-Like Symbiosis/Sympl, _nftfw_ uses _cron_ to drive regular polls by the firewall loader, and blacklist and whitelist scanners. _nftfw_ will rebuild its tables when triggered from _incron_ monitoring the four control directories in _/usr/local/etc/nftfw_. You'll find sample _cron_ and _incron_ control files in the _cronfiles_ directory in the distribution. I recommend that you wait to install these files until you are satisfied that the firewall will work.
-
-If you run the Symbiosis/Sympl firewall and want to switch to _nftfw_, then all you need to do is to move the current _cron_ and _incron_ files to a safe place - and then install the replacements.
-
+You are now ready to create  firewall to suit your needs.
 
 ### Paying attention to _/usr/local/etc/nftfw/config.ini_
 
-I suggest that you take a quick scan through _nftfw_'s _config.ini_ file, and also scan the manual page for it.
+First, I suggest that you take a quick look through _nftfw_'s _config.ini_ file, and also scan the manual page for it.
 
 Debian expects systems using _nftables_ to keep a configuration file  in _/etc/nfttables.conf_. The file sets up _nftables_ when the system reboots, or when _systemctl_ restarts the _nftables_ service. _nftfw_ will write this file after creating its rule set but depends on configuration in its _config.ini_ file to set its location. As distributed, the value of _nftables_conf_ in _config.ini_ is relative to the installation root. This means you need to take different actions depending on where your _nftfw_ is installed:
 
@@ -310,26 +303,30 @@ To tidy up, check that the setting of _nftables_conf_ in _nftfw_'s config file _
 #  Usually /etc/nftables.conf
 nftables_conf = /etc/nftables.conf
 ```
-and run 
+and run
 
 ``` sh
 $ sudo nftfw -f load
 ```
 again to make sure that the new rules are written into _/etc/nftables.conf_.
 
-Tell _systemctl_ to enable and start its _nftables_ service. 
+Tell _systemctl_ to enable and start its _nftables_ service.
 
 ``` sh
 $ sudo systemctl enable nftables
 $ sudo systemctl start nftables
-$ sudo systemctl status nftables 
+$ sudo systemctl status nftables
 ```
 
 On a boot of a Symbiosis or Sympl system, the firewall starts at network up time and closes at network down time. Change into _/etc/network_ and delete _if-up.d/{symbiosis|sympl}-firewall_ and _if-down.d/{symbiosis|sympl}-firewall}_. The file is a symbolic link to the firewall script. This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the _nftables_ settings  are loaded before the Symbiosis/Sympl ones.
 
+### Setting _cron_ and _incron_
+
+Like Symbiosis/Sympl, _nftfw_ uses _cron_ to drive regular polls by the firewall loader, and blacklist and whitelist scanners. _nftfw_ will rebuild its tables when triggered from _incron_ monitoring the four control directories in _/usr/local/etc/nftfw_. You'll find sample _cron_ and _incron_ control files in the _cronfiles_ directory in the distribution. Hopefully, by now, you've moved the Symbiosis or Sympl versions to somewhere where they are  not activ4.
+
 Look in _cronfiles_ in the _nftfw_ distribution. The files there have _/usr/local/_ in them, if your system is installed from root, you'll need to edit both files to point to the correct locations. Install _cron.d-nftfw_ in _/etc/cron.d/nftfw_, and if you are using _incron_, install _incron-nftfw_ in _/etc/incron.d/nftfw_ (if not, remember to edit _config.ini_ to tell _nftfw_).
 
-You are there.
+## You are there
 
 Now look at:
 - [User's Guide to nftfw](Users_Guide.md)
