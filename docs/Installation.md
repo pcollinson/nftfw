@@ -57,9 +57,9 @@ $ sudo ip6tables-save > ip6saved
 Now change iptables and ip6tables to use the _nftables_ versions:
 
 ``` sh
-$ sudo update_alternatives --config iptables
+$ sudo update-alternatives --config iptables
 .....
-$ sudo update_alternatives --config ip6tables
+$ sudo update-alternatives --config ip6tables
 .....
 ```
 Each gives you a menu of options: select  the _nftables_ compatible version. I used option 0 - auto.  Check your _iptables_ command is now at the correct version using _-V_. Finally, reload the _iptables_ data you saved earlier.

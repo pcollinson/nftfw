@@ -6,7 +6,6 @@ https://dev.maxmind.com/geoip/geoip2/geolite2/
 
 """
 import os.path
-from geoip2.database import Reader
 
 class GeoIPCountry:
     """Lookup ip addresses in geoip2 """
@@ -23,6 +22,7 @@ class GeoIPCountry:
         See if the country database file can be found
         """
         try:
+            from geoip2.database import Reader
             if os.path.exists(self.country):
                 self.countryreader = Reader(self.country)
         except ImportError:

@@ -7,7 +7,7 @@ incron-nftfw to reflect the locations on your system.
 
 2)    Install cron-nftfw in /etc/cron.d/nftfw as root
       Make sure that the file is owned by root and
-      read-only to root.      
+      read-only to root.
       sudo cp cron-nftfw /etc/cron.d/nftfw
       sudo chmod 644 /etc/cron.d/nftfw
 
@@ -19,6 +19,6 @@ incron-nftfw to reflect the locations on your system.
 
       b)      Copy into place
               sudo cp incron-nftfw /etc/incron.d/nftfw
-      	      sudo chmod 644 /etc.incron.d/nftfw
+      	      sudo chmod 644 /etc/incron.d/nftfw
 
 See the entry in the cron-nftfw about incron.

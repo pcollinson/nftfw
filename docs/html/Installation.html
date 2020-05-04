@@ -109,9 +109,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> iptables-save <span class="op">&gt;</span> ipsaved</a>
 <a class="sourceLine" id="cb6-2" title="2">$ <span class="fu">sudo</span> ip6tables-save <span class="op">&gt;</span> ip6saved</a></code></pre></div>
 <p>Now change iptables and ip6tables to use the <em>nftables</em> versions:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> update_alternatives --config iptables</a>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> update-alternatives --config iptables</a>
 <a class="sourceLine" id="cb7-2" title="2"><span class="ex">.....</span></a>
-<a class="sourceLine" id="cb7-3" title="3">$ <span class="fu">sudo</span> update_alternatives --config ip6tables</a>
+<a class="sourceLine" id="cb7-3" title="3">$ <span class="fu">sudo</span> update-alternatives --config ip6tables</a>
 <a class="sourceLine" id="cb7-4" title="4"><span class="ex">.....</span></a></code></pre></div>
 <p>Each gives you a menu of options: select the <em>nftables</em> compatible version. I used option 0 - auto. Check your <em>iptables</em> command is now at the correct version using <em>-V</em>. Finally, reload the <em>iptables</em> data you saved earlier.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="fu">sudo</span> iptables-restore <span class="op">&lt;</span> ipsaved</a>
