@@ -9,7 +9,6 @@ This document assumes  that you are installing on Debian Buster.
 
 ``` sh
 $ sudo apt install nftables
-
 ```
 The standard version of _nftables_ at the time of writing is: 0.9.0-2. Buster backports has a more recent version - 0.9.3-2~bpo10+1, and it's a good idea to upgrade to that. Look in _/etc/apt/sources.list_, and if necessary append:
 
@@ -23,9 +22,7 @@ then
 ``` sh
 $ sudo apt update
 ...
-...
 $ sudo apt upgrade
-...
 ...
 $ sudo apt -t buster-backports install nftables
 ```
@@ -43,7 +40,7 @@ Well, what you need to do depends on what's running in your system. Buster comes
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-if your version output looks like that, then you are OK and can just skip over what follows.
+if your version output looks like that, then you are OK and can just [skip over](#incron) what follows.
 
 If the words in brackets says _legacy_ then you need to swap to the _nf_tables_ version. Here's what you do:
 
@@ -58,9 +55,7 @@ Now change iptables and ip6tables to use the _nftables_ versions:
 
 ``` sh
 $ sudo update-alternatives --config iptables
-.....
 $ sudo update-alternatives --config ip6tables
-.....
 ```
 Each gives you a menu of options: select  the _nftables_ compatible version. I used option 0 - auto.  Check your _iptables_ command is now at the correct version using _-V_. Finally, reload the _iptables_ data you saved earlier.
 
@@ -109,19 +104,13 @@ The _nftfwls_ command uses Python's _prettytable_, which may not be installed:
  $ sudo apt install python3-prettytable
 ```
 
-### Geolocation
-
-The listing program _nftfwls_ will print out the country that originated packets in the firewall using the _geoip2_ country database available from MaxMind. MaxMind don't charge but want you to create an account with them to access their files. See the [Maxmind web site](https://dev.maxmind.com/geoip/geoip2/geolite2/).
-
-Install the _python3-geoip2_ package to access the database from Python3. You'll also need the _geoipupdate_ package  to download and manage the databases. _geoipupdate_ is 'contributed', so you may need to add 'contrib' after the word 'main' in your _/etc/apt/sources.list_.  This will install _/etc/GeoIP.conf_ and you need to add your licence information to the file.
-
-The _nftfw_ package is using the Country database which will be installed in _/var/lib/GeoIP/GeoLite2-Country.mmdb_. If this file is not available, the program will just run without it.
-
 ## _nftfw_ Installation
 
 You now need the _nftfw_  distribution. I put mine into _/usr/local/src_. Change to the directory and unpack the file, or better use
 
 ``` sh
+$ sudo apt install git
+# then cd to one level above where you want to install and
 $ git clone https://github.com/pcollinson/nftfw
 ```
 which will create an _nftfw_ directory for you.
@@ -185,19 +174,19 @@ You are now ready to create  firewall to suit your needs.
 
 ### Paying attention to _/usr/local/etc/nftfw/config.ini_
 
-First, I suggest that you take a quick look through _nftfw_'s _config.ini_ file, and also scan the manual page for it.
+Find the _Owner_ section in the file and change settings for owner and group to fit the user you selected when installing the _etc/nftfw_ files.
 
-Debian expects systems using _nftables_ to keep a configuration file  in _/etc/nfttables.conf_. The file sets up _nftables_ when the system reboots, or when _systemctl_ restarts the _nftables_ service. _nftfw_ will write this file after creating its rule set but depends on configuration in its _config.ini_ file to set its location. As distributed, the value of _nftables_conf_ in _config.ini_ is relative to the installation root. This means you need to take different actions depending on where your _nftfw_ is installed:
+If you are running _nftables_, you may need to alter the _nftables\_conf_ setting in _config.ini_ and please read on.  If not, [skip to next section](#logging).
+
+Debian expects systems using _nftables_ to keep a configuration file in _/etc/nfttables.conf_. The file sets up _nftables_ when the system reboots, or when _systemctl_ restarts the _nftables_ service. _nftfw_ will write this file after creating its rule set but depends on configuration in its _config.ini_ file to set its location. As distributed, the value of _nftables_conf_ in _config.ini_ is relative to the installation root. This means you need to take different actions depending on where your _nftfw_ is installed:
 
 - For _nftfw_ installed  in _/usr/local_:
-  The default setting will be _/usr/local/etc/nftables.conf_, which is the 'wrong' location, but is safe for now.
+  The default setting of _nftables\_conf_ will be _/usr/local/etc/nftables.conf_, which is the 'wrong' location, but is safe for now.
    You will eventually need to change the _nftables_conf_  setting in _config.ini_ to _/etc/nftables.conf_. Once you are happy with _nftfw_, you will then change the setting to its correct location in _/etc_.
 
 - For _nftfw_ installed in _/_:
-  The default setting will be _/etc/nftables.conf_, which is the 'right' location, but maybe dangerous now.
+  The default setting of _nftables\_conf_ will be _/etc/nftables.conf_, which is the 'right' location, but maybe dangerous now.
   You probably should change the default setting in _nftfw/config.ini_ to prevent it writing or installing _/etc/nftables.conf_ until you are happy. Change the setting to place the file in perhaps _/etc/nftfw/nftables.conf.new_ for now, and change it back later.
-
-Under the Locations settings, you'll find settings for owner and group, change these to fit the user you selected when installing the _etc/nftfw_ files.
 
 ### Logging
 
@@ -255,7 +244,7 @@ Assuming the tests show that the installation is OK,  then you will have a worki
 
 ### Installing
 
-If you are on a Symbiosis or Sympl system, I recommend at this point that you move _/etc/cron.d/{symbiosis|sympl}-firewall_ to a safe place. You don't want this firing when you are doing the next sequence of commands, so remove it from _cron_. On a Symbiosis system, you also need to move _/etc/incron.d/symbiosis-firewall_ to a safe place, you don't want this firing if files in _/etc/symbiosis/firewall.d_ change.
+If you are on a Symbiosis or Sympl system, I recommend at this point that you move _/etc/cron.d/{symbiosis|sympl}-firewall_ to a safe place. You don't want this firing when you are doing the next sequence of commands, so remove it from _cron_. On a Symbiosis system, you also need to move _/etc/incron.d/symbiosis-firewall_ to a safe place, you don't want this starting Symbiosis if files in _/etc/symbiosis/firewall.d_ change.
 
 If you have a running _nftables_ or _iptables_ installation, now is the time to run:
 
@@ -326,9 +315,16 @@ Like Symbiosis/Sympl, _nftfw_ uses _cron_ to drive regular polls by the firewall
 
 Look in _cronfiles_ in the _nftfw_ distribution. The files there have _/usr/local/_ in them, if your system is installed from root, you'll need to edit both files to point to the correct locations. Install _cron.d-nftfw_ in _/etc/cron.d/nftfw_, and if you are using _incron_, install _incron-nftfw_ in _/etc/incron.d/nftfw_ (if not, remember to edit _config.ini_ to tell _nftfw_).
 
-## You are there
+### Geolocation
+
+The listing program _nftfwls_ will print out the country that originated packets in the firewall using the _geoip2_ country database available from MaxMind. MaxMind don't charge but want you to create an account with them to access their files.
+
+See  [Installing GeoLocation](Installing-GeoLocation.md).
+
+## You Are There
 
 Now look at:
+- [Installing GeoLocation](Installing-GeoLocation.md)
 - [User's Guide to nftfw](Users_Guide.md)
 - [How do I.. or a User's Quick Guide](How_do_I.md)
 

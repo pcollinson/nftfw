@@ -1,3 +1,10 @@
+v0.3.1  Put back the code that allows nftfwls to run
+	without the python geoip2 package.
+	Typo fixes in documents suggested by hairydog
+	Changes to the Installation document
+	New document 'Installing GeoLocation'
+	New document 'Updating nftfw'
+
 v0.2.3	Small change to the Installation document
 	Added extra tests to test_04
 

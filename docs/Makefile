@@ -1,7 +1,7 @@
 # Makefile
 # Take ile source in .md and make html files
 # requires pandoc to run
-HTML = html/How_do_I.html  html/Installation.html  html/Users_Guide.html
+HTML = html/How_do_I.html  html/Installation.html  html/Users_Guide.html html/Installing-GeoLocation.html html/Updating-nftfw.html
 
 .PHONY: make makeclean
 
@@ -12,7 +12,7 @@ html/%.html : %.md
 
 make:
 	$(MAKE) -C man
- 
+
 clean: makeclean
 	rm $(HTML)
 

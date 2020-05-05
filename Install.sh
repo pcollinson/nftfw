@@ -36,17 +36,16 @@ getuser() {
     local _outvar=$1
     local newuser
     echo
-    echo "The files will be installed in ${DESTROOT}/etc/nftfw"
-    echo "owned by ${INSTALLAS}."
+    echo "The files will be installed in ${DESTROOT}/etc/nftfw owned by ${INSTALLAS}."
     echo "It's probably better to install this as a general user"
     echo "so they can easily alter the files. For example:"
-    echo "for Symbiosis use admin, "
-    echo "for Sympl use sympl."
+    echo "- for Symbiosis use: admin"
+    echo "- for Sympl use: sympl"
     echo "The group of the file will be set the same name as"
     echo "the user, if it exists."
     echo
-    echo "Type name of the user you want to use and type return"
-    echo "return leaves it as ${INSTALLAS}"
+    echo "Type name of the user you want to use and type return."
+    echo "Just type return to leave it as ${INSTALLAS}"
     echo
     echon "Enter user to replace ${INSTALLAS}? "
     read newuser
@@ -63,8 +62,7 @@ getuser() {
 echo "nftfw installation - ensure you are in the directory"
 echo "that contains Install.sh"
 echo "This is designed to run with dash - which is probably"
-echo "the default for sh on your system, it's been tested with"
-echo "bash - which is the shell you are probably using now"
+echo "the default for sh on your system, it's been tested with bash"
 echo
 echo "Answer questions with"
 echo "y - for yes"
@@ -82,7 +80,7 @@ INSTALLAS=root
 export INSTALLAS
 
 iam=$(whoami)
-if [ ${iam} != 'root' ]; then 
+if [ ${iam} != 'root' ]; then
     echo 'This script needs to be run by root'
     exit 1
 fi
@@ -92,9 +90,9 @@ if [ ! -d ${ETCSRC} ]; then
     echo 'Cannot find the source for installation'
     echo 'Run this command in the nftfw source at the top level'
     exit 1
-fi    
+fi
 echo
- echo '***************************************************'
+echo '***************************************************'
 echo 'Checking on installed programs and python modules'
 echo
 # Do we have install
@@ -117,7 +115,7 @@ fi
 DESTROOT=/usr/local
 if [ $DESTROOT = '/' ]; then
    DESTROOT=''
-fi   
+fi
 echo
 echo '***************************************************'
 echo 'Setting things up'
@@ -140,12 +138,12 @@ echo "Do you want see the directories and files that are installed, or "
 echo "do you prefer for it to be quieter?"
 if yesno "See the files?" ; then
     :
-else    
+else
     INSTALL="/usr/bin/install -v"
 fi
 echo
 echo '***************************************************'
-echo 'File installation in ${DESTROOT}/etc/nftfw'
+echo "File installation in ${DESTROOT}/etc/nftfw"
 echo
 # Basic directory in /etc
 DOINSTALL=Y
@@ -157,9 +155,9 @@ if [ -e ${DESTROOT}/etc/nftfw ]; then
     if yesno "Install?"; then
 	DOINSTALL=N
     fi
-fi    
+fi
 if [ ${DOINSTALL} = 'Y' ]; then
-    
+
     GROUPNAME=''
     # get the user to install as
     getuser INSTALLAS
@@ -178,7 +176,7 @@ if [ ${DOINSTALL} = 'Y' ]; then
     fi
     # make base directory
     ${INSTALL} ${SETUSER} -d ${DESTROOT}/etc/nftfw
-    ( 
+    (
 	cd ${ETCSRC}
 	DEST=${DESTROOT}/etc/nftfw
 	DIRS="blacklist.d incoming.d outgoing.d patterns.d rule.d whitelist.d"
@@ -193,7 +191,7 @@ if [ ${DOINSTALL} = 'Y' ]; then
 		echo "${DEST}/$name exists - not replaced"
 	    fi
 	done
-	
+
 	# finally two files
 	SRC="config.ini nftfw_init.nft"
 	for name in ${SRC}; do
@@ -203,7 +201,7 @@ if [ ${DOINSTALL} = 'Y' ]; then
 		echo "${DEST}/$name exists - not replaced"
 	    fi
 	done
-	
+
 	# setup the original directory
 	${INSTALL} ${SETUSER} -d $DEST/original
 	( cd original
@@ -232,15 +230,15 @@ if [ -e ${VARLIB} ]; then
 	if [ ! -e ${VARLIB}/$name ]; then
 	    VARINSTALL=Y
 	fi
-    done    
+    done
 else
     VARINSTALL=Y
-fi    
+fi
 if [ ${VARINSTALL} = 'Y' ]; then
 	echo "Installing in ${DESTROOT}/var/lib/nftfw"
 	# Now setup var/lib/nftfw
 	${INSTALL} -d ${VARLIB}
-	
+
 	DIRS="build.d install.d test.d"
 	for name in ${DIRS}; do
 	    if [ ! -e ${VARLIB}/$name ]; then
@@ -258,7 +256,7 @@ echo
 
 if yesno "Install Manual pages in ${DESTROOT}/usr/man?" ; then
     :
-else    
+else
  	echo "Installing in ${DESTROOT}/share/man"
 	# And the manual pages
 	( cd docs/man/man

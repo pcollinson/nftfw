@@ -55,7 +55,9 @@ Files in the incoming directory provides information to allow or deny inbound co
 
 See documents in the _docs_ directory:
 
-- [Installing _nftfw](docs/Installation.md)
+- [Installing _nftfw_](docs/Installation.md)
+- [Installing GeoLocation](docs/Installing-GeoLocation.md)
+- [Updating _nftfw_](docs/Updating-nftfw.md)
 - [How do I.. or Quick User's Guide](docs/How_do_I.md)
 - [User's Guide](docs/Users_Guide.md)
 - [Manual Page index](docs/man/index.md)
