@@ -43,33 +43,33 @@ class SqDb:
         # Use the row factory for lookups
         self.conn.row_factory = sqlite3.Row
 
-    def lookup(self, table, what='*', key='', predicate='=', val='', orderby=''):
-        """Lookup a value in the table
+
+    def lookup(self, table, what='*', where=None, vals=None, orderby=''):
+        """Lookup a value in the table with a WHERE condition
 
         table:str table name
         all remaining args are optional
         what:str  what is being looked up
-        key:str   name of key to use
-        predicate: str test to use
-        val:str   value of key to be matched
+        where:str where phrase with the condition
+                  ? where values need replacing
+        vals:tuple of values matching the ?
         orderby:  order by value
         return list of dicts indexed by keyname
         """
 
-        # pylint: disable=too-many-arguments,too-many-locals
-        # sadly Mr.Lint this function needs all that
+        # pylint: disable=too-many-arguments
 
         cur = self.conn.cursor()
         ob = ''
         if orderby != '':
             ob = 'ORDER BY '+orderby
         try:
-            if val == '':
+            if where is None:
                 statement = f'SELECT {what} FROM {table} {ob}'
                 cur.execute(statement)
             else:
-                statement = f'SELECT {what} FROM {table} WHERE {key} {predicate} ? {ob}'
-                cur.execute(statement, (val,))
+                statement = f'SELECT {what} FROM {table} WHERE {where} {ob}'
+                cur.execute(statement, vals)
         except sqlite3.Error as e:
             log.error('Lookup failed in %s: %s', table, e)
             return []
@@ -108,8 +108,6 @@ class SqDb:
         allcols = ",".join(cols)
         sqlcmd = f'{statement} INTO {table} ({allkeys}) VALUES ({allcols})'
         return (sqlcmd, tuple(values))
-
-    # Main entry points
 
     def insert(self, table, argdict, ignore=None, statement='INSERT'):
         """Execute and commit insert statement in a named table

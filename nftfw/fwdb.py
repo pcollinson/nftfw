@@ -91,7 +91,7 @@ class FwDb(SqDb):
         []
         """
 
-        return self.lookup('blacklist', key='ip', val=ip)
+        return self.lookup('blacklist', where='ip = ?', vals=(ip,))
 
     def lookup_ips_for_deletion(self, before):
         """Lookup the ips suitable for deletion before timestamp
@@ -111,11 +111,8 @@ class FwDb(SqDb):
         or [] if none
         """
 
-        return self.lookup('blacklist',
-                           what='ip',
-                           key='last',
-                           predicate='<',
-                           val=before)
+        return self.lookup('blacklist', what='ip',
+                           where='last < ?', vals=(before,))
 
     def insert_ip(self, argdict):
         """Insert args into the table

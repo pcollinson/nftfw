@@ -146,7 +146,7 @@ If the command says nothing, then possibly the scanner hasn't detected enough ev
 
 ## How do I: Find the country sending me blacklisted packets?
 
-If you install the geoip2 country database on your system, and its python interface, then _nftfwls_ will show the country of origin when it displays its output. Access to this database is free, but MaxMind who produce the databases ask you to [sign up](https://dev.maxmind.com/geoip/geoip2/geolite2/) to get an account.
+If you install the geoip2 country database on your system, and its python interface, then _nftfwls_ will show the country of origin when it displays its output. Access to the geoip2 databases is free, but MaxMind who produce it ask you to sign up. See the document [Installing Geolocation](Installing-GeoLocation.md) for installation and signup information.
 
 The _nftfwedit_ command also allows you to ask questions about any IP address, including the country of origin and whether the IP address is in selected DNS blacklist sites.
 
@@ -202,4 +202,3 @@ The [User's Guide to nftfw](Users_Guide.md) documents the system and there are a
 ## Acknowledgement
 
 All of this is made possible by shamelessly borrowing ideas from Patrick Cherry who created the Symbiosis hosting package for Bytemark of which the firewall system is part.
-

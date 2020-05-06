@@ -1,8 +1,12 @@
+v0.3.3  Change internal database interface slightly
+	Add reset of missing files in blacklist.d, this has never happened
+	but might.
+	Update documentation
+
 v0.3.2 	New document 'Installation Instructions'
-	Augment logic in fwmanage. When adding a new
-	IP into an set that creates a range, the
-	partial load fails. Now test the partial
-	load and do a full install when needed
+	Augment logic in fwmanage. When adding a new IP into an set that
+	creates a range, the partial load fails. Now test the partial load
+	and do a full install when needed
 
 v0.3.1  Put back the code that allows nftfwls to run
 	without the python geoip2 package.

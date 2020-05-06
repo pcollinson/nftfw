@@ -127,6 +127,21 @@ class Config:
     clean_before:int 90     Database clean
                             remove ip from the database where there has been
                             no error posted for more than these number of days
+
+    sync_check:int 50       'nftfw blacklist' will check whether the IP addresses
+                            in the database that should be active are actually present
+                            in the blacklist directory _blacklist.d_. 'Should be active'
+                            means that the addresses have not been automatically expired.
+                            'nftfw' is largely event driven, but events get missed. So
+                            on the basis that if stuff can happen, it will, this code
+                            will recover the correct state of the blacklist directory.
+                            It seems overkill to call this every time the blacklist scanner
+                            runs, so it is executed when number of runs of the scanner
+                            is greater than the value of this variable. The default is
+                            to run the blacklist scanner 96 times a day, so 50 seems
+                            are reasonable way to run the recovery code once a day. Set
+                            this to zero  to turn this feature off.
+
     [Nftfwls]
     Allow local selection for date formats in nftfwls
     Seconds are not that relevant
@@ -297,6 +312,21 @@ expire_after = 10
 # no error posted for more than these number of days
 clean_before = 90
 
+# 'nftfw blacklist' will check whether the IP addresses
+# in the database that should be active are actually present
+# in the blacklist directory _blacklist.d_. 'Should be active'
+# means that the addresses have not been automatically expired.
+# 'nftfw' is largely event driven, but events get missed. So
+# on the basis that if stuff can happen, it will, this code
+# will recover the correct state of the blacklist directory.
+# It seems overkill to call this every time the blacklist scanner
+# runs, so it is executed when number of runs of the scanner
+# is greater than the value of this variable. The default is
+# to run the blacklist scanner 96 times a day, so 50 seems
+# are reasonable way to run the recovery code once a day. Set
+# this to zero  to turn this feature off.
+sync_check = 50
+
 [Nftfwls]
 # Allow local selection for date formats in nftfwls
 # and nftfwedit print option
@@ -349,7 +379,8 @@ using_incron = Yes
     var_file = {'firewall' : 'firewall.db',
                 'filepos'  : 'filepos.db',
                 'backup'   : 'nftables.backup',
-                'lastutmp' : 'whitelist_scan'}
+                'lastutmp' : 'whitelist_scan',
+                'missingsync' : 'blacklist_missing_check'}
 
     #   Values obtained from nftfw command line
     #

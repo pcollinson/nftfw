@@ -27,81 +27,69 @@
 <p>There are several sections in the file.</p>
 <p><strong>[Locations]</strong></p>
 <p>The locations section defines the paths to files and directories used by the system. The program looks in <em>/etc</em> and then <em>/usr/local/etc</em> for the <em>nftfw</em> directory determining the ‘root’ key and that forms the basis for all paths.</p>
-<p><em>sysetc</em>, <em>sysvar</em><br />
-These two variables contain the control and working files for the system:</p>
+<p><em>sysetc</em>, <em>sysvar</em> These two variables contain the control and working files for the system:</p>
 <pre><code>  sysetc = ${root}/etc/nftfw
   sysvar = ${root}/var/lib/nftfw</code></pre>
-<p><em>nftables_conf</em><br />
-<strong>nftfw</strong> needs to know where the system stores the main <em>nftables.conf</em> file. If installing a new system into root (/) you may wish to change this value to prevent <strong>nftfw</strong> from overwriting an extant file. Conversely, if installing a new system into <em>/usr/local/etc</em>, you will need to change this value when things are working to make sure that <strong>nftfw</strong> writes its settings in the correct place.</p>
+<p><em>nftables_conf</em> <strong>nftfw</strong> needs to know where the system stores the main <em>nftables.conf</em> file. If installing a new system into root (/) you may wish to change this value to prevent <strong>nftfw</strong> from overwriting an extant file. Conversely, if installing a new system into <em>/usr/local/etc</em>, you will need to change this value when things are working to make sure that <strong>nftfw</strong> writes its settings in the correct place.</p>
 <pre><code>  nftables_conf = $(root}/etc/nftables.conf</code></pre>
-<p><em>nftfw_init</em><br />
-The location for the initial nft setup file containing the framework used by the firewall.</p>
+<p><em>nftfw_init</em> The location for the initial nft setup file containing the framework used by the firewall.</p>
 <pre><code>  nftfw_init = ${sysetc}/nftfw_init.nft</code></pre>
-<p><em>nftfw_base</em><br />
-<em>nftfw</em> expects to find the five working directories, <em>incoming.d</em>, <em>outgoing.d</em>, <em>blacklist.d</em>, <em>whitelist.d</em> and <em>patterns.d</em> under this directory. It you want to run the system from the Symbiosis control directory, then the <em>nftfw_base</em> option needs to be changed from the default to <em>/etc/symbiosis/firewall</em>. <em>Nftfw</em> expects to find its <em>rule.d</em> directory in its own <em>sysetc</em> directory. Symbiosis files in <em>firewall/local.d</em> are not supported by this system. To provide local changes, edit <em>/etc/nftfw_init.nft</em>.</p>
+<p><em>nftfw_base</em> <em>nftfw</em> expects to find the five working directories, <em>incoming.d</em>, <em>outgoing.d</em>, <em>blacklist.d</em>, <em>whitelist.d</em> and <em>patterns.d</em> under this directory. It you want to run the system from the Symbiosis control directory, then the <em>nftfw_base</em> option needs to be changed from the default to <em>/etc/symbiosis/firewall</em>. <em>Nftfw</em> expects to find its <em>rule.d</em> directory in its own <em>sysetc</em> directory. Symbiosis files in <em>firewall/local.d</em> are not supported by this system. To provide local changes, edit <em>/etc/nftfw_init.nft</em>.</p>
 <pre><code>  nftfw_base = ${sysetc}</code></pre>
 <p><strong>[Owner]</strong></p>
 <p><em>owner</em>, <em>group</em> The <em>owner</em> variable needs to be set to the username of the owner of the files in <em>${sysetc}/nftfw</em>. The intention is to allow a user to have easy non-root access to control the firewall. If the <em>group</em> variable is empty, the group will be set to the main group of the owner, but can be set to another group if this assists. The blacklist and whitelist scanners will make files owned by the user in their control directories. The default is to use the root user.</p>
-<pre><code>   owner=root 
+<pre><code>   owner=root
    group</code></pre>
 <p><strong>[Rules]</strong></p>
 <p>This section provides tailoring of the default rules used in the four processing sections of the program when rules are not explicitly given.</p>
-<pre><code>  incoming = accept  
-  outgoing = reject  
-  whitelist = accept  
+<pre><code>  incoming = accept
+  outgoing = reject
+  whitelist = accept
   blacklist = reject</code></pre>
 <p>The key on the left is a program section name and the value is the name of a rule. A possible choice for ‘reject’ is the ‘drop’ rule which simply throws inbound packets away. The ‘reject’ rule jumps to a table in the initialisation script that actively rejects the packet.</p>
 <p><strong>[Logging]</strong></p>
-<p><em>logfmt</em><br />
-Set the format of log statements (see the Python <em>logging</em> documentation for possible formats)</p>
+<p><em>logfmt</em> Set the format of log statements (see the Python <em>logging</em> documentation for possible formats)</p>
 <pre><code>  logfmt = nftfw[%(process)d]: %(message)s</code></pre>
-<p><em>loglevel</em><br />
-Sets the level are we logging at, this value needs to be a level name not a value. Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG. <strong>nftfw</strong> uses the <strong>-v</strong> flag to the set this value to INFO.</p>
+<p><em>loglevel</em> Sets the level are we logging at, this value needs to be a level name not a value. Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG. <strong>nftfw</strong> uses the <strong>-v</strong> flag to the set this value to INFO.</p>
 <pre><code>  loglevel = ERROR</code></pre>
-<p><em>logfacility</em><br />
-The logging facility are we using, it needs to be a facility name not a value.</p>
+<p><em>logfacility</em> The logging facility are we using, it needs to be a facility name not a value.</p>
 <pre><code>  logfacility = daemon</code></pre>
-<p><em>logprint</em><br />
-Control printing of logged informaion. Set to False to inhibit log printing at the console. This value is initially set to False when the program is not talking to a terminal. <strong>nftfw</strong> uses the <strong>-q</strong> flag to the set this value to False and the option will suppress printing to the terminal.</p>
+<p><em>logprint</em> Control printing of logged informaion. Set to False to inhibit log printing at the console. This value is initially set to False when the program is not talking to a terminal. <strong>nftfw</strong> uses the <strong>-q</strong> flag to the set this value to False and the option will suppress printing to the terminal.</p>
 <pre><code>  logprint = True</code></pre>
-<p><em>logsyslog</em><br />
-Set to False to inhibit syslog use.</p>
+<p><em>logsyslog</em> Set to False to inhibit syslog use.</p>
 <pre><code>  logsyslog = True</code></pre>
 <p><strong>[Nft]</strong></p>
 <p>This section affects the nftables statements generated by the rules.</p>
 <p>Do we want counters on the statements?</p>
-<pre><code>  incoming_counter = True  
-  outgoing_counter = True  
-  blacklist_counter = True  
+<pre><code>  incoming_counter = True
+  outgoing_counter = True
+  blacklist_counter = True
   whitelist_counter = True</code></pre>
 <p>Do we want nftables logging? By adding a different prefix for each of the tables, it’s possible to scan the syslog for events and get feedback from the firewall. To stop logging, just use the name.</p>
-<pre><code>  incoming_logging  
-  outgoing_logging  
-  blacklist_logging = Blacklist  
-  whitelist_logging  </code></pre>
+<pre><code>  incoming_logging
+  outgoing_logging
+  blacklist_logging = Blacklist
+  whitelist_logging</code></pre>
 <p><strong>[Whitelist]</strong></p>
-<p><em>wtmp_file</em><br />
-The <strong>whitelist</strong> command scans the wtmp file, and this variable is normally empty to use the system default. Set <em>wtmp_file=utmp</em> to use the system utmp file, otherwise set a filename in the variable.</p>
+<p><em>wtmp_file</em> The <strong>whitelist</strong> command scans the wtmp file, and this variable is normally empty to use the system default. Set <em>wtmp_file=utmp</em> to use the system utmp file, otherwise set a filename in the variable.</p>
 <pre><code>  wtmp_file</code></pre>
 <p><em>whitelist_expiry</em> Whitelist entries in _/etc/nftfw/whitelist.d`` are automatically expired by the number of days in this variable. <strong>Nftfw</strong> computes the delay as the difference between ‘now’ and the time on the file.</p>
 <pre><code>  whitelist_expiry = 10</code></pre>
 <p><strong>[Blacklist]</strong></p>
 <p>Constants to manage blacklisting depend on the number of matches found in log files for the specific IP address - the matchcount. The nftfwls(1) program shows the currently active blacklist and all the information associated with each IP.</p>
-<p><em>block_after</em><br />
-When the matchcount goes over this level, <strong>nftfw</strong> blocks the ip using the ports in the rule (Symbiosis used 2).</p>
-<pre><code>  block_after = 10 </code></pre>
-<p><em>block_all_after</em><br />
-When the matchcount goes over this level, <strong>nftfw</strong> blocks the ip using all ports.</p>
-<pre><code>  block_all_after = 100 </code></pre>
-<p><em>expire_after</em><br />
-<strong>nftfw</strong> removes blocked IPs from the <em>blacklist.d</em> directory after the number of days in this value have passed since the last incident. Bad guys keep coming back, and sometimes re-appear several months after expiry. It’s useful to have feedback from the firewall to keep them in play while they batter at the firewall door. The system allows for this, see nftfw_files(5) for information on patterns that support feedback.</p>
+<p><em>block_after</em> When the matchcount goes over this level, <strong>nftfw</strong> blocks the ip using the ports in the rule (Symbiosis used 2).</p>
+<pre><code>  block_after = 10</code></pre>
+<p><em>block_all_after</em> When the matchcount goes over this level, <strong>nftfw</strong> blocks the ip using all ports.</p>
+<pre><code>  block_all_after = 100</code></pre>
+<p><em>expire_after</em> <strong>nftfw</strong> removes blocked IPs from the <em>blacklist.d</em> directory after the number of days in this value have passed since the last incident. Bad guys keep coming back, and sometimes re-appear several months after expiry. It’s useful to have feedback from the firewall to keep them in play while they batter at the firewall door. The system allows for this, see nftfw_files(5) for information on patterns that support feedback.</p>
 <pre><code>  expire_after = 10</code></pre>
 <p>Symbiosis used 2 for this value.</p>
 <p><em>clean_before</em> <strong>nftfw blacklist</strong> will remove ip from the database where there has been no error posted for more than these number of day, the intention is to keep the database from growing to huge proportions. A zero value will inhibit this action.</p>
-<pre><code>  clean_before = 90</code></pre>
+<pre><code> clean_before = 90</code></pre>
+<p><em>sync_check</em> <strong>nftfw blacklist</strong> will check whether the IP addresses in the database that should be active are actually present in the blacklist directory <em>blacklist.d</em>. ‘Should be active’ means that the addresses have not been automatically expired. <strong>nftfw</strong> is largely event driven, but events get missed. So on the basis that if stuff can happen, it will, this code will recover the correct state of the blacklist directory. It seems overkill to call this every time the blacklist scanner runs, so it is executed when number of runs of the scanner is greater than the value of this variable. The default is to run the blacklist scanner 96 times a day, so 50 seems are reasonable way to run the recovery code once a day. Set this to zero to turn this feature off.</p>
+<pre><code> sync_check = 50</code></pre>
 <p><strong>[Nftfwls]</strong></p>
-<p><em>date_fmt</em><br />
-Allows change of date format for <em>nftfwls</em>. The default is DD-MM-YYYY HH:MM:SS. I’m using a two digit year number.</p>
+<p><em>date_fmt</em> Allows change of date format for <em>nftfwls</em>. The default is DD-MM-YYYY HH:MM:SS. I’m using a two digit year number.</p>
 <pre><code>  date_fmt = %d-%m-%Y %H:%M:%S</code></pre>
 <p><em>pattern_split</em> Replaces any commas in the pattern listing column by a newline and a space, reducing output width on the terminal output. Can be overridden by <em>-p</em> option to <em>nftfwls</em>.</p>
 <pre><code>  pattern_split = No</code></pre>
@@ -112,8 +100,7 @@ Allows change of date format for <em>nftfwls</em>. The default is DD-MM-YYYY HH:
   ;Barracuda=b.barracudacentral.org
   ;SpamCop=bl.spamcop.net</code></pre>
 <p><strong>[Incron]</strong></p>
-<p><em>use_incron</em><br />
-<strong>nftfw</strong> uses <em>incron</em> so that the firewall files in <em>/usr/local/etc/nftfw</em> are updated, changes are actioned automatically. Set the <em>use_incron</em> variable to ‘No’ if <em>incron</em> is not available. Background processing of black and white lists will action the changes, <strong>nftfw load</strong> will need to be run after any changes made by hand.</p>
+<p><em>use_incron</em> <strong>nftfw</strong> uses <em>incron</em> so that the firewall files in <em>/usr/local/etc/nftfw</em> are updated, changes are actioned automatically. Set the <em>use_incron</em> variable to ‘No’ if <em>incron</em> is not available. Background processing of black and white lists will action the changes, <strong>nftfw load</strong> will need to be run after any changes made by hand.</p>
 <pre><code>  use_incron = Yes</code></pre>
 <h1 id="files">FILES</h1>
 <p>Files can be located in <em>/</em> rather than <em>/usr/local</em>.</p>

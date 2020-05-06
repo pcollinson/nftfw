@@ -38,6 +38,9 @@ class BlackList:
     6. Clean database
     """
 
+    # pylint: disable=too-many-instance-attributes
+    # Eight is reasonable in this case.
+
     def __init__(self, cf):
         """Blacklist init
 
@@ -56,6 +59,7 @@ class BlackList:
         self.block_all_after = int(logvars['block_all_after'])
         self.expire_after = int(logvars['expire_after'])
         self.clean_before = int(logvars['clean_before'])
+        self.sync_check = int(logvars['sync_check'])
         # file manager instance
         self.manager = None
 
@@ -89,6 +93,11 @@ class BlackList:
         if any(work):
             changes, ipsmatched = self.install_ips(work)
             log.info('Blacklist matches: %s', ipsmatched)
+
+        # Missing sync code
+        # don't run if disabled
+        if self.sync_check != 0:
+            changes += self.scan_for_missing()
 
         # Expiry code
         log.info("Blacklist expiry scan")
@@ -459,6 +468,76 @@ class BlackList:
         self.manager.touch(ipfile)
         log.info("%s updated from %s", fname, current['pattern'])
         return 0
+
+    def scan_for_missing(self):
+        """ Check database for current entries and match with blacklist.d
+
+        The system is event driven, and needs to be checked that an
+        event has not been missed, meaning a file that should be in
+        blacklist.d simply isn't.
+
+        use number of days in cf.expire_after
+        but we'll subtract a day in case the entry has been expired
+
+        Returns
+        -------
+        int :
+            Number of files installed
+        """
+
+        # calculate threshold time
+        included = self.expire_after - 1
+        threshold = int(time.time()) - included*86400
+
+        # get records to check
+        fwdb = FwDb(self.cf)
+        # need the whole record to install the file
+        datalist = fwdb.lookup('blacklist',
+                               where='last >= ? AND matchcount >= ?',
+                               vals=(threshold, self.block_after))
+        # bail if no data at present
+        if not any(datalist):
+            fwdb.close()
+            return 0
+
+        # get the number of runs from the file in sysvar
+        # work out if we need to run the scan
+        missingsync = self.cf.varfilepath('missingsync')
+        checkdata = False
+        if not missingsync.exists():
+            syncval = 0
+            checkdata = True
+        else:
+            syncval = int(missingsync.read_text())
+            if syncval > self.sync_check:
+                checkdata = True
+                syncval = 0
+        syncval += 1
+        missingsync.write_text(str(syncval))
+
+        if not checkdata:
+            fwdb.close()
+            return 0
+
+        log.info('Running missing blacklist ip file check')
+        # create the files if missing
+        installed = 0
+        bld = self.blacklistpath
+        for ipentry in datalist:
+            ip = ipentry['ip']
+            fname = ip.replace('/', '|')
+            # ignore raw file if it exists
+            path = bld / fname
+            if path.exists():
+                continue
+            # otherwise it's an .auto file
+            fname = fname + '.auto'
+            path = bld / fname
+            if not path.exists():
+                log.error('Install missing blacklist ip file %s', str(fname))
+                installed += self.install_file(fwdb, ipentry, True)
+        fwdb.close()
+        return installed
 
     def scan_for_expires(self):
         """Expire files in the blacklist directory

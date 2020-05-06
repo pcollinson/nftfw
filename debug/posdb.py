@@ -26,13 +26,13 @@ def prdb(cf):
     pt = PrettyTable()
     pt.field_names = [ 'Name', 'Posn', 'Time']
 
-    
+
     for line in ans:
         pt.add_row([line['file'],
                     line['posn'],
                     datefmt(line['ts'])])
-        
-                   
+
+
     # set up format
     pt.align = 'l'
     pt.align['Posn'] = 'r'
@@ -56,10 +56,9 @@ if __name__ == '__main__':
     else:
         db = FileposDb(cf)
         for file in args.zero:
-            ans = db.lookup('filepos', key='file', val=file)
+            ans = db.lookup('filepos', where='file = ?', vals=(file,))
             if len(ans) == 0:
                 print(f'Cannot find {file} in database')
                 sys.exit(1)
             else:
                 db.setfilepos(file, 0)
-                

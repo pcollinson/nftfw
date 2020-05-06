@@ -63,7 +63,7 @@ class FileposDb(SqDb):
         """
 
         ans = self.lookup('filepos', what='posn,linesig',
-                          key='file', val=file)
+                          where='file = ?', vals=(file,))
         if ans is None or not any(ans):
             return (0, None)
         return (ans[0]['posn'], ans[0]['linesig'])

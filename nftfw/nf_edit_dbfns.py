@@ -161,7 +161,7 @@ class DbFns:
         for ip in iplist:
             current = work[ip]
             # fake matchcount
-            current['matchcount'] = int(self.cf.block_after)
+            current['matchcount'] = int(bl.block_after)
             added += bl.install_file(fwdb, current, True)
             log.info('%s added to blacklist.d', ip)
 

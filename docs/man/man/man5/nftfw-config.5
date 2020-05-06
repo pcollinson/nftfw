@@ -33,12 +33,8 @@ The program looks in \f[I]/etc\f[] and then \f[I]/usr/local/etc\f[] for
 the \f[I]nftfw\f[] directory determining the `root' key and that forms
 the basis for all paths.
 .PP
-\f[I]sysetc\f[], \f[I]sysvar\f[]
-.PD 0
-.P
-.PD
-These two variables contain the control and working files for the
-system:
+\f[I]sysetc\f[], \f[I]sysvar\f[] These two variables contain the control
+and working files for the system:
 .IP
 .nf
 \f[C]
@@ -47,12 +43,8 @@ system:
 \f[]
 .fi
 .PP
-\f[I]nftables_conf\f[]
-.PD 0
-.P
-.PD
-\f[B]nftfw\f[] needs to know where the system stores the main
-\f[I]nftables.conf\f[] file.
+\f[I]nftables_conf\f[] \f[B]nftfw\f[] needs to know where the system
+stores the main \f[I]nftables.conf\f[] file.
 If installing a new system into root (/) you may wish to change this
 value to prevent \f[B]nftfw\f[] from overwriting an extant file.
 Conversely, if installing a new system into \f[I]/usr/local/etc\f[], you
@@ -65,12 +57,8 @@ will need to change this value when things are working to make sure that
 \f[]
 .fi
 .PP
-\f[I]nftfw_init\f[]
-.PD 0
-.P
-.PD
-The location for the initial nft setup file containing the framework
-used by the firewall.
+\f[I]nftfw_init\f[] The location for the initial nft setup file
+containing the framework used by the firewall.
 .IP
 .nf
 \f[C]
@@ -78,13 +66,10 @@ used by the firewall.
 \f[]
 .fi
 .PP
-\f[I]nftfw_base\f[]
-.PD 0
-.P
-.PD
-\f[I]nftfw\f[] expects to find the five working directories,
-\f[I]incoming.d\f[], \f[I]outgoing.d\f[], \f[I]blacklist.d\f[],
-\f[I]whitelist.d\f[] and \f[I]patterns.d\f[] under this directory.
+\f[I]nftfw_base\f[] \f[I]nftfw\f[] expects to find the five working
+directories, \f[I]incoming.d\f[], \f[I]outgoing.d\f[],
+\f[I]blacklist.d\f[], \f[I]whitelist.d\f[] and \f[I]patterns.d\f[] under
+this directory.
 It you want to run the system from the Symbiosis control directory, then
 the \f[I]nftfw_base\f[] option needs to be changed from the default to
 \f[I]/etc/symbiosis/firewall\f[].
@@ -116,7 +101,7 @@ The default is to use the root user.
 .IP
 .nf
 \f[C]
-\ \ \ owner=root\ 
+\ \ \ owner=root
 \ \ \ group
 \f[]
 .fi
@@ -128,9 +113,9 @@ processing sections of the program when rules are not explicitly given.
 .IP
 .nf
 \f[C]
-\ \ incoming\ =\ accept\ \ 
-\ \ outgoing\ =\ reject\ \ 
-\ \ whitelist\ =\ accept\ \ 
+\ \ incoming\ =\ accept
+\ \ outgoing\ =\ reject
+\ \ whitelist\ =\ accept
 \ \ blacklist\ =\ reject
 \f[]
 .fi
@@ -144,12 +129,8 @@ actively rejects the packet.
 .PP
 \f[B][Logging]\f[]
 .PP
-\f[I]logfmt\f[]
-.PD 0
-.P
-.PD
-Set the format of log statements (see the Python \f[I]logging\f[]
-documentation for possible formats)
+\f[I]logfmt\f[] Set the format of log statements (see the Python
+\f[I]logging\f[] documentation for possible formats)
 .IP
 .nf
 \f[C]
@@ -157,12 +138,8 @@ documentation for possible formats)
 \f[]
 .fi
 .PP
-\f[I]loglevel\f[]
-.PD 0
-.P
-.PD
-Sets the level are we logging at, this value needs to be a level name
-not a value.
+\f[I]loglevel\f[] Sets the level are we logging at, this value needs to
+be a level name not a value.
 Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG.
 \f[B]nftfw\f[] uses the \f[B]\-v\f[] flag to the set this value to INFO.
 .IP
@@ -172,12 +149,8 @@ Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG.
 \f[]
 .fi
 .PP
-\f[I]logfacility\f[]
-.PD 0
-.P
-.PD
-The logging facility are we using, it needs to be a facility name not a
-value.
+\f[I]logfacility\f[] The logging facility are we using, it needs to be a
+facility name not a value.
 .IP
 .nf
 \f[C]
@@ -185,11 +158,7 @@ value.
 \f[]
 .fi
 .PP
-\f[I]logprint\f[]
-.PD 0
-.P
-.PD
-Control printing of logged informaion.
+\f[I]logprint\f[] Control printing of logged informaion.
 Set to False to inhibit log printing at the console.
 This value is initially set to False when the program is not talking to
 a terminal.
@@ -202,11 +171,7 @@ and the option will suppress printing to the terminal.
 \f[]
 .fi
 .PP
-\f[I]logsyslog\f[]
-.PD 0
-.P
-.PD
-Set to False to inhibit syslog use.
+\f[I]logsyslog\f[] Set to False to inhibit syslog use.
 .IP
 .nf
 \f[C]
@@ -222,9 +187,9 @@ Do we want counters on the statements?
 .IP
 .nf
 \f[C]
-\ \ incoming_counter\ =\ True\ \ 
-\ \ outgoing_counter\ =\ True\ \ 
-\ \ blacklist_counter\ =\ True\ \ 
+\ \ incoming_counter\ =\ True
+\ \ outgoing_counter\ =\ True
+\ \ blacklist_counter\ =\ True
 \ \ whitelist_counter\ =\ True
 \f[]
 .fi
@@ -236,21 +201,17 @@ To stop logging, just use the name.
 .IP
 .nf
 \f[C]
-\ \ incoming_logging\ \ 
-\ \ outgoing_logging\ \ 
-\ \ blacklist_logging\ =\ Blacklist\ \ 
-\ \ whitelist_logging\ \ 
+\ \ incoming_logging
+\ \ outgoing_logging
+\ \ blacklist_logging\ =\ Blacklist
+\ \ whitelist_logging
 \f[]
 .fi
 .PP
 \f[B][Whitelist]\f[]
 .PP
-\f[I]wtmp_file\f[]
-.PD 0
-.P
-.PD
-The \f[B]whitelist\f[] command scans the wtmp file, and this variable is
-normally empty to use the system default.
+\f[I]wtmp_file\f[] The \f[B]whitelist\f[] command scans the wtmp file,
+and this variable is normally empty to use the system default.
 Set \f[I]wtmp_file=utmp\f[] to use the system utmp file, otherwise set a
 filename in the variable.
 .IP
@@ -278,39 +239,28 @@ in log files for the specific IP address \- the matchcount.
 The nftfwls(1) program shows the currently active blacklist and all the
 information associated with each IP.
 .PP
-\f[I]block_after\f[]
-.PD 0
-.P
-.PD
-When the matchcount goes over this level, \f[B]nftfw\f[] blocks the ip
-using the ports in the rule (Symbiosis used 2).
+\f[I]block_after\f[] When the matchcount goes over this level,
+\f[B]nftfw\f[] blocks the ip using the ports in the rule (Symbiosis used
+2).
 .IP
 .nf
 \f[C]
-\ \ block_after\ =\ 10\ 
+\ \ block_after\ =\ 10
 \f[]
 .fi
 .PP
-\f[I]block_all_after\f[]
-.PD 0
-.P
-.PD
-When the matchcount goes over this level, \f[B]nftfw\f[] blocks the ip
-using all ports.
+\f[I]block_all_after\f[] When the matchcount goes over this level,
+\f[B]nftfw\f[] blocks the ip using all ports.
 .IP
 .nf
 \f[C]
-\ \ block_all_after\ =\ 100\ 
+\ \ block_all_after\ =\ 100
 \f[]
 .fi
 .PP
-\f[I]expire_after\f[]
-.PD 0
-.P
-.PD
-\f[B]nftfw\f[] removes blocked IPs from the \f[I]blacklist.d\f[]
-directory after the number of days in this value have passed since the
-last incident.
+\f[I]expire_after\f[] \f[B]nftfw\f[] removes blocked IPs from the
+\f[I]blacklist.d\f[] directory after the number of days in this value
+have passed since the last incident.
 Bad guys keep coming back, and sometimes re\-appear several months after
 expiry.
 It's useful to have feedback from the firewall to keep them in play
@@ -334,17 +284,34 @@ A zero value will inhibit this action.
 .IP
 .nf
 \f[C]
-\ \ clean_before\ =\ 90
+\ clean_before\ =\ 90
+\f[]
+.fi
+.PP
+\f[I]sync_check\f[] \f[B]nftfw blacklist\f[] will check whether the IP
+addresses in the database that should be active are actually present in
+the blacklist directory \f[I]blacklist.d\f[].
+`Should be active' means that the addresses have not been automatically
+expired.
+\f[B]nftfw\f[] is largely event driven, but events get missed.
+So on the basis that if stuff can happen, it will, this code will
+recover the correct state of the blacklist directory.
+It seems overkill to call this every time the blacklist scanner runs, so
+it is executed when number of runs of the scanner is greater than the
+value of this variable.
+The default is to run the blacklist scanner 96 times a day, so 50 seems
+are reasonable way to run the recovery code once a day.
+Set this to zero to turn this feature off.
+.IP
+.nf
+\f[C]
+\ sync_check\ =\ 50
 \f[]
 .fi
 .PP
 \f[B][Nftfwls]\f[]
 .PP
-\f[I]date_fmt\f[]
-.PD 0
-.P
-.PD
-Allows change of date format for \f[I]nftfwls\f[].
+\f[I]date_fmt\f[] Allows change of date format for \f[I]nftfwls\f[].
 The default is DD\-MM\-YYYY HH:MM:SS.
 I'm using a two digit year number.
 .IP
@@ -388,13 +355,9 @@ used to access the list in the DNS lookup.
 .PP
 \f[B][Incron]\f[]
 .PP
-\f[I]use_incron\f[]
-.PD 0
-.P
-.PD
-\f[B]nftfw\f[] uses \f[I]incron\f[] so that the firewall files in
-\f[I]/usr/local/etc/nftfw\f[] are updated, changes are actioned
-automatically.
+\f[I]use_incron\f[] \f[B]nftfw\f[] uses \f[I]incron\f[] so that the
+firewall files in \f[I]/usr/local/etc/nftfw\f[] are updated, changes are
+actioned automatically.
 Set the \f[I]use_incron\f[] variable to `No' if \f[I]incron\f[] is not
 available.
 Background processing of black and white lists will action the changes,
