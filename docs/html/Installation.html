@@ -108,7 +108,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb6-2" title="2">$ <span class="fu">sudo</span> ip6tables-save <span class="op">&gt;</span> ip6saved</a></code></pre></div>
 <p>Now change iptables and ip6tables to use the <em>nftables</em> versions:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> update-alternatives --config iptables</a>
-<a class="sourceLine" id="cb7-2" title="2">$ <span class="fu">sudo</span> update-alternatives --config ip6tables</a></code></pre></div>
+<a class="sourceLine" id="cb7-2" title="2"><span class="co"># select selection 0, /usr/sbin/iptables-nft, auto mode</span></a>
+<a class="sourceLine" id="cb7-3" title="3">$ <span class="fu">sudo</span> update-alternatives --config ip6tables</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="co"># select selection 0, /usr/sbin/iptables-nft, auto mode</span></a></code></pre></div>
 <p>Each gives you a menu of options: select the <em>nftables</em> compatible version. I used option 0 - auto. Check your <em>iptables</em> command is now at the correct version using <em>-V</em>. Finally, reload the <em>iptables</em> data you saved earlier.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="fu">sudo</span> iptables-restore <span class="op">&lt;</span> ipsaved</a>
 <a class="sourceLine" id="cb8-2" title="2">$ <span class="fu">sudo</span> ip6tables-restore <span class="op">&lt;</span> ip6saved</a></code></pre></div>
@@ -167,7 +169,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>and now you need to re-educate yourself to run:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
 <p>You are now ready to create firewall to suit your needs.</p>
-<h3 id="paying-attention-to-usrlocaletcnftfwconfig.ini">Paying attention to <em>/usr/local/etc/nftfw/config.ini</em></h3>
+<h3 id="paying-attention-to-config.ini">Paying attention to <em>config.ini</em></h3>
 <p>Find the <em>Owner</em> section in the file and change settings for owner and group to fit the user you selected when installing the <em>etc/nftfw</em> files.</p>
 <p>If you are running <em>nftables</em>, you may need to alter the <em>nftables_conf</em> setting in <em>config.ini</em> and please read on. If not, <a href="#logging">skip to next section</a>.</p>
 <p>Debian expects systems using <em>nftables</em> to keep a configuration file in <em>/etc/nfttables.conf</em>. The file sets up <em>nftables</em> when the system reboots, or when <em>systemctl</em> restarts the <em>nftables</em> service. <em>nftfw</em> will write this file after creating its rule set but depends on configuration in its <em>config.ini</em> file to set its location. As distributed, the value of <em>nftables_conf</em> in <em>config.ini</em> is relative to the installation root. This means you need to take different actions depending on where your <em>nftfw</em> is installed:</p>
@@ -240,9 +242,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Look in <em>cronfiles</em> in the <em>nftfw</em> distribution. The files there have <em>/usr/local/</em> in them, if your system is installed from root, you’ll need to edit both files to point to the correct locations. Install <em>cron.d-nftfw</em> in <em>/etc/cron.d/nftfw</em>, and if you are using <em>incron</em>, install <em>incron-nftfw</em> in <em>/etc/incron.d/nftfw</em> (if not, remember to edit <em>config.ini</em> to tell <em>nftfw</em>).</p>
 <h3 id="geolocation">Geolocation</h3>
 <p>The listing program <em>nftfwls</em> will print out the country that originated packets in the firewall using the <em>geoip2</em> country database available from MaxMind. MaxMind don’t charge but want you to create an account with them to access their files.</p>
-<p>See <a href="Installing-GeoLocation.md">Installing GeoLocation</a>.</p>
+<p>See <a href="Installing-GeoLocation.md">Installing Geolocation</a>.</p>
+<h3 id="sympl-users-update-your-mail-system-after-installation">Sympl users: Update your mail system after installation</h3>
+<p>A repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs - see <a href="https://github.com/pcollinson/sympl-email-changes">Sympl mail system update</a>.</p>
 <h2 id="you-are-there">You Are There</h2>
-<p>Now look at: - <a href="Installing-GeoLocation.md">Installing GeoLocation</a> - <a href="Users_Guide.md">User’s Guide to nftfw</a> - <a href="How_do_I.md">How do I.. or a User’s Quick Guide</a></p>
+<p>Now look at:</p>
+<ul>
+<li><a href="Updating-nftfw.md">Updating <em>nftfw</em></a>
+<ul>
+<li>How to update <em>nftfw</em>.</li>
+</ul></li>
+<li><a href="Users_Guide.md">User’s Guide to nftfw</a>
+<ul>
+<li>The full User guide, the first section explains how the system is controlled.</li>
+</ul></li>
+<li><a href="How_do_I.md">How do I.. or a User’s Quick Guide</a>
+<ul>
+<li>Answers a bunch of questions about the system.</li>
+</ul></li>
+</ul>
 <h2 id="acknowledgement">Acknowledgement</h2>
 <p>All of this is made possible by shamelessly borrowing ideas from Patrick Cherry who created the Symbiosis hosting package for Bytemark of which the firewall system is part.</p>
 </body>

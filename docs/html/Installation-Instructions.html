@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Installation Instructions</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw-doc.css" />
+</head>
+<body>
+<header>
+<h1 class="title">Installation Instructions</h1>
+</header>
+<h1 id="installation-instructions">Installation Instructions</h1>
+<p>For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the <a href="Installation.md">Installing nftfw</a> document. There are links, shown as ‘Explanation’, to the Installation document.</p>
+<h2 id="basic-package-installations">Basic package installations</h2>
+<p>(<a href="Installation.md#nftables">Explanation</a>)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">sudo</span> apt install nftables</a></code></pre></div>
+<p>If this installs a version less than 0.9.3, then edit <code>/etc/apt/sources.d</code> and add</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># backports</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">deb</span> <span class="op">&lt;</span>YOUR SOURCE<span class="op">&gt;</span> buster-backports main contrib non-free</a></code></pre></div>
+<p>and then</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="fu">sudo</span> apt update</a>
+<a class="sourceLine" id="cb3-2" title="2">$ <span class="fu">sudo</span> apt upgrade</a>
+<a class="sourceLine" id="cb3-3" title="3">$ <span class="fu">sudo</span> apt -t buster-backports install nftables</a></code></pre></div>
+<p>Install <em>incron</em> (<a href="Installation.md#incron">Explanation</a>)</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="fu">sudo</span> apt install incron</a></code></pre></div>
+<p>Install Python packages (<a href="Installation.md#python">Explanation</a>)</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> apt install python3-pip</a>
+<a class="sourceLine" id="cb5-2" title="2">$ <span class="fu">sudo</span> apt install python3-prettytable</a></code></pre></div>
+<h2 id="check-on-iptables">Check on iptables</h2>
+<p>Check on the state of <em>iptables</em>, and set things up to use the <em>nftables</em> compatibility mode (<a href="Installation.md#ive-got-a-live-iptables-installation">Explanation</a>)</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> iptables -V</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">iptables</span> v1.8.2 (nf_tables)</a></code></pre></div>
+<p>If the output looks like this, then skip to the next section. If the word in brackets is ‘legacy’, do the following</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> iptables-save <span class="op">&gt;</span> ipsaved</a>
+<a class="sourceLine" id="cb7-2" title="2">$ <span class="fu">sudo</span> ip6tables-save <span class="op">&gt;</span> ip6saved</a>
+<a class="sourceLine" id="cb7-3" title="3">$ <span class="fu">sudo</span> update-alternatives --config iptables</a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="co"># select selection 0, /usr/sbin/iptables-nft, auto mode</span></a>
+<a class="sourceLine" id="cb7-5" title="5">$ <span class="fu">sudo</span> update-alternatives --config ip6tables</a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co"># select selection 0, /usr/sbin/iptables-nft, auto mode</span></a></code></pre></div>
+<p>Run the <code>sudo iptables -V</code> again, to check things have switched, and</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="fu">sudo</span> iptables-restore <span class="op">&lt;</span> ipsaved</a>
+<a class="sourceLine" id="cb8-2" title="2">$ <span class="fu">sudo</span> ip6tables-restore <span class="op">&lt;</span> ip6saved</a>
+<a class="sourceLine" id="cb8-3" title="3">$ <span class="fu">sudo</span> iptables-legacy -F</a>
+<a class="sourceLine" id="cb8-4" title="4">$ <span class="fu">sudo</span> ip6tables-legacy -F</a></code></pre></div>
+<h2 id="installing-nftfw">Installing <em>nftfw</em></h2>
+<p>Get <em>nftfw</em> installation and install (<a href="Installation.md#nftfw-installation">Explanation</a>)</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># Change to a suitable directory</span></a>
+<a class="sourceLine" id="cb9-2" title="2">$ <span class="fu">sudo</span> apt install git</a>
+<a class="sourceLine" id="cb9-3" title="3">$ <span class="fu">git</span> clone https://github.com/pcollinson/nftfw</a></code></pre></div>
+<p>Change into the <em>nftfw</em> directory you’ve just installed and:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">sudo</span> pip3 install .</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></a></code></pre></div>
+<p>Install <em>nftfw</em> infrastructure:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">sudo</span> sh Install.sh</a></code></pre></div>
+<p>Answers for default installation: - <em>Install under /usr/local?</em> yes - <em>See the files installed?</em> your choice - <em>Install?</em> yes - <em>User to replace root?</em> ‘admin’ for Symbiosis, ‘sympl’ for Symbl, ‘return’ for root - <em>Install Manual pages?</em> yes</p>
+<h2 id="setting-up-config.ini">Setting up <em>config.ini</em></h2>
+<p>Edit <em>/usr/local/etc/nftfw/config.ini</em>. Change: (<a href="Installation.md#paying_attention_to_configini">Explanation</a>)</p>
+<pre class="text"><code>[Owner]
+;owner=</code></pre>
+<p>remove the semi-colon and after the = add the user you selected when installing the files.</p>
+<p>Change the logging level for now: Change</p>
+<pre class="text"><code>#  what level are we logging at
+#  needs to be a level name not a value
+#  CRITICAL, ERROR, WARNING, INFO, DEBUG
+;loglevel = INFO</code></pre>
+<p>remove the semi-colon, and change INFO to ERROR.</p>
+<p>If you are running <em>nftables</em> on your system now and you’ve installed <em>nftfw</em> in the root of the file system, then in the <em>Locations</em> section change</p>
+<pre class="text"><code>
+#  Location of system nftables.conf
+#  Usually /etc/nftables.conf
+;nftables_conf = /etc/nftables.conf
+</code></pre>
+<p>remove the semi-colon, and replace <code>/etc/nftables.conf</code> by <code>/etc/nftables.conf.new</code>.</p>
+<h2 id="disable-cron-and-incron-actions">Disable cron and incron actions</h2>
+<p>(<a href="Installation.md#installation">Explanation</a>)</p>
+<p>On Symbiosis move <em>/etc/cron.d/symbiosis-firewall</em> to a safe place. On Symbiosis move <em>/etc/incron.d/symbiosis-firewall</em> to a safe place. On Sympl move <em>/etc/cron.d/sympl-firewall</em> to a safe place.</p>
+<h2 id="test-that-nftfw-doesnt-complain">Test that nftfw doesn’t complain</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> nftfw -x -v load</a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="ex">nftfw</span>[15264]: Loading data from /usr/local/etc/nftfw</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="ex">nftfw</span>[15264]: Creating reference files in /usr/local/var/lib/nftfw/test.d</a>
+<a class="sourceLine" id="cb15-4" title="4"><span class="ex">nftfw</span>[15264]: Test files using nft command</a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="ex">nftfw</span>[15264]: Testing nft rulesets from nftfw_init.nft</a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="ex">nftfw</span>[15264]: Determine required installation</a>
+<a class="sourceLine" id="cb15-7" title="7"><span class="ex">nftfw</span>[15264]: No install needed</a></code></pre></div>
+<p>The number in the log is the process id, so will be different for you.</p>
+<h2 id="taking-precautions-if-you-have-a-live-firewall">Taking precautions if you have a live firewall</h2>
+<p>If you don’t have a running <em>nftables</em> or <em>iptables</em> firewall, then skip to next section.</p>
+<p>If you DO carry on here (<a href="Installation.md#installation">Explanation</a>)</p>
+<p>If you have a running firewall, save its rules first:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> nftfwadm save</a>
+<a class="sourceLine" id="cb16-2" title="2">$ <span class="fu">sudo</span> nftfw -f -v load</a></code></pre></div>
+<p>Output should end with ‘Install rules in …’ - wherever the <em>config.ini</em> file tells <em>nftfw</em> to store the <em>nftables.conf</em> file.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
+<p>will list the ruleset.</p>
+<p>If you have a problem, revert to old rules:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1">$ <span class="fu">sudo</span> nftfwadm restore</a></code></pre></div>
+<p>if not</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1">$ <span class="fu">sudo</span> nftfwadm clean</a></code></pre></div>
+<h2 id="run-a-test-if-you-dont-have-a-live-firewall">Run a test if you don’t have a live firewall</h2>
+<p>If you DON’T have a running <em>nftables</em> or <em>iptables</em> firewall (<a href="Installation.md#installation">Explanation</a>) If you DO then you’ve done this bit above.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1">$ <span class="fu">sudo</span> nftfw -f -v load</a></code></pre></div>
+<p>to test installation. Output should end with ‘Install rules in …’ - wherever the <em>config.ini</em> file tells <em>nftfw</em> to store the <em>nftables.conf</em> file. Now skip to next section.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
+<p>will list the ruleset.</p>
+<h2 id="final-steps">Final steps</h2>
+<p>(<a href="Installation.md#final_steps">Explanation</a>)</p>
+<p>Edit <em>/usr/local/etc/nftfw/config.ini</em> to put the <em>nftables.conf</em> file in the right place</p>
+<pre class="text"><code>#  Location of system nftables.conf
+#  Usually /etc/nftables.conf
+nftables_conf = /etc/nftables.conf</code></pre>
+<p>run to write it there</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1">$ <span class="fu">sudo</span> nftfw -f load</a></code></pre></div>
+<p>Tell <em>systemctl</em> to enable and start its <em>nftables</em> service.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1">$ <span class="fu">sudo</span> systemctl enable nftables</a>
+<a class="sourceLine" id="cb24-2" title="2">$ <span class="fu">sudo</span> systemctl start nftables</a>
+<a class="sourceLine" id="cb24-3" title="3">$ <span class="fu">sudo</span> systemctl status nftables</a></code></pre></div>
+<h2 id="installing-cron-and-incron">Installing cron and incron</h2>
+<p>See README in the <em>cronfiles</em> directory.</p>
+<h2 id="installing-geolocation">Installing Geolocation</h2>
+<p>This will add country detection to <em>nftfwls</em>, which is optional but desirable. See the <a href="Installing-GeoLocation.md">document</a>.</p>
+<h3 id="sympl-users-update-your-mail-system-after-installation">Sympl users: Update your mail system after installation</h3>
+<p>A repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs - see <a href="https://github.com/pcollinson/sympl-email-changes">Sympl mail system update</a>.</p>
+<h2 id="you-are-there">You Are There</h2>
+<p>Now look at:</p>
+<ul>
+<li><a href="Updating-nftfw.md">Updating <em>nftfw</em></a>
+<ul>
+<li>How to update <em>nftfw</em>.</li>
+</ul></li>
+<li><a href="Users_Guide.md">User’s Guide to nftfw</a>
+<ul>
+<li>The full User guide, the first section explains how the system is controlled.</li>
+</ul></li>
+<li><a href="How_do_I.md">How do I.. or a User’s Quick Guide</a>
+<ul>
+<li>Answers a bunch of questions about the system.</li>
+</ul></li>
+</ul>
+<h2 id="acknowledgement">Acknowledgement</h2>
+<p>All of this is made possible by shamelessly borrowing ideas from Patrick Cherry who created the Symbiosis hosting package for Bytemark of which the firewall system is part.</p>
+</body>
+</html>

@@ -56,17 +56,21 @@ Files in the incoming directory provides information to allow or deny inbound co
 See documents in the _docs_ directory:
 
 - [Installing _nftfw_](docs/Installation.md)
-- [Installing GeoLocation](docs/Installing-GeoLocation.md)
-- [Updating _nftfw_](docs/Updating-nftfw.md)
-- [How do I.. or Quick User's Guide](docs/How_do_I.md)
-- [User's Guide](docs/Users_Guide.md)
-- [Manual Page index](docs/man/index.md)
-
-## Update your mail system
-
-I've add a repository that steps through the changes I make to the standard exim4/dovecot systems on Sympl to improve feedback and detection of bad IPs. Find that here:
-
+  - Full installation of the system for Debian Buster.
+- [Installation Instructions](docs/Installation-Instructions.md)
+  - For those who want a bare bones list of tasks.
+- [Installing Geolocation](docs/Installing-GeoLocation.md)
+  - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
 - [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
+  - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
+- [Updating _nftfw_](docs/Updating-nftfw.md)
+  - How to update _nftfw_.
+- [User's Guide](docs/Users_Guide.md)
+  - The full User guide, the first section explains how the system is controlled.
+- [How do I.. or Quick User's Guide](docs/How_do_I.md)
+  - Answers a bunch of questions about the system.
+- [Manual Page index](docs/man/index.md)
+  - Manual Page index
 
 ## Request for help
 

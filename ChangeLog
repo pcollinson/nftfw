@@ -1,3 +1,9 @@
+v0.3.2 	New document 'Installation Instructions'
+	Augment logic in fwmanage. When adding a new
+	IP into an set that creates a range, the
+	partial load fails. Now test the partial
+	load and do a full install when needed
+
 v0.3.1  Put back the code that allows nftfwls to run
 	without the python geoip2 package.
 	Typo fixes in documents suggested by hairydog

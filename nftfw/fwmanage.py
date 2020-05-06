@@ -28,12 +28,16 @@ Step 3: Run nft to validate installation. During development, it
 Step 4: See if we need to perform full install or update sets or do
         nothing
 
-Step 5: Save backup of current settings
+Step 5: If updating sets, check that the rules for that work
+        sometimes they fail when expanding the set by an ip that
+        causes a range
 
-Step 6: Perform the required installation, unless inhibited by
+Step 6: Save backup of current settings
+
+Step 7: Perform the required installation, unless inhibited by
         create_build_only flag in cf
 
-Step 7: Save installed settings in /etc/nftables.conf
+Step 8: Save installed settings in /etc/nftables.conf
 
 The selection of installation type is done by comparing files from the
 last installation. Full installation can be forced.
@@ -91,20 +95,25 @@ def fw_manage(cf):
             log.info('Set update of %s suppressed. Full install must be forced later', args)
         return
 
-    # Step 5 - Check and create backup
-    backup_result, retain_backup = step5(cf)
+    # Step 5 - Check partial set change rules work
+    # will return 'full' on fail
+    if install != 'full':
+        install = step5(cf, install, buildpath)
+
+    # Step 6 - Check and create backup
+    backup_result, retain_backup = step6(cf)
     if backup_result == 'errors':
         return
 
-    # Step 6 - Perform the install
+    # Step 7 - Perform the install
     # install is None, 'full' or a list
     # of files to be run
-    result = step6(cf, install, backup_result, retain_backup)
+    result = step7(cf, install, backup_result, retain_backup)
 
-    # Step 7 - Read the nftables setting back
+    # Step 8 - Read the nftables setting back
     # and place in /etc/nftables.conf
     if result:
-        step7(cf)
+        step8(cf)
 
 def step1(cf):
     """Step 1 - load all information
@@ -242,8 +251,31 @@ def step4(cf, buildpath, installpath, files):
         install = None
     return install
 
-def step5(cf):
-    """Step 5 - Create backup if wanted
+def step5(cf, install, buildpath):
+    """Step 5: Check partial update rules work
+
+    If updating sets, check that the rules work. Sometimes
+    they fail when expanding the set by an ip that creates a range
+
+    Parameters
+    ----------
+    cf : class
+        Config class instance
+    install : ('full', List[str] - list of sets to update
+    buildpath : path to buildarea
+    """
+
+    assert isinstance(install, list)
+    for name in install:
+        log.info('Testing reload of %s', name)
+        fname = name + '_sets_reload.nft'
+        if not nft.nft_load(cf, str(buildpath), fname, test=True):
+            log.info('Test failed using %s', fname)
+            return 'full'
+    return install
+
+def step6(cf):
+    """Step 6 - Create backup if wanted
 
     Parameters
     ----------
@@ -276,20 +308,18 @@ def step5(cf):
 
     return (backup_result, retain_backup)
 
-def step6(cf, install, backup_result, retain_backup):
-    """Step 6 - Perform the install
+def step7(cf, install, backup_result, retain_backup):
+    """Step 7 - Perform the install
 
     Parameters
     ----------
     cf : Config
-    install : {None, 'full', List[str]}
-    	None - nothing to be done
+    install : {'full', List[str]}
         full - full install needed
         list of files to be installed
-   	backup_result : {'errors', 'preserve'}
+    backup_result : {'errors', 'preserve'}
         errors - tell caller to die
-        preserve - backup file exists when
-                   install attempted
+        preserve - backup file exists wheninstall attempted
     retain_backup : bool
         True - tells caller to hang onto backup
 
@@ -338,8 +368,8 @@ def step6(cf, install, backup_result, retain_backup):
         log.info('Backup file not removed')
     return retval
 
-def step7(cf):
-    """Step 7 - Read the nftables setting back
+def step8(cf):
+    """Step 8 - Read the nftables setting back
     and place in /etc/nftables.conf
 
     Parameters

@@ -1,7 +1,7 @@
 # Makefile
 # Take ile source in .md and make html files
 # requires pandoc to run
-HTML = html/How_do_I.html  html/Installation.html  html/Users_Guide.html html/Installing-GeoLocation.html html/Updating-nftfw.html
+HTML = html/How_do_I.html  html/Installation.html  html/Users_Guide.html html/Installing-GeoLocation.html html/Updating-nftfw.html html/Installation-Instructions.html
 
 .PHONY: make makeclean
 

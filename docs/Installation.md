@@ -55,7 +55,9 @@ Now change iptables and ip6tables to use the _nftables_ versions:
 
 ``` sh
 $ sudo update-alternatives --config iptables
+# select selection 0, /usr/sbin/iptables-nft, auto mode
 $ sudo update-alternatives --config ip6tables
+# select selection 0, /usr/sbin/iptables-nft, auto mode
 ```
 Each gives you a menu of options: select  the _nftables_ compatible version. I used option 0 - auto.  Check your _iptables_ command is now at the correct version using _-V_. Finally, reload the _iptables_ data you saved earlier.
 
@@ -172,7 +174,7 @@ $ sudo nft list ruleset
 ```
 You are now ready to create  firewall to suit your needs.
 
-### Paying attention to _/usr/local/etc/nftfw/config.ini_
+### Paying attention to _config.ini_
 
 Find the _Owner_ section in the file and change settings for owner and group to fit the user you selected when installing the _etc/nftfw_ files.
 
@@ -319,16 +321,22 @@ Look in _cronfiles_ in the _nftfw_ distribution. The files there have _/usr/loca
 
 The listing program _nftfwls_ will print out the country that originated packets in the firewall using the _geoip2_ country database available from MaxMind. MaxMind don't charge but want you to create an account with them to access their files.
 
-See  [Installing GeoLocation](Installing-GeoLocation.md).
+See  [Installing Geolocation](Installing-GeoLocation.md).
+
+### Sympl users: Update your mail system after installation
+
+ A repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs - see  [Sympl mail system update](https://github.com/pcollinson/sympl-email-changes).
 
 ## You Are There
 
 Now look at:
-- [Installing GeoLocation](Installing-GeoLocation.md)
-- [User's Guide to nftfw](Users_Guide.md)
-- [How do I.. or a User's Quick Guide](How_do_I.md)
 
-
+-  [Updating _nftfw_](Updating-nftfw.md)
+   -  How to update _nftfw_.
+-  [User's Guide to nftfw](Users_Guide.md)
+   -  The full User guide, the first section explains how the system is controlled.
+-  [How do I.. or a User's Quick Guide](How_do_I.md)
+   -  Answers a bunch of questions about the system.
 
 ## Acknowledgement
 
