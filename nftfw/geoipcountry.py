@@ -69,7 +69,7 @@ class GeoIPCountry:
             cname = None
             if cn.country.iso_code:
                 iso = cn.country.iso_code
-            if cn.country.names['en']:
+            if 'en' in cn.country.names and cn.country.names['en']:
                 cname = cn.country.names['en']
             return(cname, iso)
         except ValueError:

@@ -58,7 +58,7 @@ Now click on 'Download Config' - this will create a local file called _GeoIP.con
 
 ## Installing the key
 
-The Debian installation will have created ```/etc/GeoIP.conf``` for you. You need to set the
+The Debian installation will have created ```/etc/GeoIP.conf``` for you. The file pre-dates the Maxmind decision to ask you to sign up for a free license, ignore the comment above the _AccountID_ line. You need to set the:
 
 - AccountID _to your account id_
 - LicenseKey _to your License Key_

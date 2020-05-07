@@ -101,7 +101,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Well, what you need to do depends on what’s running in your system. Buster comes ready installed with two flavours of <em>iptables</em>: the legacy version and a bridging version using the <em>iptables</em> API, which maps and loads the <em>iptables</em> formatted rules into <em>nftables</em>. You can tell which one you are using by:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> iptables -V</a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="ex">iptables</span> v1.8.2 (nf_tables)</a></code></pre></div>
-<p>if your version output looks like that, then you are OK and can just <a href="#incron">skip over</a> what follows.</p>
+<p>if your version output looks like that, then you are OK and can just skip over what follows to <strong><a href="#incron">incron</a></strong>.</p>
 <p>If the words in brackets says <em>legacy</em> then you need to swap to the <em>nf_tables</em> version. Here’s what you do:</p>
 <p>FIrst, save the current <em>iptables</em> settings, you’ll need to put the settings into the kernel’s <em>nftables</em> system when you switch.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> iptables-save <span class="op">&gt;</span> ipsaved</a>
@@ -132,12 +132,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The <em>nftfwls</em> command uses Python’s <em>prettytable</em>, which may not be installed:</p>
 <pre><code> $ sudo apt install python3-prettytable</code></pre>
 <h2 id="nftfw-installation"><em>nftfw</em> Installation</h2>
-<p>You now need the <em>nftfw</em> distribution. I put mine into <em>/usr/local/src</em>. Change to the directory and unpack the file, or better use</p>
+<p>You now need the <em>nftfw</em> distribution. I put mine into <em>/usr/local/src</em>, it can be your home directory.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$ <span class="fu">sudo</span> apt install git</a>
-<a class="sourceLine" id="cb13-2" title="2"><span class="co"># then cd to one level above where you want to install and</span></a>
-<a class="sourceLine" id="cb13-3" title="3">$ <span class="fu">git</span> clone https://github.com/pcollinson/nftfw</a></code></pre></div>
-<p>which will create an <em>nftfw</em> directory for you.</p>
-<p>Now change into the directory and use <em>pip3</em> to install the package. <em>pip3</em> will allow you to uninstall the package at a later date, if you wish.</p>
+<a class="sourceLine" id="cb13-2" title="2"><span class="ex">...</span></a>
+<a class="sourceLine" id="cb13-3" title="3">$ <span class="bu">cd</span> /usr/local/src</a>
+<a class="sourceLine" id="cb13-4" title="4">$ <span class="fu">sudo</span> git clone https://github.com/pcollinson/nftfw</a></code></pre></div>
+<p>which will create an <em>nftfw</em> directory.</p>
+<p>Now change into the <em>nftfw</em> directory and use <em>pip3</em> to install the package. <em>pip3</em> will allow you to uninstall the package at a later date, if you wish.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1">$ <span class="fu">sudo</span> pip3 install .</a>
 <a class="sourceLine" id="cb14-2" title="2"><span class="ex">...</span></a>
 <a class="sourceLine" id="cb14-3" title="3"><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></a></code></pre></div>
@@ -152,7 +153,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Take care, and slowly…</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> sh Install.sh</a>
 <a class="sourceLine" id="cb16-2" title="2"><span class="ex">...</span></a></code></pre></div>
-<p>In <em>/usr/local/etc/nftfw</em>, you will find two files: <em>config.ini</em> and <em>nftfw_init.nft</em>. <em>config.ini</em> provides configuration information overriding coded settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. <em>nftfw_init.nft</em> is the framework template file for the firewall. It’s copied into the build system whenever a <em>nftfw</em> creates a firewall. Also, you’ll find the <em>original</em> directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.</p>
+<p>Answers for default installation: - <em>Install under /usr/local?</em> yes - <em>See the files installed?</em> your choice - <em>Install?</em> yes - <em>User to replace root?</em> ‘admin’ for Symbiosis, ‘sympl’ for Symbl, ‘return’ for root - <em>Install Manual pages?</em> yes</p>
+<p>In <em>/usr/local/etc/nftfw</em>, you will find two files: <em>config.ini</em> and <em>nftfw_init.nft</em>. <em>config.ini</em> provides configuration information overriding coded-in settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. <em>nftfw_init.nft</em> is the framework template file for the firewall. It’s copied into the build system whenever a <em>nftfw</em> creates a firewall. Also, you’ll find the <em>original</em> directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.</p>
 <p><em>install.sh</em> also creates the necessary directories into <em>/usr/local/var/lib/nftfw</em>.</p>
 <p>The final stage of the installation is to copy manual pages into <em>/usr/local/share/man</em>. There are six pages:</p>
 <ul>
@@ -171,7 +173,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>You are now ready to create firewall to suit your needs.</p>
 <h3 id="paying-attention-to-config.ini">Paying attention to <em>config.ini</em></h3>
 <p>Find the <em>Owner</em> section in the file and change settings for owner and group to fit the user you selected when installing the <em>etc/nftfw</em> files.</p>
-<p>If you are running <em>nftables</em>, you may need to alter the <em>nftables_conf</em> setting in <em>config.ini</em> and please read on. If not, <a href="#logging">skip to next section</a>.</p>
+<p>If you are running <em>nftables</em> and have a live <em>/etc/nftables.conf</em> file, you may need to alter the <em>nftables_conf</em> setting in <em>config.ini</em> and please read on. If not, <a href="#logging">skip to <strong>Logging</strong></a>.</p>
 <p>Debian expects systems using <em>nftables</em> to keep a configuration file in <em>/etc/nfttables.conf</em>. The file sets up <em>nftables</em> when the system reboots, or when <em>systemctl</em> restarts the <em>nftables</em> service. <em>nftfw</em> will write this file after creating its rule set but depends on configuration in its <em>config.ini</em> file to set its location. As distributed, the value of <em>nftables_conf</em> in <em>config.ini</em> is relative to the installation root. This means you need to take different actions depending on where your <em>nftfw</em> is installed:</p>
 <ul>
 <li><p>For <em>nftfw</em> installed in <em>/usr/local</em>: The default setting of <em>nftables_conf</em> will be <em>/usr/local/etc/nftables.conf</em>, which is the ‘wrong’ location, but is safe for now. You will eventually need to change the <em>nftables_conf</em> setting in <em>config.ini</em> to <em>/etc/nftables.conf</em>. Once you are happy with <em>nftfw</em>, you will then change the setting to its correct location in <em>/etc</em>.</p></li>
@@ -194,7 +196,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><em>nftfw</em> has its own set of rules used by actions to create control lines in the firewall. Symbiosis keeps its rules in <em>/usr/share/lib/symbiosis/firewall/rule.d</em> and <em>nftfw</em> has moved its files to its own directory in <em>/usr/local/etc/nftfw/rule.d</em>. Several of <em>nftfw</em>’s rules are there to provide compatibility with Symbiosis and some of these return nothing because the functionality has migrated into the firewall framework provided by <em>nftfw_init.nft</em>.</p>
 <h2 id="migrating-to-nftfw">Migrating to nftfw</h2>
 <p>The <em>nftfw</em> command builds the firewall, installs it in the kernel and saves a copy of what it has created in <em>/etc/nftables.conf</em>. Debian expects to reload <em>nftables</em> from the file in <em>/etc</em> on a reboot.</p>
-<p>If your system has a running firewall that’s not <em>nftfw</em> then you probably don’t want to be too hasty about installing the system. I have no expectation that things <em>will</em> go wrong, but the ability to go back is important. Following the steps below provides backup steps and will not take too long.</p>
+<p>If your system has a running firewall that’s not <em>nftfw</em> then you probably don’t want to be too hasty about installing the system. I have no expectation that things <em>will</em> go wrong, but the ability to go back is important. The steps below provides ways to revert, and explain how to do the installation safely.</p>
 <p>First, make sure you open another window to the system and login to the machine with it, this will keep the connection open and you can recover if something goes wrong. See the Users Guide for <a href="Users_guide.md#an_example_of_incoming.d">An example of incoming.d</a> to see how to do that.</p>
 <p>Let’s look at where you might be now:</p>
 <ul>
@@ -203,7 +205,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><em>Or</em>: Your system already runs an <em>nftables</em> based firewall, and you want to try <em>nftfw</em> out. In this case, do make sure that <em>nftfw</em> won’t overwrite your <em>/etc/nftables.conf</em> file.</li>
 <li><em>Or</em>: There may be other options.</li>
 </ul>
-<p>If you have a live <em>iptables</em> system, check the information about <em>iptables</em> versions and how to set things up at the <a href="#Ive_got_a_live_iptables_installation">top of this document</a>.</p>
+<p>If you have a live <em>iptables</em> system, check the information about <em>iptables</em> versions and how to set things up at the <a href="#ive_got_a_live_iptables_installation">top of this document</a>.</p>
 <p>Having set up the directories in <em>/usr/local/etc/nftfw</em> and the working directories in <em>/usr/local/var/lib/nftfw</em>, you can run:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1">$ <span class="fu">sudo</span> nftfw -x -v load</a></code></pre></div>
 <p>The <em>-x</em> flag makes <em>nftfw</em> compile the files used in setting up the firewall, tests their syntax using the <em>nft</em> command, but doesn’t install them. The <em>-v</em> flag prints information messages, and is a good idea if you’ve not altered logging levels in <em>config.ini</em>.</p>

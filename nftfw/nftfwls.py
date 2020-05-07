@@ -121,7 +121,8 @@ def formatline(date_fmt, pattern_split, line, geoip, is_html=False):
             iso = "  "
         elif is_html:
             # if html add abbr so mouseover shows country name
-            iso = f'<abbr title="{country}">{iso}</abbr>'
+            if country is not None:
+                iso = f'<abbr title="{country}">{iso}</abbr>'
         ip = iso + " " + ip
 
     # special handling for last, and duration

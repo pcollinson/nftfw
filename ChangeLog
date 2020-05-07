@@ -1,3 +1,6 @@
+v0.3.4  More documentation changes, make the geoiplocation code more
+	robust.
+
 v0.3.3  Change internal database interface slightly
 	Add reset of missing files in blacklist.d, this has never happened
 	but might.

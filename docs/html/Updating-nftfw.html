@@ -84,17 +84,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 id="updating-nftfw">Updating nftfw</h1>
 <h2 id="get-current-version">Get current version</h2>
 <p>If you’ve installed <em>nftfw</em> from a zip or tar file, then revisit the github pages and pull the current version. Unpack and install the files.</p>
-<p>If you used <em>git</em>, then change to the source directory and</p>
+<p>If you used <em>git</em>, then change to the your <em>nftfw</em> source directory and</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">git</span> pull</a></code></pre></div>
-<p>which will pull the files that have changed, and will also tell you if you are up-to-date. To use <em>git</em> in future:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="fu">sudo</span> apt install git</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="co"># cd to one level above where you want to install</span></a>
-<a class="sourceLine" id="cb2-3" title="3">$ <span class="fu">git</span> clone https://github.com/pcollinson/nftfw</a></code></pre></div>
+<p>which will pull the files that have changed, and will also tell you if you are up-to-date.</p>
+<p>If you’ve run the <em>nftfw</em> system tests, <em>git</em> will complain about some new files. In the <em>nftfw</em> directory:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="bu">cd</span> tests</a>
+<a class="sourceLine" id="cb2-2" title="2">$ <span class="fu">make</span> clean</a></code></pre></div>
+<p>will remove the files created by the tests, and the <em>pull</em> should now work.</p>
+<p>To use <em>git</em> in future:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="fu">sudo</span> apt install git</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">..</span></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="co"># I put my copy in /usr/local/src, and need to be root to install</span></a>
+<a class="sourceLine" id="cb3-4" title="4">$ <span class="bu">cd</span> /usr/local/src</a>
+<a class="sourceLine" id="cb3-5" title="5">$ <span class="fu">sudo</span> git clone https://github.com/pcollinson/nftfw</a></code></pre></div>
 <h2 id="re-install-the-nftfw-python-modules-programs">Re-install the <em>nftfw</em> Python modules &amp; programs</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># cd into the installed directory</span></a>
-<a class="sourceLine" id="cb3-2" title="2">$ <span class="fu">sudo</span> pip3 install .</a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="co"># will uninstall the old version and</span></a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># cd into the installed nftfw directory</span></a>
+<a class="sourceLine" id="cb4-2" title="2">$ <span class="fu">sudo</span> pip3 install .</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co"># will uninstall the old version say</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></a></code></pre></div>
 <h2 id="re-run-the-install.sh-script">Re-run the Install.sh script</h2>
 <p>Will update files in your <em>etc/nftfw</em> directory, but will not touch any working files. The <em>original</em> directory may contain changes that are useful to you. You can use <em>diff</em> to compare your working versions with the distribution.</p>
 </body>

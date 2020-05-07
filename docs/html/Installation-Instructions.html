@@ -102,7 +102,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Check on the state of <em>iptables</em>, and set things up to use the <em>nftables</em> compatibility mode (<a href="Installation.md#ive-got-a-live-iptables-installation">Explanation</a>)</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> iptables -V</a>
 <a class="sourceLine" id="cb6-2" title="2"><span class="ex">iptables</span> v1.8.2 (nf_tables)</a></code></pre></div>
-<p>If the output looks like this, then skip to the next section. If the word in brackets is ‘legacy’, do the following</p>
+<p>If the output looks like this, then skip to ‘Installing <em>nftfw</em>. If the word in brackets is ’legacy’, do the following</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> iptables-save <span class="op">&gt;</span> ipsaved</a>
 <a class="sourceLine" id="cb7-2" title="2">$ <span class="fu">sudo</span> ip6tables-save <span class="op">&gt;</span> ip6saved</a>
 <a class="sourceLine" id="cb7-3" title="3">$ <span class="fu">sudo</span> update-alternatives --config iptables</a>
@@ -116,9 +116,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb8-4" title="4">$ <span class="fu">sudo</span> ip6tables-legacy -F</a></code></pre></div>
 <h2 id="installing-nftfw">Installing <em>nftfw</em></h2>
 <p>Get <em>nftfw</em> installation and install (<a href="Installation.md#nftfw-installation">Explanation</a>)</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># Change to a suitable directory</span></a>
-<a class="sourceLine" id="cb9-2" title="2">$ <span class="fu">sudo</span> apt install git</a>
-<a class="sourceLine" id="cb9-3" title="3">$ <span class="fu">git</span> clone https://github.com/pcollinson/nftfw</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># Change to a suitable directory, perhaps</span></a>
+<a class="sourceLine" id="cb9-2" title="2">$ <span class="bu">cd</span> /usr/local/source</a>
+<a class="sourceLine" id="cb9-3" title="3">$ <span class="fu">sudo</span> apt install git</a>
+<a class="sourceLine" id="cb9-4" title="4">$ <span class="fu">sudo</span> git clone https://github.com/pcollinson/nftfw</a></code></pre></div>
 <p>Change into the <em>nftfw</em> directory you’ve just installed and:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">sudo</span> pip3 install .</a>
 <a class="sourceLine" id="cb10-2" title="2"><span class="ex">...</span></a>
@@ -135,15 +136,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre class="text"><code>#  what level are we logging at
 #  needs to be a level name not a value
 #  CRITICAL, ERROR, WARNING, INFO, DEBUG
-;loglevel = INFO</code></pre>
-<p>remove the semi-colon, and change INFO to ERROR.</p>
-<p>If you are running <em>nftables</em> on your system now and you’ve installed <em>nftfw</em> in the root of the file system, then in the <em>Locations</em> section change</p>
+;loglevel = ERROR</code></pre>
+<p>remove the semi-colon, and change ERROR to INFO.</p>
+<p>If you have a file in <em>/etc/nftables.conf</em> (use <em>ls</em>) and you’ve installed <em>nftfw</em> in the root of the file system, then in the <em>Locations</em> section change</p>
 <pre class="text"><code>
 #  Location of system nftables.conf
 #  Usually /etc/nftables.conf
 ;nftables_conf = /etc/nftables.conf
 </code></pre>
-<p>remove the semi-colon, and replace <code>/etc/nftables.conf</code> by <code>/etc/nftables.conf.new</code>.</p>
+<p>remove the semi-colon, and replace <code>/etc/nftables.conf</code> by <code>/etc/nftables.conf.new</code>. This avoids writing over the current <em>/etc/nftables.conf</em>.</p>
 <h2 id="disable-cron-and-incron-actions">Disable cron and incron actions</h2>
 <p>(<a href="Installation.md#installation">Explanation</a>)</p>
 <p>On Symbiosis move <em>/etc/cron.d/symbiosis-firewall</em> to a safe place. On Symbiosis move <em>/etc/incron.d/symbiosis-firewall</em> to a safe place. On Sympl move <em>/etc/cron.d/sympl-firewall</em> to a safe place.</p>
@@ -187,6 +188,17 @@ nftables_conf = /etc/nftables.conf</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1">$ <span class="fu">sudo</span> systemctl enable nftables</a>
 <a class="sourceLine" id="cb24-2" title="2">$ <span class="fu">sudo</span> systemctl start nftables</a>
 <a class="sourceLine" id="cb24-3" title="3">$ <span class="fu">sudo</span> systemctl status nftables</a></code></pre></div>
+<p>On a Symbiosis system -</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1">$ <span class="bu">cd</span> /etc/network</a>
+<a class="sourceLine" id="cb25-2" title="2"><span class="co"># put into a safe place - in case you want to revert</span></a>
+<a class="sourceLine" id="cb25-3" title="3">$ <span class="fu">sudo</span> mv if-up.d/symbiosis-firewall ~/up-symbiosis-firewall</a>
+<a class="sourceLine" id="cb25-4" title="4">$ <span class="fu">sudo</span> mv if-down.d/symbiosis-firewall ~/down-symbiosis-firewall</a></code></pre></div>
+<p>On a Sympl system -</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1">$ <span class="bu">cd</span> /etc/network</a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="co"># put into a safe place - in case you want to revert</span></a>
+<a class="sourceLine" id="cb26-3" title="3">$ <span class="fu">sudo</span> mv if-up.d/sympl-firewall ~/up-sympl-firewall</a>
+<a class="sourceLine" id="cb26-4" title="4">$ <span class="fu">sudo</span> mv if-down.d/sympl-firewall ~/down-sympl-firewall</a></code></pre></div>
+<p>This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the <em>nftables</em> settings are loaded before the Symbiosis/Sympl ones.</p>
 <h2 id="installing-cron-and-incron">Installing cron and incron</h2>
 <p>See README in the <em>cronfiles</em> directory.</p>
 <h2 id="installing-geolocation">Installing Geolocation</h2>

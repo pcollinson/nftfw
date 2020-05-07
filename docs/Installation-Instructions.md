@@ -42,7 +42,7 @@ Check on the state of _iptables_, and set things up to use the _nftables_ compat
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-If the output looks like this, then skip to the next section. If the word in brackets is 'legacy', do the following
+If the output looks like this, then skip to 'Installing _nftfw_. If the word in brackets is 'legacy', do the following
 
 ``` sh
 $ sudo iptables-save > ipsaved
@@ -65,9 +65,10 @@ $ sudo ip6tables-legacy -F
 Get _nftfw_ installation and install ([Explanation](Installation.md#nftfw-installation))
 
 ``` sh
-# Change to a suitable directory
+# Change to a suitable directory, perhaps
+$ cd /usr/local/source
 $ sudo apt install git
-$ git clone https://github.com/pcollinson/nftfw
+$ sudo git clone https://github.com/pcollinson/nftfw
 ```
 Change into the _nftfw_ directory you've just installed and:
 
@@ -104,12 +105,12 @@ Change the logging level for now: Change
 #  what level are we logging at
 #  needs to be a level name not a value
 #  CRITICAL, ERROR, WARNING, INFO, DEBUG
-;loglevel = INFO
+;loglevel = ERROR
 ```
 
-remove the semi-colon, and change INFO to ERROR.
+remove the semi-colon, and change ERROR to INFO.
 
-If you are running _nftables_ on your system now and you've installed _nftfw_ in the root of the file system, then in the _Locations_ section change
+If you have a file in _/etc/nftables.conf_ (use _ls_) and you've installed _nftfw_ in the root of the file system, then in the _Locations_ section change
 
 ``` text
 
@@ -118,7 +119,7 @@ If you are running _nftables_ on your system now and you've installed _nftfw_ in
 ;nftables_conf = /etc/nftables.conf
 
 ```
-remove the semi-colon, and replace ```/etc/nftables.conf``` by ```/etc/nftables.conf.new```.
+remove the semi-colon, and replace ```/etc/nftables.conf``` by ```/etc/nftables.conf.new```. This avoids writing over the current _/etc/nftables.conf_.
 
 ## Disable cron and incron actions
 
@@ -206,12 +207,31 @@ $ sudo systemctl start nftables
 $ sudo systemctl status nftables
 ```
 
+On a Symbiosis system -
+
+``` sh
+$ cd /etc/network
+# put into a safe place - in case you want to revert
+$ sudo mv if-up.d/symbiosis-firewall ~/up-symbiosis-firewall
+$ sudo mv if-down.d/symbiosis-firewall ~/down-symbiosis-firewall
+```
+On a Sympl system -
+
+``` sh
+$ cd /etc/network
+# put into a safe place - in case you want to revert
+$ sudo mv if-up.d/sympl-firewall ~/up-sympl-firewall
+$ sudo mv if-down.d/sympl-firewall ~/down-sympl-firewall
+```
+
+This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the _nftables_ settings  are loaded before the Symbiosis/Sympl ones.
+
 ## Installing cron and incron
 See README in the _cronfiles_ directory.
 
 ## Installing Geolocation
 
-This will  add country detection to _nftfwls_, which is optional but desirable. See the [document](Installing-GeoLocation.md).
+This will add country detection to _nftfwls_, which is optional but desirable. See the [document](Installing-GeoLocation.md).
 
 ### Sympl users: Update your mail system after installation
 

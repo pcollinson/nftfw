@@ -12,7 +12,7 @@ incron-nftfw to reflect the locations on your system.
       sudo chmod 644 /etc/cron.d/nftfw
 
 3)   To make the firewall change when files alter in the
-       control directories  use incron
+     control directories: use incron
 
       a)      install incron
       	      sudo apt install incron

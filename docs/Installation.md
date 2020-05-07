@@ -40,7 +40,7 @@ Well, what you need to do depends on what's running in your system. Buster comes
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-if your version output looks like that, then you are OK and can just [skip over](#incron) what follows.
+if your version output looks like that, then you are OK and can just skip over what follows to **[incron](#incron)**.
 
 If the words in brackets says _legacy_ then you need to swap to the _nf_tables_ version. Here's what you do:
 
@@ -108,16 +108,17 @@ The _nftfwls_ command uses Python's _prettytable_, which may not be installed:
 
 ## _nftfw_ Installation
 
-You now need the _nftfw_  distribution. I put mine into _/usr/local/src_. Change to the directory and unpack the file, or better use
+You now need the _nftfw_ distribution. I put mine into _/usr/local/src_, it can be your home directory.
 
 ``` sh
 $ sudo apt install git
-# then cd to one level above where you want to install and
-$ git clone https://github.com/pcollinson/nftfw
+...
+$ cd /usr/local/src
+$ sudo git clone https://github.com/pcollinson/nftfw
 ```
-which will create an _nftfw_ directory for you.
+which will create an _nftfw_ directory.
 
-Now change into the directory and use _pip3_ to install the package. _pip3_ will allow you to uninstall the package at a later date, if you wish.
+Now change into the _nftfw_ directory and use _pip3_ to install the package. _pip3_ will allow you to uninstall the package at a later date, if you wish.
 
 ``` sh
 $ sudo pip3 install .
@@ -128,7 +129,7 @@ To uninstall, ```sudo pip3 uninstall nftfw```.
 
 _pip3_ installs four commands: _nftfw_, _nftfwls_, _nftfwedit_ and _nftfwadm_ in _/usr/local/bin_. Since these are system commands, they ought to be in _/usr/local/sbin_, but the Python installation system doesn't allow that.
 
-Take a moment to see if  the installation worked by asking _nftfw_ for help:
+Take a moment to see if the installation worked by asking _nftfw_ for help:
 
 ``` sh
 $ nftfw -h
@@ -139,7 +140,7 @@ The next step is to install the basic control files in _/usr/local/etc/nftfw_, t
 
 The _Install.sh_ script will copy files from the distribution into their correct places. It asks several questions and permits you to control the installation phases. It's safe to run the script again, it will not replace the contents of any directory ending with _.d_, or the two control files in _/usr/local/etc/nftfw_.  The script uses the standard system _install_ program to do its work.
 
-It's a good idea to make files in _/usr/local/etc/nftfw_ owned by a non-root user, so they  are easier to change without using _sudo_. For Symbiosis, the user should be _admin_, for Sympl it will _sympl_. The script asks for a user name and will create these files owned by that user. Later, it's important to edit _/usr/local/etc/nftfw/config.ini_ to tell _nftfw_ the user that you selected.
+It's a good idea to make files in _/usr/local/etc/nftfw_ owned by a non-root user, so they are easier to change without using _sudo_. For Symbiosis, the user should be _admin_, for Sympl it will _sympl_. The script asks for a user name and will create these files owned by that user. Later, it's important to edit _/usr/local/etc/nftfw/config.ini_ to tell _nftfw_ the user that you selected.
 
 Take care, and slowly...
 
@@ -147,7 +148,14 @@ Take care, and slowly...
 $ sudo sh Install.sh
 ...
 ```
-In _/usr/local/etc/nftfw_, you will find two files: _config.ini_ and _nftfw_init.nft_. _config.ini_ provides configuration information overriding coded settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. _nftfw_init.nft_ is the framework template file for the firewall. It's copied into the build system whenever a _nftfw_ creates a firewall. Also, you'll find the  _original_ directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.
+Answers for default installation:
+- _Install under /usr/local?_ yes
+- _See the files installed?_ your choice
+- _Install?_ yes
+- _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root
+- _Install Manual pages?_ yes
+
+In _/usr/local/etc/nftfw_, you will find two files: _config.ini_ and _nftfw_init.nft_. _config.ini_ provides configuration information overriding coded-in settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. _nftfw_init.nft_ is the framework template file for the firewall. It's copied into the build system whenever a _nftfw_ creates a firewall. Also, you'll find the  _original_ directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.
 
 _install.sh_ also creates the necessary directories into _/usr/local/var/lib/nftfw_.
 
@@ -178,7 +186,7 @@ You are now ready to create  firewall to suit your needs.
 
 Find the _Owner_ section in the file and change settings for owner and group to fit the user you selected when installing the _etc/nftfw_ files.
 
-If you are running _nftables_, you may need to alter the _nftables\_conf_ setting in _config.ini_ and please read on.  If not, [skip to next section](#logging).
+If you are running _nftables_ and have a live _/etc/nftables.conf_ file, you may need to alter the _nftables\_conf_ setting in _config.ini_ and please read on.  If not, [skip to  **Logging**](#logging).
 
 Debian expects systems using _nftables_ to keep a configuration file in _/etc/nfttables.conf_. The file sets up _nftables_ when the system reboots, or when _systemctl_ restarts the _nftables_ service. _nftfw_ will write this file after creating its rule set but depends on configuration in its _config.ini_ file to set its location. As distributed, the value of _nftables_conf_ in _config.ini_ is relative to the installation root. This means you need to take different actions depending on where your _nftfw_ is installed:
 
@@ -223,7 +231,7 @@ _nftfw_ has its own set of rules used by actions to create control lines in the 
 
 The _nftfw_ command builds the firewall, installs it in the kernel and saves a copy of what it has created in _/etc/nftables.conf_.  Debian expects to reload _nftables_ from the file in  _/etc_ on a reboot.
 
-If your system has a running firewall that's not _nftfw_ then you probably don't want to be too hasty about installing the system. I have no expectation that things *will* go wrong, but the ability to go back is important. Following the steps below provides backup steps and will not take too long.
+If your system has a running firewall that's not _nftfw_ then you probably don't want to be too hasty about installing the system. I have no expectation that things *will* go wrong, but the ability to go back is important. The steps below provides ways to revert, and explain how to do the installation safely.
 
 First, make sure you open another window to the system and login to the machine with it, this will keep the connection open and you can recover if something goes wrong. See the Users Guide for  [An example of incoming.d](Users_guide.md#an_example_of_incoming.d) to see how to do that.
 
@@ -234,7 +242,7 @@ Let's look at where you might be now:
 - _Or_: Your system already runs an _nftables_ based firewall, and you want to try _nftfw_ out. In this case, do make sure that _nftfw_ won't overwrite your _/etc/nftables.conf_ file.
 - _Or_: There may be other options.
 
-If you have a live _iptables_ system, check the information about _iptables_ versions and how to set things up at the [top of this document](#Ive_got_a_live_iptables_installation ).
+If you have a live _iptables_ system, check the information about _iptables_ versions and how to set things up at the [top of this document](#ive_got_a_live_iptables_installation).
 
 Having set up the directories in _/usr/local/etc/nftfw_ and the working directories in _/usr/local/var/lib/nftfw_, you can run:
 ``` sh
