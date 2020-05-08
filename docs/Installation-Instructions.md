@@ -66,7 +66,7 @@ Get _nftfw_ installation and install ([Explanation](Installation.md#nftfw-instal
 
 ``` sh
 # Change to a suitable directory, perhaps
-$ cd /usr/local/source
+$ cd /usr/local/src
 $ sudo apt install git
 $ sudo git clone https://github.com/pcollinson/nftfw
 ```
