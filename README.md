@@ -1,55 +1,30 @@
 # nftfw - nftables firewall builder for Debian
 
-The **nftfw** package builds firewalls for _nftables_. The system replaces the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package and also for Sympl, a fork of Symbiosis. **nftfw** copies the simple configuration model for firewall management created for Symbiosis. For example, adding a new IP address to the whitelist simply involves creating a file named for the IP address in a control directory. Adding a new rule permitting access to a port just takes the addition of a suitably named file in another directory. As far as possible, **nftfw** follows the easy-to-use file based user interface designed for Symbiosis and may run using the same control files, making it a viable drop-in choice.
+The _nftfw_ package builds firewalls for _nftables_. The system copies the simple configuration model for firewall management created for  the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package and also for Sympl, a fork of Symbiosis. For example, adding a new IP address to the whitelist simply involves creating a file named for the IP address in a control directory. Adding a new rule permitting access to a port just takes the addition of a suitably named file in another directory. As far as possible, **nftfw** follows the easy-to-use file based user interface used by Symbiosis/Sympl and may run using the same control files, making it a viable drop-in choice.
 
-Most hosted systems consist of a server with a single network interface attached to the internet. **nftfw** adds its automatically generated rules to an _nftables_ template file that provides a framework. The template is intentionally accessible and can be changed to support more complex network structures. The distribution provides an example.
+_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system. It should work on other Linux distributions. The package is written in Python 3 and needs at least the 3.6 release.
 
-_nftfw_ makes extensive use of _nftables_ sets supplying lists of IP addresses for packet matches. It also tries hard to only change the sets when updating content, minimising total reloads of the firewall, allowing effective monitoring of counts.
+## Features
 
-The **nftfw** package, developed on Debian Buster, is stand-alone, and should work on other Linux distributions. The package is written in Python 3 and needs at least the 3.6 release.
+- **Easy-to-use firewall admin**.  Four directories control the firewall. Placing files in the directories create firewall rules configured from the file names. Two directories, _incoming.d_ and _outgoing.d_, supply rules allowing access to ports for incoming and outgoing connections. These files are usually empty, but can contain IP addresses to make the rule more specific. Two more directories, _blacklist.d_ and _whitelist.d_, contain IP addresses, blocking or allowing access for specific addresses. These files can contain ports, again modifying the action of the rule. Changing the firewall is simply a matter of making or removing a file in one of these directories. The directory contents are described in detail in the [User's Guide](docs/Users_Guide.md), while the [How do I... or Quick Users' Guide](docs/How_do_I.md) gives a more task oriented decription.
 
-## What's in the System?
+- **Automatic blacklisting**. The system contains a log file scanner that uses regular expressions to detect unwanted access and then creates files in the _blacklist.d_ directory to block access to any matched IP address. Files to scan, the relevant ports to block for the file and the regular expressions for matching are all contained in a set of files in _patterns.d_. Pattern files are small text files, easy to add and edit,  and the system contains a method of testing them. The _nftfw_ configuration file controls the number of matched lines needed for blocking and how long to wait before removing the IP address from the blacklist.
 
-The system consists of a single Python package and creates four user commands:
+- **Firewall feedback**.  The blacklist scanner can be told how to scan the _syslog_ file looking for log entries from _nftables_ and updates the blacklist database when a blocked IP address returns, keeping it in the firewall until it stops being active.
 
-- **nftfw**: The main active script loading the firewall from the control files, with arguments selecting the blacklist and whitelist scanners providing input to the firewall.
+- **Automatic whitelisting**. The whitelist scanner looks in the system's _wtmp_ file for logins from users and automatically whitelists their IP addresses.
 
-- **nftfwls**: The system stores blacklist state in an sqlite3 database, this script lists its data. The default is to display only the installed IP addresses, but the entire database can also be listed. There's an HTML interface for plumbing into a webpage.
+- **Full use of _nftables_ sets**. Blacklist and whitelist rules use _nftables_ sets, and _nftfw_ tries not to perform a full firewall reload until it's needed. If just the blacklist or whitelist sets change, then only those sets are reloaded.
 
-- **nftfwedit**: provides a command line interface to inspect IP addresses (both in and not in the blacklist database). Tools provided by options add and delete IP addresses in the database, and additionally will add them to the active blacklist (removal uses the _rm_ command).
+- **Configurable _nftables_ template**. A user editable template provides the framework for _nftables_. _nftfw_ uses the template on every firewall build, using 'includes' to pull in its own rules. The use of a template allows for local changes, perhaps to support internal LAN interfaces on a gateway machine. A sample version of the template file used on my gateway machine is supplied.
 
-- **nftfwadm**: provides some admin tools useful for managing the system installation and firewall testing.
+- **Editable _nftables_ commands**.  Rules in _incoming.d_ and _outgoing.d_ use small action files that are shell scripts to create data for _nftables_ rules. The scripts  are called with a defined set of environment variables and generate output using _echo_. Again the idea is that local tailoring should be possible and easy.
 
-The system comes with a default setup for its control files, and a script installs files on your machine in _/usr/local/_. Files can be placed relative to the root. There is some, hopefully intelligible, documentation and guides.
+- **Blacklist monitoring**. The system provides a tool listing the current blacklist status. For each live entry it shows: the IP address and optionally the country of origin, the blocked ports, the date and time of the first and last access and the difference between the two times. HTML output can be generated so the data can be seen from the web. A sample PHP webpage is provided.
 
-## Controlling the firewall
+- **Admin editing**. A database editor allows admins to add and delete entries from the blacklist database.
 
-Files in directories situated in _/usr/local/etc/nftfw_ (or optionally _/etc/symbiosis/firewall_ or _/etc/sympl/firewall_) control the firewall. _/usr/local/etc/nftfw_ also contains an ini style config file read at startup, optionally changing locations of various files and other program settings.
-
-The control directories are:
-
-- _incoming.d_
-Files in the incoming directory provides information to allow or deny inbound connections through the firewall. The file name format is _number-description_ where number is a two digit sequence number providing order to the rules. The _description_  can be a port number, a service name from _/etc/services_ or an action name.
-
-   FIles whose description is a port number or service name use a default action to create the necessary rules for the firewall, for _incoming.d_ the default is to accept the connection.
-
-  Actions are small shell scripts stored in _rule.d_  generating _nftables_ commands appended to setup files. Some actions are default rules like 'reject' or 'drop'. Some actions provide specific settings, for example, _ftp_helper_ adds the necessary extra rules to include the _ftp_ connection helper. The use of shell scripts makes it easy to add local action rules.
-
-  A file in _incoming.d_ is usually empty, but can contain a list of IP addresses to restrict the scope of the rule set it contains.
-
-- _outgoing.d_
-  The outgoing directory behaves in the same way as the incoming rule set except that the default action is to reject the matching pattern.
-
-- _whitelist.d_
-  The whitelist directory contains files named for IP addresses. IPv6 addresses are usually expressed using /64, with | replacing the / character.
-
-  The files are also generally empty, but can contain specific ports used in the rules. The system provides a whitelist scanner that looks in the system's _wtmp_ file for logins and automatically whitelists the IPs of the users fortunate enough to have a login. Automatically generated files have _.auto_ appended that flags the rule for expiry after some period.
-
-- _blacklist.d_
-  The blacklist directory has similar contents to the whitelist. It allows blocking of access to IP addresses and as above, ports can be specified. The system provides an automatic log scanner used to create blacklist files based on frequency of abuse.
-
-- _patterns.d_
-  The patterns directory drives the blacklist scanner. It contains a set of files, each file names a log file for scanning and the specific ports placed in the firewall for the pattern. The file statement can specify several files using shell _glob_ syntax. Most of the file contains a set of regular expressions used to match lines in the log file, ```__IP__``` (two underscores at each end) in the regex picks out the IP address. When the scanner finds a match, it records the IP address in a database. When taking a decision whether to blacklist the IP, it compares the total number of matches with a threshold value, and if greater, creates a file in the _blacklist.d_ directory.
+- **Initial configuration**. The system comes with a fully configured set of firewall rules and is supplied with some working pattern files that are  in use now keeping the bad guys out.
 
 ## Other documents
 
