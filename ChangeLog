@@ -1,3 +1,6 @@
+v0.4.1  Removed reject-www-data from default outgoing setting
+	advice says that this causes more problems than it solves
+
 v0.4.0  Change the README.md file, lots of what was there is
 	now in other files.
 

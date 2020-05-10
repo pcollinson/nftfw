@@ -3,6 +3,7 @@
 # Designed for outbound use, prevent packets from
 # the webserver which is user "www-data" from sending anything other than domain requests.
 # Unless the action file contains nominated IP addresses in its list
+# Retained for compatibility - but no recommended for use
 #
 if [ "$DIRECTION" = 'incoming' ]; then
     exit 0
@@ -12,7 +13,7 @@ table $PROTO filter {
       chain reject-www-data {
       	    tcp dport 53 $COUNTER $LOGGER accept
       	    udp dport 53 $COUNTER $LOGGER accept
-      }    
+      }
 }
 EOF
 # white list any IPs
