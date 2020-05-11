@@ -21,7 +21,7 @@
 <h1 id="name">NAME</h1>
 <p><strong>nftfwedit</strong> — command line to add, delete and blacklist IPs and IP information print</p>
 <h1 id="synopsis">SYNOPSIS</h1>
-<div class="line-block"><strong>nftfwedit</strong> [<strong>-h</strong>] [** -d | -a | -b <strong>] [</strong>-p** <em>PORT</em>] [<strong>-n</strong> <em>PATTERN</em>] [** -q <strong>] [</strong> -v <strong>] [</strong> ipaddress [ ipaddress … ]**]</div>
+<div class="line-block"><strong>nftfwedit</strong> [<strong>-h</strong>] [** -d | -a | -b | -g <strong>] [</strong>-p** <em>PORT</em>] [<strong>-n</strong> <em>PATTERN</em>] [** -q <strong>] [</strong> -v <strong>] [</strong> ipaddress [ ipaddress … ]**]</div>
 <h1 id="description">DESCRIPTION</h1>
 <p><em>nftfwedit</em> is a command line tool to add or remove IP addresses from the <em>nftfw</em> blacklist database, and also optionally from the <em>blacklist.d</em> directory affecting the running firewall. Options on the command line are followed by one of more IP addresses.</p>
 <p>If one of the <strong>delete</strong> (<strong>-d</strong>) , <strong>add</strong> (<strong>-a</strong>) or <strong>blacklist</strong> (<strong>-b</strong>) options is not supplied, <em>nftfwedit</em> prints information about its ip address arguments. Information from the blacklist database is printed if available, along with the country of origin (if <em>geoip2</em> is installed) and output from any DNS blocklists, if specified in <em>config.ini</em>.</p>
@@ -38,6 +38,9 @@
 </dd>
 <dt><strong>-b</strong>, <strong>--blacklist</strong></dt>
 <dd><p>The nominated IP addresses are added to the <em>blacklist.d</em> directory. If an address to be added is present in the blacklist database, then the installation uses that information to create the file. When the database doesn’t contain the address, it’s added to the database, and in this case the port and pattern options must be supplied. Requires root access.</p>
+</dd>
+<dt><strong>-g</strong>, <strong>--gethostname</strong></dt>
+<dd><p>Include hostname information when printing ip address information. This is optional because name lookups can be slow for ip addresses with known hostname.</p>
 </dd>
 <dt><strong>-p</strong>,<strong>--port</strong> PORT</dt>
 <dd><p>Supply the ports used when blocking the IP address. The PORT value can be <em>all</em>, a single numeric port number or a comma separated list of ports.</p>

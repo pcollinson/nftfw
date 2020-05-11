@@ -1,7 +1,7 @@
 """ nftfwedit - Print IP address information
 """
 
-from socket import gethostbyaddr
+from socket import gethostbyaddr, herror
 from nftfwls import datefmt
 from stats import duration, frequency
 from nf_edit_validate import validate_and_return_ip
@@ -52,7 +52,7 @@ class PrintInfo:
             return str(filepath.name)
         return None
 
-    def print_ip(self, ipaddress):
+    def print_ip(self, ipaddress, showhostinfo=False):
         """Print information about the IP address
 
         Parameters
@@ -69,18 +69,8 @@ class PrintInfo:
         print(fmt % ('IP:', str(ipstr)))
 
         # gethostbyaddr information
-        try:
-            host, alias, ips = gethostbyaddr(str(ipstr))
-            if host is not None:
-                print(fmt % ('Hostname:', host))
-            if any(alias):
-                print(fmt % ('Alias:', alias.join(', ')))
-            if any(ips):
-                rem = [i for i in ips if i != ipstr]
-                if any(rem):
-                    print(fmt % ('Other IPs:', rem.join(', ')))
-        except:
-            print(fmt % ('Hostname:', 'Unknown'))
+        if showhostinfo:
+            self.print_hostinfo(fmt, ipstr)
 
         online = self.check_online(ipstr)
         if online is not None:
@@ -109,6 +99,23 @@ class PrintInfo:
                 for name, inlist, verbose in lookup:
                     if inlist:
                         print(fmt % (name.capitalize()+':', verbose))
+
+    @staticmethod
+    def print_hostinfo(fmt, ipstr):
+        """ Print hostinfo """
+
+        try:
+            host, alias, ips = gethostbyaddr(str(ipstr))
+            if host is not None:
+                print(fmt % ('Hostname:', host))
+            if any(alias):
+                print(fmt % ('Alias:', alias.join(', ')))
+            if any(ips):
+                rem = [i for i in ips if i != ipstr]
+                if any(rem):
+                    print(fmt % ('Other IPs:', rem.join(', ')))
+        except herror:
+            print(fmt % ('Hostname:', 'Unknown'))
 
     def format_item(self, fmt, current):
         """Format standard values from a record

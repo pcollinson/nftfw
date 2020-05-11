@@ -19,7 +19,9 @@ v0.4.2  Added blacklist_set_auto_merge and whitelist_set_auto_merge to
 	attempt at a set reload fails. However, it seems a good idea to
 	provide a way of turning this feature off.
 
-	Added hostname printing into the print function of nftfwedit
+	Added hostname printing into the print function of nftfwedit, made
+	optional using a command line option, because it can be slow
+	when printing many addresses with no hostname.
 
 v0.4.1  Removed reject-www-data from default outgoing setting
 	advice says that this causes more problems than it solves

@@ -8,7 +8,7 @@ NAME
 SYNOPSIS
 ======
 
-| **nftfwedit** \[**-h**\]  \[** -d | -a | -b **\]  \[**-p** _PORT_] \[**-n** _PATTERN_] \[** -q **] \[** -v **] \[** ipaddress [ ipaddress ... ]**\]
+| **nftfwedit** \[**-h**\]  \[** -d | -a | -b | -g **\]  \[**-p** _PORT_] \[**-n** _PATTERN_] \[** -q **] \[** -v **] \[** ipaddress [ ipaddress ... ]**\]
 
 
 DESCRIPTION
@@ -35,6 +35,10 @@ These are the available options to the program:
 **-b**, **-\-blacklist**
 
 :   The nominated IP addresses are added to the _blacklist.d_ directory. If an address to be added is present in the blacklist database, then the installation uses that information to create the file. When the database doesn't contain the address, it's added to the database, and in this case the port and pattern options must be supplied. Requires root access.
+
+**-g**, **-\-gethostname**
+
+:   Include hostname information when printing ip address information. This is optional because name lookups can be slow for ip addresses with known hostname.
 
 **-p**,**-\-port** PORT
 

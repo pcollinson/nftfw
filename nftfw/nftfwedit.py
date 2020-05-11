@@ -16,6 +16,8 @@ optional arguments:
                         arguments.
   -b, --blacklist       Add ip to blacklist directory. If necessary add the ip to the
                         database, and then requires port and pattern arguments.
+  -g, --gethostname     Include hostname information when printing ip address
+                        information. Can be slow for ip addresses with no information.
   -p PORT, --port PORT  Port for -a or -b action, 'all' or port number or comma
                         separated numeric port list (no spaces)
   -n PATTERN, --pattern PATTERN
@@ -68,6 +70,10 @@ config.ini.
                     help='Add ip to blacklist directory. If necessary " \
                     + "add the ip to the database, and then requires port and pattern arguments.',
                     action='store_true')
+    gp.add_argument('-g', '--gethostname',
+                    help='Include hostname information when printing ip address information. '\
+                    + 'Can be slow for ip addresses with no information.',
+                    action='store_true')
     ap.add_argument('-p', '--port',
                     help="Port for -a or -b action, \'all\' or port " \
                     + "number or comma separated numeric port list (no spaces)")
@@ -113,20 +119,28 @@ config.ini.
     elif args.port:
         print('-p (port) is used with the -a and -b options')
 
+    elif args.gethostname:
+        print_info(cf, args, gethostname=True)
+
     else:
         if not any(args.ipaddress):
             ap.print_usage()
             sys.exit(0)
+        print_info(cf, args)
 
-        config = cf.get_ini_values_by_section('Nftfwls')
-        cf.date_fmt = config['date_fmt']
 
-        pi = PrintInfo(cf)
-        addnl = len(args.ipaddress) != 1
-        for ip in args.ipaddress:
-            pi.print_ip(ip)
-            if addnl:
-                print()
+def print_info(cf, args, gethostname=False):
+    """ Print the information """
+
+    config = cf.get_ini_values_by_section('Nftfwls')
+    cf.date_fmt = config['date_fmt']
+
+    pi = PrintInfo(cf)
+    addnl = len(args.ipaddress) != 1
+    for ip in args.ipaddress:
+        pi.print_ip(ip, showhostinfo=gethostname)
+        if addnl:
+            print()
 
 def run_delete(cf, ap, args):
     """Run the delete command"""

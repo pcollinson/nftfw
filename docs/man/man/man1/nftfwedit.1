@@ -8,9 +8,9 @@
 and IP information print
 .SH SYNOPSIS
 .PP
-\f[B]nftfwedit\f[] [\f[B]\-h\f[]] [** \-d | \-a | \-b \f[B]] [\f[]\-p**
-\f[I]PORT\f[]] [\f[B]\-n\f[] \f[I]PATTERN\f[]] [** \-q \f[B]] [\f[] \-v
-\f[B]] [\f[] ipaddress [ ipaddress \&... ]**]
+\f[B]nftfwedit\f[] [\f[B]\-h\f[]] [** \-d | \-a | \-b | \-g \f[B]]
+[\f[]\-p** \f[I]PORT\f[]] [\f[B]\-n\f[] \f[I]PATTERN\f[]] [** \-q \f[B]]
+[\f[] \-v \f[B]] [\f[] ipaddress [ ipaddress \&... ]**]
 .SH DESCRIPTION
 .PP
 \f[I]nftfwedit\f[] is a command line tool to add or remove IP addresses
@@ -57,6 +57,13 @@ When the database doesn't contain the address, it's added to the
 database, and in this case the port and pattern options must be
 supplied.
 Requires root access.
+.RS
+.RE
+.TP
+.B \f[B]\-g\f[], \f[B]\-\-gethostname\f[]
+Include hostname information when printing ip address information.
+This is optional because name lookups can be slow for ip addresses with
+known hostname.
 .RS
 .RE
 .TP
