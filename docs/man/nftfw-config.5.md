@@ -107,6 +107,15 @@ Do we want nftables logging? By adding a different prefix for each of the tables
       blacklist_logging = Blacklist
       whitelist_logging
 
+These two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, _nftfw_ uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.
+
+However, at present, the auto-merged, interval sets can cause the _nft_ program to fail, flagging an error. There is a bug causing _nft_ to succeed in loading the set when a full install is performed but failing when attempting a reload.
+
+The bug has been reported to the _nftables_ development team, but no fix has been generated as of the current releases. _nftfw_ will work around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature off.
+
+      blacklist_set_auto_merge: True
+      whitelist_set_auto_merge: True
+
 **\[Whitelist]**
 
 _wtmp_file_

@@ -100,6 +100,34 @@ class Config:
     blacklist_logging : str
     whitelist_logging : str
 
+                          These two variables control the type of sets
+                          automatically generated for blacklist and
+                          whitelist tables. When true, nftfw uses
+                          auto_merged, interval sets for the blacklist
+                          or whitelist sets it makes. This set type
+                          automatically create single entries
+                          containing an address range for adjacent IP
+                          addresses. The feature is desirable because
+                          it reduces the number of matches.
+
+                          However, at present, the auto-merged,
+                          interval sets can cause the nft program to
+                          fail, flagging an error. There is a bug
+                          causing nft to succeed in loading the set
+                          when a full install is performed but failing
+                          when attempting a reload.
+
+                          The bug has been reported to the nftables
+                          development team, but no fix has been
+                          generated as of the current releases. nftfw
+                          will work around this bug, automatically
+                          generating a full install when an attempt at
+                          a set reload fails. However, it seems a good
+                          idea to provide a way of turning this
+                          feature off.
+    blacklist_set_auto_merge : bool
+    whitelist_set_auto_merge : bool
+
     [Whitelist]
     wtmp_file : str        Wtmp file to scan, empty to use the system
                            default. Set wtmp_file=utmp to use the system
@@ -162,6 +190,7 @@ class Config:
                             remember that hand changes to the control
                             files will need you to run nftfw load
                             by hand to set up the firewall
+
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -270,6 +299,26 @@ incoming_logging
 outgoing_logging
 blacklist_logging = Blacklist
 whitelist_logging
+
+# These two variables control the type of sets automatically generated
+# for blacklist and whitelist tables. When true, nftfw uses
+# auto_merged, interval sets for the blacklist or whitelist sets it
+# makes. This set type automatically create single entries containing
+# an address range for adjacent IP addresses. The feature is desirable
+# because it reduces the number of matches.
+#
+# However, at present, the auto-merged, interval sets can cause the
+# nft program to fail, flagging an error. There is a bug causing
+# nft to succeed in loading the set when a full install is performed
+# but failing when attempting a reload.
+#
+# The bug has been reported to the nftables development team, but no
+# fix has been generated as of the current releases. nftfw will work
+# around this bug, automatically generating a full install when an
+# attempt at a set reload fails. However, it seems a good idea to
+# provide a way of turning this feature off.
+blacklist_set_auto_merge: True
+whitelist_set_auto_merge: True
 
 [Whitelist]
 #
@@ -432,6 +481,8 @@ using_incron = Yes
         'logprint', 'logsyslog',
         'incoming_counter', 'outgoing_counter',
         'blacklist_counter', 'whitelist_counter',
+        'blacklist_set_auto_merge',
+        'whitelist_set_auto_merge',
         'pattern_split', 'using_incron')
 
 

@@ -142,12 +142,19 @@ class ListProcess:
         setinfo = self.records[key]
         setname = setinfo['name']
 
+        ixauto = self.listtype + '_set_auto_merge'
+        automerge = self.nftconfig[ixauto]
+
         for ip, adtype in (('ip', 'ipv4_addr'),
                            ('ip6', 'ipv6_addr')):
             if ip in setinfo.keys():
                 # create the set
-                app = f'add set {ip} filter {setname} '\
-                  + f'{{type {adtype}; flags interval; auto-merge;}}'+"\n"
+                # NB {{ and }} replaced by single braces
+                if automerge:
+                    settype = f'{{type {adtype}; flags interval; auto-merge;}}'+"\n"
+                else:
+                    settype = f'{{type {adtype};}}'+"\n"
+                app = f'add set {ip} filter {setname} ' + settype
                 self.set_init['create'][ip] += app
                 # update the set
                 app = f'flush set {ip} filter {setname}\n'
