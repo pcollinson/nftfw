@@ -164,10 +164,22 @@ The remainder of the pattern file is a set of regular expressions,
 placed one per line, that match offending lines in the log files.
 The rules all contain the string \f[C]__IP__\f[] (two underscores at
 end) used to match and capture the IPv4 or IPv6 address from the line.
+Non\-empty lines that don't contain \f[C]__IP__\f[] are flagged as
+errors.
+.PP
+The expressions support Python's standard regular expression syntax but
+must only have one matching `capturing group' which is the
+\f[C]__IP__\f[] expansion.
+It is safe to use non\-capturing expressions, for example to match
+\f[I]word1\f[] or \f[I]word2\f[] in the line, use
+\f[C](?:word1|word2)\f[].
+.PP
+Lines are flagged in the logs and ignored if the compilation of the
+regular expression fails, or if there is more than one matching group.
 .PP
 The \f[B]blacklist\f[] action for \f[B]nftfw\f[] uses the patterns to
-scan log files for matching lines and finds IP addresses that it adds to
-an sqlite3(1) database.
+scan log files for matching lines using case\-independent matching by
+the regex and finds IP addresses that it adds to an sqlite3(1) database.
 IP addresses exhibiting activity levels over a threshold will cause the
 script to add the IP address file to the blacklist directory (see
 nftfw(1)).
@@ -218,36 +230,11 @@ the shell.
 The parameters are:
 .RS
 .PP
-DIRECTION \- incoming | outgoing
-.PD 0
-.P
-.PD
-PROTO \- values ip|ip6
-.PD 0
-.P
-.PD
-TABLE \- usually filter
-.PD 0
-.P
-.PD
-CHAIN \- table to add the rule to
-.PD 0
-.P
-.PD
-PORTS \- ports to use (can be empty)
-.PD 0
-.P
-.PD
-COUNTER \- set to counter or empty
-.PD 0
-.P
-.PD
-IPS \- ip addresses (can be empty, single, ranges, named sets, unnamed
-sets)
-.PD 0
-.P
-.PD
-LOGGER \- logger statement
+DIRECTION \- incoming | outgoing PROTO \- values ip|ip6 TABLE \- usually
+filter CHAIN \- table to add the rule to PORTS \- ports to use (can be
+empty) COUNTER \- set to counter or empty IPS \- ip addresses (can be
+empty, single, ranges, named sets, unnamed sets) LOGGER \- logger
+statement
 .RE
 .PP
 The pattern script uses the DIRECTION parameter in both incoming and

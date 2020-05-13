@@ -27,6 +27,11 @@ def init_tests():
         print(f'Not set up correctly: {str(e)}')
         sys.exit(1)
 
+    # Blacklist will expire time elapsed files
+    # and this may happen when they are downloaded
+    # from github
+    checkbasicfiles(cf)
+
     # test_02
     rdr = RulesReader(cf)
 
@@ -75,6 +80,40 @@ def init_tests():
 
     if filepos.exists():
         filepos.unlink()
+
+def checkbasicfiles(cf):
+    """ check that the basic files exist and update them """
+
+    # check that the blacklist.d directory is setup
+    # as we want it - and touch the files so they
+    # don't get expired
+    basefiles = {'192.0.2.5.auto': '',
+                 '198.51.100.128.auto': '22\n',
+                 '198.51.100.5':'',
+                 '2001:db8:fab::|64.auto': '80\n443\n',
+                 '203.0.113.7.auto': ''
+                 }
+    try:
+        blacklist = cf.nftfwpath('blacklist')
+        assert str(blacklist) == 'sys/blacklist.d'
+        assert blacklist.exists()
+    except AssertionError as e:
+        print(f'Not set up correctly: {str(e)}')
+        sys.exit(1)
+
+    for bfile, contents in basefiles.items():
+        bpath = blacklist / bfile
+        if bpath.exists():
+            bpath.touch()
+        elif contents != '':
+            bpath.write_text(contents)
+        else:
+            bpath.touch()
+
+    # 198.51.100.32 should be deleted
+    dfile = blacklist / '198.51.100.32'
+    if dfile.exists():
+        dfile.unlink()
 
 
 def write_json(file, obj):

@@ -16,8 +16,8 @@ The _etc/nftfw_ directory contains:
 -  _outbound.d_ - sets any rules controlling packets leaving the system;
 -  _whitelist.d_ - contains IP addresses that have full access to the system;
 -  _blacklist.d_ - specifies IP addresses and ports in the inbound packets that should not have access;
--   _patterns.d_ - contain pattern files for matching lines in log files for blacklist; and
--   _rule.d_  - hold  files for generating **nft** commands from rule names.
+-  _patterns.d_ - contain pattern files for matching lines in log files for blacklist; and
+-  _rule.d_  - hold  files for generating **nft** commands from rule names.
 
 Distributed files can be found in _etc/nftfw/original_.
 
@@ -32,7 +32,7 @@ where 'number' is a pair of digits used as a sequence number and 'description' s
 Descriptions can be:
 
 -  a port number inserted into the firewall rule
--  the name of a service found in _/etc/services_. 
+-  the name of a service found in _/etc/services_.
 -  the name of a rule found in the rules directories (with the .sh suffix removed)
 
 When port numbers appear in the filename, the directory name dictates the action file applied for the rule. The _config.ini_ file contains variables that select the default rule based on the directory name (see nftfw-config(1)).
@@ -60,30 +60,34 @@ The system has no way of distinguishing between TCP and UDP protocols and the sy
 
 Administrators can disable the  blacklist and whitelist systems separately by creating a file called 'disabled' in the relevant directory.
 
-When building the firewall from these two directories, **nftfw** writes the IP addresses into nftables sets. The program writes the information into two separate files and uses file comparison with the last loaded files to see If it can update the sets of IP addresses without reloading the whole firewall. 
+When building the firewall from these two directories, **nftfw** writes the IP addresses into nftables sets. The program writes the information into two separate files and uses file comparison with the last loaded files to see If it can update the sets of IP addresses without reloading the whole firewall.
 
 patterns.d
 ---------
 Patterns define rules for the **blacklist** module containing the log file (or files) for scanning, the port numbers for the blocking firewall rules, and a list of regular expressions matching lines in the log file.
 
-Pattern files are text files named _name.pattern_. The files support comments when the first character of the line contains '#'. 
+Pattern files are text files named _name.pattern_. The files support comments when the first character of the line contains '#'.
 
 The files contain two 'equals' statements that should always be present:
 
->  file = filename 
+>  file = filename
 >  ports = port specification
 
 Filename is the full path to a logfile that the pattern will used to scan. The filename can also contain shell 'glob' characters ('*', '?' and single character ranges) allowing for the rule set to match a range of files.  The blacklist system will ignore the pattern file (and complain) if the file (or files) that it nominates doesn't exist.
 
-The port specification is usually a comma separated list of port numbers. A firewall rule uses the port list to ban access to specific services on the system.  The ports statement has three 'special' values: 
+The port specification is usually a comma separated list of port numbers. A firewall rule uses the port list to ban access to specific services on the system.  The ports statement has three 'special' values:
 
 - 'all' will ban access to all ports for  any matching IP;
 - 'update' allows us to get feedback from the firewall.  The 'update' value will not create any firewall rules, it will only  increment counts in the system's sqlite3(1) database for any IP that matches. The option provides feedback from the firewall that log continued attempts to access the machine from blocked IP addresses.
 - 'test' marks the file as a testing pattern file. The normal scan from the blacklist system will ignore  files with _ports=test_. Using the **-p** _patternname_ option  with the blacklist command will consider  only files with _ports=test_ and the pattern file name without the _.pattern_ suffix must match _patternname_.
 
-The remainder of the pattern file is a set of regular expressions, placed one per line, that match offending lines in the log files. The rules all contain the string ```__IP__``` (two underscores at end) used to match and capture the IPv4 or IPv6 address from the line.
+The remainder of the pattern file is a set of regular expressions, placed one per line, that match offending lines in the log files. The rules all contain the string ```__IP__``` (two underscores at end) used to match and capture the IPv4 or IPv6 address from the line. Non-empty lines that don't contain ```__IP__``` are flagged as errors.
 
-The **blacklist** action for **nftfw** uses the patterns to scan log files for matching lines and finds IP addresses that it adds to an sqlite3(1) database. IP addresses exhibiting activity levels over a threshold will cause the script to add the IP address file to the blacklist directory (see nftfw(1)).
+The expressions support Python's standard regular expression syntax but must only have one matching 'capturing group' which is the ```__IP__``` expansion. It is safe to use non-capturing expressions, for example to match _word1_ or _word2_ in the line, use ```(?:word1|word2)```.
+
+Lines are flagged in the logs and ignored if the compilation of the regular expression fails, or if there is more than one matching group.
+
+The **blacklist** action for **nftfw** uses the patterns to scan log files for matching lines using case-independent matching by the regex and finds IP addresses that it adds to an sqlite3(1) database. IP addresses exhibiting activity levels over a threshold will cause the script to add the IP address file to the blacklist directory (see nftfw(1)).
 
 Setting _ports=test_ in a pattern file enables testing to see if regular expressions pick up offending IP addresses. Set up a pattern test file pointing to the file you want to scan, and set _port=test_, add the regular expression you wish to test. Then running
 
@@ -101,13 +105,13 @@ Filenames have the format:
 
 **nftfw** runs the scripts though the shell and captures the output text, appending it  to an nftables command file. The system calls each action file twice, once for IPv4 and again for IPv6. The processing script uses environment variables to pass parameters into the shell. The parameters are:
 
->DIRECTION - incoming | outgoing  
->PROTO - values ip|ip6  
->TABLE - usually filter  
->CHAIN - table to add the rule to  
->PORTS - ports to use (can be empty)  
->COUNTER - set to counter or empty  
->IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets)  
+>DIRECTION - incoming | outgoing
+>PROTO - values ip|ip6
+>TABLE - usually filter
+>CHAIN - table to add the rule to
+>PORTS - ports to use (can be empty)
+>COUNTER - set to counter or empty
+>IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets)
 >LOGGER - logger statement
 
 The pattern script uses the DIRECTION parameter in both incoming and outgoing contexts and  must set directional keywords in **nft** commands correctly.  For an incoming rule, an IP address (if present) will be a 'source' address.  For an outgoing rule, an IP address (if present) will be a 'destination' address.
@@ -129,7 +133,7 @@ Files in _var/lib/nftfw_
 The _lib/nftfw_ directory provides working space for the system. It contains three directories and several working files.
 
 -   _build.d_ - The _build_ directory provides an initial build space for **nftfw**, it creates a new file set in the directory from the information available to it. The **nft** checking function validates the newly installed files, and the update process will stop for any errors.
--   _install.d_ - The _install_ directory is the source for the **nft** command to load the tested file set into the system. On the next run, **nftfw** will compare the newly generated files in _build_ with that last used set in _install_. The comparison determines whether to run a complete or partial reinstall, or perhaps whether there has been no change. The intention is to only update blacklist and whitelist set information if this is possible. 
+-   _install.d_ - The _install_ directory is the source for the **nft** command to load the tested file set into the system. On the next run, **nftfw** will compare the newly generated files in _build_ with that last used set in _install_. The comparison determines whether to run a complete or partial reinstall, or perhaps whether there has been no change. The intention is to only update blacklist and whitelist set information if this is possible.
 -   _test.d_ - **nftfw -x** runs the build process up to the point of validating the files and will use this directory as a target for the build.
 -  _firewall.db_  - is an sqlite3(1) database used by the blacklist command to store state on the IP's it detects, when and why. The nftfwls(1) command prints  its contents.
 -  _filepos.db_  - is an sqlite3(1) database used by the blacklist command to store the last known position in the log files that it scans.

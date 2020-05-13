@@ -74,8 +74,10 @@
 <li>‘update’ allows us to get feedback from the firewall. The ‘update’ value will not create any firewall rules, it will only increment counts in the system’s sqlite3(1) database for any IP that matches. The option provides feedback from the firewall that log continued attempts to access the machine from blocked IP addresses.</li>
 <li>‘test’ marks the file as a testing pattern file. The normal scan from the blacklist system will ignore files with <em>ports=test</em>. Using the <strong>-p</strong> <em>patternname</em> option with the blacklist command will consider only files with <em>ports=test</em> and the pattern file name without the <em>.pattern</em> suffix must match <em>patternname</em>.</li>
 </ul>
-<p>The remainder of the pattern file is a set of regular expressions, placed one per line, that match offending lines in the log files. The rules all contain the string <code>__IP__</code> (two underscores at end) used to match and capture the IPv4 or IPv6 address from the line.</p>
-<p>The <strong>blacklist</strong> action for <strong>nftfw</strong> uses the patterns to scan log files for matching lines and finds IP addresses that it adds to an sqlite3(1) database. IP addresses exhibiting activity levels over a threshold will cause the script to add the IP address file to the blacklist directory (see nftfw(1)).</p>
+<p>The remainder of the pattern file is a set of regular expressions, placed one per line, that match offending lines in the log files. The rules all contain the string <code>__IP__</code> (two underscores at end) used to match and capture the IPv4 or IPv6 address from the line. Non-empty lines that don’t contain <code>__IP__</code> are flagged as errors.</p>
+<p>The expressions support Python’s standard regular expression syntax but must only have one matching ‘capturing group’ which is the <code>__IP__</code> expansion. It is safe to use non-capturing expressions, for example to match <em>word1</em> or <em>word2</em> in the line, use <code>(?:word1|word2)</code>.</p>
+<p>Lines are flagged in the logs and ignored if the compilation of the regular expression fails, or if there is more than one matching group.</p>
+<p>The <strong>blacklist</strong> action for <strong>nftfw</strong> uses the patterns to scan log files for matching lines using case-independent matching by the regex and finds IP addresses that it adds to an sqlite3(1) database. IP addresses exhibiting activity levels over a threshold will cause the script to add the IP address file to the blacklist directory (see nftfw(1)).</p>
 <p>Setting <em>ports=test</em> in a pattern file enables testing to see if regular expressions pick up offending IP addresses. Set up a pattern test file pointing to the file you want to scan, and set <em>port=test</em>, add the regular expression you wish to test. Then running</p>
 <blockquote>
 <p>sudo nftfw -x -p pattern-test blacklist</p>
@@ -89,14 +91,7 @@
 </blockquote>
 <p><strong>nftfw</strong> runs the scripts though the shell and captures the output text, appending it to an nftables command file. The system calls each action file twice, once for IPv4 and again for IPv6. The processing script uses environment variables to pass parameters into the shell. The parameters are:</p>
 <blockquote>
-<p>DIRECTION - incoming | outgoing<br />
-PROTO - values ip|ip6<br />
-TABLE - usually filter<br />
-CHAIN - table to add the rule to<br />
-PORTS - ports to use (can be empty)<br />
-COUNTER - set to counter or empty<br />
-IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets)<br />
-LOGGER - logger statement</p>
+<p>DIRECTION - incoming | outgoing PROTO - values ip|ip6 TABLE - usually filter CHAIN - table to add the rule to PORTS - ports to use (can be empty) COUNTER - set to counter or empty IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets) LOGGER - logger statement</p>
 </blockquote>
 <p>The pattern script uses the DIRECTION parameter in both incoming and outgoing contexts and must set directional keywords in <strong>nft</strong> commands correctly. For an incoming rule, an IP address (if present) will be a ‘source’ address. For an outgoing rule, an IP address (if present) will be a ‘destination’ address.</p>
 <p>A rule script will usually create a simpler version of the command when called with no ports.</p>

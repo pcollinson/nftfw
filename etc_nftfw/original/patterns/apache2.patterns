@@ -11,12 +11,10 @@ ports = 80,443
 #  The patterns we use
 #  These may generate some false positives
 #  but pick up on attempts to crack php
-__IP__.*%20UNION.*$
 __IP__.*%20union.*$
 __IP__.*select%20.*$
 __IP__.*%20name_const.*$
-__IP__.*%20unhex(hex(version()))%20.*$
+__IP__.*%20unhex\(hex\(version\(\)\)\)%20.*$
 __IP__.*%20and%201%3D1.*$
 __IP__.*%20and%201%3E1.*$
 __IP__.*%20and%20%27x%27%3D%27x.*$
-

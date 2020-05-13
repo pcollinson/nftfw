@@ -7,13 +7,20 @@ apt install pylint3
 
 The tests need a symlink to the nftfw package.
 
-Step 1:
-Create files needed for comparison - only needed once - see below
-$ make init
+Running
 
-Step 2:
-Run tests
 $ make
+
+will run the init_tests.py to create the necessary reference files
+and will then run all the tests.
+
+If you are using git to get updates, then you must run
+
+$ make clean
+
+afterwards so that you don't have any changed files, otherwise git will
+complain when you run 'git pull' to update things.
+
 
 You can use
 $ make lint
@@ -39,7 +46,9 @@ break.
 Tests that use stored data will also create a new file in 'newdata'
 when they run. The relevant file can be copied to 'data' so that
 the next run will be using the correct comparison data. Alternatively,
+
 $ make init
+
 can be used to create the files.
 
 Some things cannot be tested - for example, the current nftables on

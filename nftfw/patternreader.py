@@ -229,12 +229,22 @@ def _pattern_scan(contents, filename):
         # replace __IP__ by address match
         # add compiled re to regex list
         # re stolen from symbiosis
-        linere = line.replace('__IP__', r'(?:::ffff:)?([0-9a-fA-F:\.]+(?:/[0-9]+)?)', 1)
-        try:
-            cm = re.compile(linere)
-            regex.append(cm)
-        except re.error:
-            log.error('Pattern: invalid regex in %s: Line %s - line ignored',
+        # make this a little more robust
+        # the line must contain __IP__
+        if '__IP__' in line:
+            linere = line.replace(r'__IP__', r'(?:::ffff:)?([0-9a-fA-F:\.]+(?:/[0-9]+)?)', 1)
+            try:
+                cm = re.compile(linere, re.IGNORECASE)
+                if cm.groups != 1:
+                    log.error('Pattern in %s, Line %s ignored - extra regex match groups found - use \ before ( and )',
+                              filename, lineno)
+                else:
+                    regex.append(cm)
+            except re.error:
+                log.error('Pattern: invalid regex in %s: Line %s - line ignored',
+                          filename, lineno)
+        else:
+            log.error('Pattern: Unknown line in %s: Line %s - line ignored',
                       filename, lineno)
     return (file, ports, regex)
 

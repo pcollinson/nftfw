@@ -1,5 +1,6 @@
 """ Pytest config test """
 
+from pathlib import Path
 import pytest
 from configsetup import config_init
 from fwdb import FwDb
@@ -53,6 +54,20 @@ def test_setup(cf):
         path = cf.varpath(name)
         assert path.exists(), f'{dirname} doesn\'t exist'
 
+    # see if things have been initialised
+    datadir = Path('data')
+    reference = ('build_files.json',
+                 'firewallreader.pickle',
+                 'listreader-records.json',
+                 'logreader.json',
+                 'patternreader.pickle',
+                 'rulesreader.json',
+                 'srcdict.json',
+                 'step1_files.json')
+    for rf in reference:
+        rfp = datadir / rf
+        if not rfp.exists():
+            pytest.fail("Run 'make init' to set up reference files")
 
 def test_fwdb(cf, fwdb_handle):
     """ Check firewall database """

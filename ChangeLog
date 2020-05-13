@@ -1,3 +1,15 @@
+v0.4.3	Make the pattern reader regex compilation more robust.
+	Ignore case when compiling regexes for log scanning (should
+	have done this before).
+	Only allow one regex group in the match, so that brackets ()
+	in patterns now must be prefixed by a back slash.
+
+	Upgraded test suite initialisation. Prevents the nftfw code
+	from timing out any blacklist entries by touching the files
+	in the reference 'data' directory.
+	The initialise script is now called from the Makefile if the
+	'data' directory is empty.
+
 v0.4.2  Added blacklist_set_auto_merge and whitelist_set_auto_merge to
 	config.ini.
 
@@ -22,6 +34,8 @@ v0.4.2  Added blacklist_set_auto_merge and whitelist_set_auto_merge to
 	Added hostname printing into the print function of nftfwedit, made
 	optional using a command line option, because it can be slow
 	when printing many addresses with no hostname.
+
+
 
 v0.4.1  Removed reject-www-data from default outgoing setting
 	advice says that this causes more problems than it solves

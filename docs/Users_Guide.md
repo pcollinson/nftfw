@@ -21,12 +21,12 @@ The whitelist directory contains files named for IP addresses, it makes rules to
 - _blacklist.d_
 The blacklist directory has similar contents to the whitelist but will block any attempt to access the system from the IP address. Adding port numbers as contents to the files modifies the rules to only block access to those services. There's an automatic system that looks in log files for people doing bad things and adds their IP address into this directory.
 
-All of these directories create a list of rules. The order of the list is important. The firewall passes each packet  from one rule to the next trying to match the data in the packet with the tests in the rule. Some rules will be looking for matching IP addresses, some for ports and some for both addresses and ports. When the firewall finds a match, the rule tells it to make one of two decisions: accept the packet or reject it. 
+All of these directories create a list of rules. The order of the list is important. The firewall passes each packet  from one rule to the next trying to match the data in the packet with the tests in the rule. Some rules will be looking for matching IP addresses, some for ports and some for both addresses and ports. When the firewall finds a match, the rule tells it to make one of two decisions: accept the packet or reject it.
 
 The firewall is a filter, continuing with testing until it finds a decision. For inbound packets, the firewall passes the packet into:
 
-- the whitelist rules that will accept good guys, then 
-- the blacklist rules that will reject bad guys 
+- the whitelist rules that will accept good guys, then
+- the blacklist rules that will reject bad guys
 - and finally the incoming rules that will make decisions about all others.
 - If the packet falls out the bottom, then it's automatically rejected.
 
@@ -101,7 +101,7 @@ and you need to edit that to read:
 Port 22
 Port 516
 ```
-You now need to restart the sshd service. If you are on a remote machine and are using *ssh* to connect, this can be somewhat scary to restart the program you need to run to talk to the system. Firewalls will allow current connections to continue, so login using the Port 22 connection in a separate window and stay logged in until you are happy that things are working. 
+You now need to restart the sshd service. If you are on a remote machine and are using *ssh* to connect, this can be somewhat scary to restart the program you need to run to talk to the system. Firewalls will allow current connections to continue, so login using the Port 22 connection in a separate window and stay logged in until you are happy that things are working.
 
 Restart the _sshd_ service and find out what happened:
 
@@ -119,7 +119,7 @@ and hopefully it should connect. Incidentally if you use _scp_ to copy into the 
 We have _ssh_ running on a new port, what about port 22? It's still open to the world. You can delete it, or you can add one or more fixed IP addresses into the contents of that file to force it only to work for the addresses that it contains. If you don't have the need for fixed IP addresses, one strategy is to remove it from _incoming.d_ but leave it active. You can use the whitelist system to permit selected users from known IP addresses into the system using _ssh_.
 
 ### outgoing.d
- 
+
 Here's what is present in the _outgoing.d_ directory for a standard installation:
 
 ``` sh
@@ -184,7 +184,7 @@ $ sudo nftfw load
 ```
 
 Mostly it's run from the _incron_ daemon which triggers a call to _nftfw_ when files change in one of the action directories. As a catch-all, _cron_ will run the command once an hour.
- 
+
 The _load_ command tries not to make changes to the kernel's tables unless it has to. It creates a set of files that are needed for the complete ruleset and then compares those files with the set that was made on the last run. If the files are identical, no change is needed. The blacklist and whitelist rule sets can be replaced without changing the whole ruleset. The blacklist rules change most frequently, and an update to the blacklist is done without disturbing the remainder of the firewall. In general, all the rules maintain counts of matches, and these counts are reloaded when the complete firewall is replaced. By updating only parts of the firewall, these counts become a good indicator of activity on your system.
 
 The _-f_ or _--full_ flag to the _load_ command forces the new files to be loaded without reference to the last run.
@@ -193,10 +193,10 @@ _nftfw_ uses a configuration file in _/usr/local/etc/nftfw/config.ini_ to supply
 
 _nftfw_ will write error messages into _/var/log/syslog_ using the standard _syslog_ mechanism. To get an listing of what _ntfw_ is doing, set _loglevel_ in the config file to _INFO_.
 
-There are various manual pages - see [Manual page index](man/index.md). 
+There are various manual pages - see [Manual page index](man/index.md).
 
  If you are migrating from another firewall system to _nftfw_, now's the time to look at the [Migrating to nftfw](Installation.md#migrating-to-nftfw) section of the Installation document.
- 
+
 ## Blacklist
 
 _nftfw_ contains a scanner whose job is to watch log files and add offending IP addresses into _blacklist.d_. The scanner is started by:
@@ -225,7 +225,7 @@ __IP__.*%20UNION.*$
 
 Comments are useful, and comment lines are shown by putting a # at the start of the line.
 
-The file is split into two sections. The first couple of statements set the file to be scanned and the ports to be blocked if this pattern is matched. The rest of the file contains several regular expressions that match lines in the logfile. The 'magic' string ```__IP__``` (two underscores at each end) matches an IPv4 or IPv6 address in the line. If you are a _regex_ novice, then ```.*``` matches 'anything' and the ```$``` matches the end of the line.
+The file is split into two sections. The first couple of statements set the file to be scanned and the ports to be blocked if this pattern is matched. The rest of the file contains several regular expressions that match lines in the logfile.
 
 The file statement can contain shell 'glob' patterns, for example on a Symbiosis/Sympl system, you can scan all the website log files by using:
 
@@ -233,7 +233,17 @@ The file statement can contain shell 'glob' patterns, for example on a Symbiosis
 file=/srv/*/public/logs/access.log
 ```
 
-When scanning files, _nftfw_ remembers the last position it reached in the a file and restarts from that position. When adding a new expression to capture some bad line you've spotted in a log, it can sometimes be confusing that the bad guy doesn't suddenly appear in the blacklist. _nftfw_ supplies a way round this, see below.
+When scanning files, _nftfw_ remembers the last position it reached in the a file and restarts from that position. When adding a new expression to capture some bad line you've spotted in a log, it can sometimes be confusing that the bad guy doesn't suddenly appear in the blacklist. _nftfw_ supplies a way round this using the 'ports' statement, see below.
+
+The regular expressions contain the 'magic' string ```__IP__``` (two underscores at each end) matching an IPv4 or IPv6 address in the line. If you are a _regex_ novice, then ```.*``` matches 'anything' and the ```$``` matches the end of the line. Most matches can be specified using these simple constructs. Character case is ignored when the expression is matched against lines from the file.
+
+Regular expressions use several characters to mean something special, and if you want to match these characters in a line from a log then they must be preceded by a back-slash (\). The characters are:
+
+``` text
+\ . ^ $ * + ? ( ) { } [ ] |
+
+```
+It's important to use backslash before these characters to ensure that the expression means what you want it to mean. You can use any of the Python regular expression syntax to match lines, but _nftfw_ will complain if unescaped (..) strings appear, these indicate a 'match group', there should only be one - the ```__IP__``` . You _can_ use 'non-capturing groups'. For example,  to provide alternation,  an expression containing ```(?:word1|word2)```  will match 'word1' or 'word2' at that position in the line.
 
 _nftfw_ will ignore matched addresses that are not 'global', so if your system is a gateway with a local network running from it,  local network addresses are not blacklisted. It also ignores addresses found in the _whitelist.d_ directory. Using the whitelist avoids any entry for 'good' addresses appearing in the blacklist database.
 
@@ -244,10 +254,10 @@ If the match count is over a threshold number, defaulting to 10, and settable in
 The current state of the blacklist can be seen by using
 
 ``` sh
-$ nftfwls 
+$ nftfwls
 ```
 
-and the _-a_ option to this command lists all the entries in the database. _nftfwls_ has a manual page, see the [Manual page index](man/index.md). 
+and the _-a_ option to this command lists all the entries in the database. _nftfwls_ has a manual page, see the [Manual page index](man/index.md).
 
 ### The ports=update option
 
@@ -303,7 +313,7 @@ The whitelist scanner is started by
 $ sudo nftfw whitelist
 ```
 
-and is usually run from _cron_ every 15 minutes, usually 5 minutes after the blacklist run. 
+and is usually run from _cron_ every 15 minutes, usually 5 minutes after the blacklist run.
 
 It's job is a little simpler than the task faced by the blacklist, it adds the IP addresses used by users of the machine that have logged in from a global IP address into the _whitelist.d_ directory. The _whitelist.d_ directory is tracked by _incron_ and _nftfw load_ will be run to set any changed addresses into the firewall.
 
@@ -324,7 +334,7 @@ The _rule_ directory contains small shell scripts that translate firewall action
 - COUNTER - adds the 'counter' statement to the rule. The value is usually empty, or the word 'counter'
 - LOGGER - Finally the LOGGER value is either empty or contains ‘log prefix “String ”’, adding a space after any supplied string from _nftfw_.
 
-There are several examples of these scripts in the _/usr/local/etc/nftfw/rule.d_ and the README file in that directory explains what they do. 
+There are several examples of these scripts in the _/usr/local/etc/nftfw/rule.d_ and the README file in that directory explains what they do.
 
 ## Acknowledgement
 
