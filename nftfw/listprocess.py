@@ -153,7 +153,7 @@ class ListProcess:
                 if automerge:
                     settype = f'{{type {adtype}; flags interval; auto-merge;}}'+"\n"
                 else:
-                    settype = f'{{type {adtype};}}'+"\n"
+                    settype = f'{{type {adtype}; flags interval;}}'+"\n"
                 app = f'add set {ip} filter {setname} ' + settype
                 self.set_init['create'][ip] += app
                 # update the set

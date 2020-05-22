@@ -1,3 +1,6 @@
+v0.4.4  v0.4.2 removed intervals from sets as well as merge
+	intervals are needed for ipv6
+
 v0.4.3	Make the pattern reader regex compilation more robust.
 	Ignore case when compiling regexes for log scanning (should
 	have done this before).
