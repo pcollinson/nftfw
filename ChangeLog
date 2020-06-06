@@ -1,3 +1,9 @@
+v0.4.5  Don't use interval sets by default for blacklist and whitelist
+	sets. This is a change in distributed config rather than
+	functionality. Use of the system has found that certain
+	national actors frequently use adjacent IP addresses and
+	this triggers the nft bug causing table reloads to fail.
+
 v0.4.4  v0.4.2 removed intervals from sets as well as merge
 	intervals are needed for ipv6
 

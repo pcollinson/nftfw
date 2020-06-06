@@ -208,7 +208,7 @@ To stop logging, just use the name.
 \f[]
 .fi
 .PP
-These two variables control the type of sets automatically generated for
+Two variables control the type of sets automatically generated for
 blacklist and whitelist tables.
 When true, \f[I]nftfw\f[] uses auto_merged, interval sets for the
 blacklist or whitelist sets it makes.
@@ -217,7 +217,7 @@ range for adjacent IP addresses.
 The feature is desirable because it reduces the number of matches.
 .PP
 However, at present, the auto\-merged, interval sets can cause the
-\f[I]nft\f[] program to fail, flagging an error.
+\f[I]nft\f[] program to fail in some circumstances, flagging an error.
 There is a bug causing \f[I]nft\f[] to succeed in loading the set when a
 full install is performed but failing when attempting a reload.
 .PP
@@ -226,12 +226,12 @@ no fix has been generated as of the current releases.
 \f[I]nftfw\f[] will work around this bug, automatically generating a
 full install when an attempt at a set reload fails.
 However, it seems a good idea to provide a way of turning this feature
-off.
+on and default to not using the feature.
 .IP
 .nf
 \f[C]
-\ \ blacklist_set_auto_merge:\ True
-\ \ whitelist_set_auto_merge:\ True
+\ \ blacklist_set_auto_merge\ =\ False
+\ \ whitelist_set_auto_merge\ =\ False
 \f[]
 .fi
 .PP

@@ -70,11 +70,11 @@
   outgoing_logging
   blacklist_logging = Blacklist
   whitelist_logging</code></pre>
-<p>These two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, <em>nftfw</em> uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.</p>
-<p>However, at present, the auto-merged, interval sets can cause the <em>nft</em> program to fail, flagging an error. There is a bug causing <em>nft</em> to succeed in loading the set when a full install is performed but failing when attempting a reload.</p>
-<p>The bug has been reported to the <em>nftables</em> development team, but no fix has been generated as of the current releases. <em>nftfw</em> will work around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature off.</p>
-<pre><code>  blacklist_set_auto_merge: True
-  whitelist_set_auto_merge: True</code></pre>
+<p>Two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, <em>nftfw</em> uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.</p>
+<p>However, at present, the auto-merged, interval sets can cause the <em>nft</em> program to fail in some circumstances, flagging an error. There is a bug causing <em>nft</em> to succeed in loading the set when a full install is performed but failing when attempting a reload.</p>
+<p>The bug has been reported to the <em>nftables</em> development team, but no fix has been generated as of the current releases. <em>nftfw</em> will work around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.</p>
+<pre><code>  blacklist_set_auto_merge = False
+  whitelist_set_auto_merge = False</code></pre>
 <p><strong>[Whitelist]</strong></p>
 <p><em>wtmp_file</em> The <strong>whitelist</strong> command scans the wtmp file, and this variable is normally empty to use the system default. Set <em>wtmp_file=utmp</em> to use the system utmp file, otherwise set a filename in the variable.</p>
 <pre><code>  wtmp_file</code></pre>

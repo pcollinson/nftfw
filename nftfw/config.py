@@ -124,7 +124,8 @@ class Config:
                           generating a full install when an attempt at
                           a set reload fails. However, it seems a good
                           idea to provide a way of turning this
-                          feature off.
+                          feature on and default to not using the feature.
+
     blacklist_set_auto_merge : bool
     whitelist_set_auto_merge : bool
 
@@ -316,9 +317,11 @@ whitelist_logging
 # fix has been generated as of the current releases. nftfw will work
 # around this bug, automatically generating a full install when an
 # attempt at a set reload fails. However, it seems a good idea to
-# provide a way of turning this feature off.
-blacklist_set_auto_merge: True
-whitelist_set_auto_merge: True
+# provide a way of turning this feature on and default to not using
+# the feature.
+#
+blacklist_set_auto_merge: False
+whitelist_set_auto_merge: False
 
 [Whitelist]
 #
