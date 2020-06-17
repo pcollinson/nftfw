@@ -1,3 +1,9 @@
+v0.5.1  Pure FTP needs to allow access to a port range on input
+	for it to work. Add new rule - ftp-passive.sh to determine
+	the range from /etc/pure-ftpd/conf/PassivePortRange and
+	then add it to the allowed inbound ports. Put 21-ftp-passive in
+	incoming.d to include the range.
+
 v0.5.0  Tag a new release
 
 v0.4.5  Don't use interval sets by default for blacklist and whitelist

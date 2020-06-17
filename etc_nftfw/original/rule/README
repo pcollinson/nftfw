@@ -15,7 +15,7 @@ LOGGER - logger statement
        LOGGER='log prefix "STRING "'
        the space at the end of the string is needed
        to add a space in the log file
-       
+
 Files:
 allowtcpreset.sh       - allow tcp resets
 accept.sh              - general default accept ruleset
@@ -25,6 +25,8 @@ established.sh         - accept established connections
                        - Symbiosis compatibility, rules to do this
 		       - are in nftfw_init.nft
 ftp-helper.sh          - Add ftp helper for the ftp
+ftp-passive.sh	       - Add Passive inbound ports needed for pure-ftpd
+		         If not using pure-ftp edit the script to provide ports
 http-meter.sh          - replace http and https by a metering
                        - call to stop http(s) flooding
                        - needs load-http-meter
@@ -40,4 +42,3 @@ related.sh             - accept related connections
 syn-ack-flood-protection.sh
                        - Symbiosis compatibility, rules to do this
 		       - are in nftfw_init.nft
-
