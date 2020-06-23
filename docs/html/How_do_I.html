@@ -96,6 +96,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#how-do-i-see-what-the-firewall-is-doing">How do I: See what the firewall is doing?</a></li>
 <li><a href="#how-do-i-check-what-the-blacklist-scanner-is-doing">How do I: Check what the blacklist scanner is doing?</a></li>
 <li><a href="#how-do-i-find-the-country-sending-me-blacklisted-packets">How do I: Find the country sending me blacklisted packets?</a></li>
+<li><a href="#how-do-i-remove-a-good-ip-address-from-the-blacklist">How do I: Remove a good IP address from the blacklist?</a></li>
 <li><a href="#how-do-i-add-a-new-reason-for-blacklisting">How do I: Add a new reason for blacklisting?</a></li>
 <li><a href="#how-do-i-debug-my-new-blacklisting-expression">How do I: Debug my new blacklisting expression?</a></li>
 <li><a href="#how-do-i-change-the-settings-for-nftfw">How do I: Change the settings for <em>nftfw</em>?</a></li>
@@ -161,14 +162,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="how-do-i-find-the-country-sending-me-blacklisted-packets">How do I: Find the country sending me blacklisted packets?</h2>
 <p>If you install the geoip2 country database on your system, and its python interface, then <em>nftfwls</em> will show the country of origin when it displays its output. Access to the geoip2 databases is free, but MaxMind who produce it ask you to sign up. See the document <a href="Installing-GeoLocation.md">Installing Geolocation</a> for installation and signup information.</p>
 <p>The <em>nftfwedit</em> command also allows you to ask questions about any IP address, including the country of origin and whether the IP address is in selected DNS blacklist sites.</p>
+<h2 id="how-do-i-remove-a-good-ip-address-from-the-blacklist">How do I: Remove a good IP address from the blacklist?</h2>
+<p>If an IP address has found its way into the blacklist in error, then you can delete it using</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1">$ <span class="fu">sudo</span> nftfwedit -d IP.ADD.RE.SS</a></code></pre></div>
+<p>this will remove the address from the blacklist database and also delete the entry in the <em>blacklist.d</em> directory. If you just remove the address from the directory, <em>nftfw</em> will reinstate it because it’s in the database.</p>
 <h2 id="how-do-i-add-a-new-reason-for-blacklisting">How do I: Add a new reason for blacklisting?</h2>
 <p>If you’ve spotted a line in a logfile that you want to use to blacklist a site, then first see if the logfile is already scanned by the system and just add a new regular expression to the file. You can create a new pattern file if needed, calling it anything, but it must end in <em>.pattern</em>. Do beware that some log entries can appear in several log files.</p>
 <p>The regular expression doesn’t need to match the whole line, you need to identify where the IP address is in the line and use the string <code>__IP__</code> (that’s two underscores at each end) to pick it out. There should be enough information on the regular expression to make it only select one line. Look in the pattern files for examples. There’s also a section in the <a href="Users_Guide.md#blacklist">User’s Guide</a>.</p>
 <h2 id="how-do-i-debug-my-new-blacklisting-expression">How do I: Debug my new blacklisting expression?</h2>
 <p>You can use the <em>nftfw</em> command to see if your expression works. Create a new pattern file and set</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">ports</span> = test</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">ports</span> = test</a></code></pre></div>
 <p>and add your regular expression. Now say:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$ <span class="fu">sudo</span> nftfw -x -p PATTERN blacklist</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1">$ <span class="fu">sudo</span> nftfw -x -p PATTERN blacklist</a></code></pre></div>
 <p>and this will print a table showing the number of matches that the expression has detected. The PATTERN is the name of your file but without the <em>.pattern</em> appended. The <em>-x</em> option makes the program print a table, and also starts scanning the file from the beginning and doesn’t record where it found the end of the file, so using this command will not interfere with normal processing.</p>
 <p>The blacklist scanner normally ignores pattern files with <em>ports=test</em>, so it’s safe to leave these files in place.</p>
 <h2 id="how-do-i-change-the-settings-for-nftfw">How do I: Change the settings for <em>nftfw</em>?</h2>
@@ -177,9 +182,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="how-do-i-do-without-incron">How do I: do without <em>incron</em>?</h2>
 <p>It’s perfectly possible to run the firewall system without having <em>incron</em> installed on your machine.</p>
 <p>Ensure that the config file entry for incron is set to No:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">using_incron</span> = No</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">using_incron</span> = No</a></code></pre></div>
 <p>When you make manual changes to any of the control files, make sure you run</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> nftfw -f load</a></code></pre></div>
 <p>after you’ve changed the directory contents, or wait for the next automatic update.</p>
 <h2 id="how-do-i-get-more-information-on-nftfw">How do I: Get more information on <em>nftfw</em>?</h2>
 <p>The <a href="Users_Guide.md">User’s Guide to nftfw</a> documents the system and there are also <a href="man/index.md">UNIX manual pages</a>.</p>

@@ -14,6 +14,7 @@
     - [How do I: See what the firewall is doing?](#how-do-i-see-what-the-firewall-is-doing)
     - [How do I: Check what the blacklist scanner is doing?](#how-do-i-check-what-the-blacklist-scanner-is-doing)
     - [How do I: Find the country sending me blacklisted packets?](#how-do-i-find-the-country-sending-me-blacklisted-packets)
+    - [How do I: Remove a good IP address from the blacklist?](#how-do-i-remove-a-good-ip-address-from-the-blacklist)
     - [How do I: Add a new reason for blacklisting?](#how-do-i-add-a-new-reason-for-blacklisting)
     - [How do I: Debug my new blacklisting expression?](#how-do-i-debug-my-new-blacklisting-expression)
     - [How do I: Change the settings for _nftfw_?](#how-do-i-change-the-settings-for-nftfw)
@@ -150,6 +151,15 @@ If you install the geoip2 country database on your system, and its python interf
 
 The _nftfwedit_ command also allows you to ask questions about any IP address, including the country of origin and whether the IP address is in selected DNS blacklist sites.
 
+## How do I: Remove a good IP address from the blacklist?
+
+If an IP address has found its way into the blacklist in error,  then you can delete it using
+
+``` sh
+$ sudo nftfwedit -d IP.ADD.RE.SS
+```
+this will remove the address from the blacklist database and also delete the entry in the _blacklist.d_ directory. If you just remove the address from the directory, _nftfw_ will reinstate it because it's in the database.
+
 ## How do I: Add a new reason for blacklisting?
 
 If you've spotted a line in a logfile that you want to use to blacklist a site, then first see if the logfile is already scanned by the system and just add a new regular expression to the file. You can create a new pattern file if needed, calling it anything, but it must end in _.pattern_. Do beware that some log entries can appear in several log files.
@@ -191,7 +201,7 @@ using_incron = No
 When you make manual changes to any of the control files, make sure you run
 
 ``` sh
-$ sudo nftfw load
+$ sudo nftfw -f load
 ```
 after you've changed the directory contents, or wait for the next automatic update.
 

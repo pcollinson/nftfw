@@ -28,7 +28,7 @@ class ListReader:
     ----------
 
     srcdict : Dict[ip:contents]
-        Reads data from whitelist.d and loads
+        Reads data from {whitelist,blacklist}.d and loads
         ip : str
             IP address from the directory
         contents: str

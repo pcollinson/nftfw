@@ -43,10 +43,10 @@ class Scheduler:
 
         lock = Locker(str(self.lockfile))
 
-        # wait for lock for user commands don't process the queue for
-        # background commands treat build_only option to 'load' and
-        # 'blacklist' and if there a single pattern file as 'user'
-        # commands
+        # wait for lock for user commands
+        # don't process the queue for background commands
+        # treat build_only option to 'load' and 'blacklist'
+        #   and if there a single pattern file as 'user' commands
 
         if command in self.wait \
            or self.cf.create_build_only \
