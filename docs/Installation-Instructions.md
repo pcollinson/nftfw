@@ -3,6 +3,8 @@
 
 For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the [Installing nftfw](Installation.md) document. There are links, shown as 'Explanation', to the Installation document.
 
+NB. Versions of _nftfw_ from 0.6 no longer use _incron_ to create active directories, if you installed a previous version make sure you remove _incron_ support.
+
 ## Basic package installations
 
 ([Explanation](Installation.md#nftables))
@@ -23,11 +25,6 @@ $ sudo apt upgrade
 $ sudo apt -t buster-backports install nftables
 ```
 
-Install _incron_ ([Explanation](Installation.md#incron))
-
-``` sh
-$ sudo apt install incron
-```
 Install Python packages ([Explanation](Installation.md#python))
 
 ``` sh
@@ -144,7 +141,7 @@ The number in the log is the process id, so will be different for you.
 
 ## Taking precautions if you have a live firewall
 
-If you don't have a running _nftables_ or _iptables_ firewall, then skip to next section.
+If you don't have a running _nftables_ or _iptables_ firewall, then [skip to 'Run a test...'](#run-a-test-if-you-dont-have-a-live-firewall).
 
 If you DO carry on here ([Explanation](Installation.md#installation))
 
@@ -226,8 +223,64 @@ $ sudo mv if-down.d/sympl-firewall ~/down-sympl-firewall
 
 This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the _nftables_ settings  are loaded before the Symbiosis/Sympl ones.
 
-## Installing cron and incron
-See README in the _cronfiles_ directory.
+## Installing cron
+([Explanation](Installation.md#setting-up-cron))
+
+Change into the _cronfiles_ directory in the distribution. If you ran versions of _nftfw_ before 0.6, ensure that you replace the _cron.d_ file with the current version that doesn't run _incron_.
+
+``` sh
+$ cd cronfiles
+# check that the paths used in cron-nftfw are correct for you
+$ sudo cp cron-nftfw /etc/cron.d/nftfw
+$ cd ..
+```
+
+## Active control directories
+([Explanation](Installation.md#making-nftfw-control-directories-active))
+
+Make _nfwfw_ update the firewall when files in the control directories change. If you don't do this, then you will need to run
+
+``` sh
+$ sudo nftfw -f load
+```
+when you make a change by hand.
+
+Take these steps if you ran versions of _nftfw_ before 0.6 and used _incron_.
+
+``` sh
+# first, replace /etc/cron.d/nftfw with the current version that doesn't use incron
+# see above
+# then stop nftfw incron actions
+$ sudo rm /etc/incron.d/nftfw
+```
+Install _systemd_ control files from _systemd_ in the _nftfw_ distribution:
+
+``` sh
+$ cd systemd
+# check nftfw.path and nftfw.service have correct paths
+$ sudo cp nftfw.* /etc/systemd/system
+$ cd ..
+
+# start the path unit only
+$ sudo systemctl enable nftfw.path
+$ sudo systemctl start nftfw.path
+$ sudo systemctl status
+
+# DON'T start or enable nftfw.service
+# it will be started when needed by nftfw.path
+```
+
+Stop incron if it's running and you no longer need it
+``` sh
+$ sudo systemctl stop incron
+$ sudo systemctl disable incron
+```
+
+Finally a tip that's hard to find: reload  _systemd_ if you change the _nftfw_ files after installation and starting:
+
+``` sh
+$ sudo systemctl daemon-reload
+```
 
 ## Installing Geolocation
 

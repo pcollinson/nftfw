@@ -118,15 +118,15 @@ used to access the system.
 \f[B]nftfw\f[] creates a file named for the IP address in
 \f[I]/usr/local/etc/nftfw/whitelist.d\f[] as long as the IP address is
 global.
-On the next \f[B]load\f[] run, these addresses will find their way into
-the firewall accepting connections before any further checking.
-The effect is to whitelist remote users of the system.
 .PP
 The \f[B]whitelist\f[] command expires addresses that were automatically
 created (identified by the suffix \f[I].auto\f[]) after a set number of
 days given in \f[B]nftfw\f[]'s config file.
-\f[B]nftfw\f[] uses incrond(8) to trigger a call the \f[B]load\f[]
-function when the contents of the whitelist directory alters.
+.PP
+If the scanner makes any changes, \f[B]whitelist\f[] invokes the
+\f[B]load\f[] command automatically installing the changes in the
+firewall.
+.PP
 See nftfw\-files(5) for information on the file formats used for
 whitelist control files.
 .PP
@@ -152,12 +152,18 @@ number of days.
 See nftfw\-files(5) for information on the file formats used for
 blacklist control files.
 .PP
+If the scanner makes any changes, \f[B]blacklist\f[] invokes the
+\f[B]load\f[] command automatically installing the changes in the
+firewall.
+.PP
 \f[B]tidy\f[]
 .PP
 The \f[B]tidy\f[] command removes old entries from the blacklist
 database stopping it from growing to immense proportions.
-Records are removed if the IPs they refer to haven't been seen for a set
-number of days given in the configuration file, see nftfw\-config(5).
+\f[B]tidy\f[] removes IP's that haven't appeared for a set number of
+days.
+The configuration file (see nftfw\-config(5)) supplies the number of
+days.
 .PP
 These are the available options to the program:
 .TP
@@ -179,7 +185,7 @@ stored log file positions.
 .RS
 .RE
 .TP
-.B \f[B]\-C\f[], \f[B]\-\-ConfigO\f[] CONFIG
+.B \f[B]\-C\f[], \f[B]\-\-config\f[] CONFIG
 Supply a alternate configuration file, overriding any values from the
 default system settings.
 .RS

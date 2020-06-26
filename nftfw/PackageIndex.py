@@ -33,11 +33,9 @@ fileposdb.py	       Derived from SqDb, FileposdB is interface to
 fwdb.py		       Derived from SqDb, FwDb is interface to sqlite3
                        providing an interface to the blacklist database
 scheduler.py	       Provides locking and command sequencing for
-                       both background commands run from cron and
+                       both background commands run from cron, systemd or
                        incron and also for commands run from the
                        command line
-filemanager.py	       Stores file actions and then executes them
-		               to ensure the filesystem is updated quickly
 stats.py               Compute durations and frequencies
 
 Nftfw modules
@@ -83,10 +81,6 @@ blacklist.py	       Controls blacklisting, reads patterns
 		       scan and regexes to apply.
  logreader.py	       Uses patternreader output and manages file
 		       scanning
- filemanager.py	       Collects all file change actions and then
-		       executes them in a fast loop
-		       Intended to assist with when incron calls
-		       for a rebuild
  whitelistcheck.py     Checks whether addresses found in logs
                        are actually whitelisted, don't blacklist
                        whitelist addresses

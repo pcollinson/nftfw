@@ -18,7 +18,6 @@
     - [How do I: Add a new reason for blacklisting?](#how-do-i-add-a-new-reason-for-blacklisting)
     - [How do I: Debug my new blacklisting expression?](#how-do-i-debug-my-new-blacklisting-expression)
     - [How do I: Change the settings for _nftfw_?](#how-do-i-change-the-settings-for-nftfw)
-    - [How do I: do without _incron_?](#how-do-i-do-without-incron)
     - [How do I: Get more information on _nftfw_?](#how-do-i-get-more-information-on-nftfw)
     - [Acknowledgement](#acknowledgement)
 
@@ -187,23 +186,6 @@ The blacklist scanner normally ignores pattern files with _ports=test_, so it's 
 The file _/usr/local/etc/nftfw.ini_ is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.
 
 See the manual page [_nftfw-config_](man/nftfw-config.5.md) for a description.
-
-## How do I: do without _incron_?
-
-It's perfectly possible to run the firewall system without having _incron_ installed on your machine.
-
-Ensure that the config file entry for incron is set to No:
-
-``` sh
-using_incron = No
-
-```
-When you make manual changes to any of the control files, make sure you run
-
-``` sh
-$ sudo nftfw -f load
-```
-after you've changed the directory contents, or wait for the next automatic update.
 
 ## How do I: Get more information on _nftfw_?
 

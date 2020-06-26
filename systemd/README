@@ -1,0 +1,16 @@
+These two files will enable nftfw to run and load
+nftables when contents of the control directories change.
+
+To install:
+
+1) copy nftfw.path and nftfw.service to /etc/systemd/system
+
+2) Start the path checking service
+
+sudo systemctl start nftfw.path
+
+2) Enable the unit so it will start in boot
+
+sudo systemctl enable nftfw.path
+
+and you are done.

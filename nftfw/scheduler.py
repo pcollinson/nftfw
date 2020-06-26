@@ -2,10 +2,9 @@
 
 Use a lockfile to ensure only one instance is running at any one time.
 
-For commands called automatically from cron & incron, use a
+For commands called automatically from cron, systemd or incron, use a
 non-blocking lock, when access to the lock fails, the command is
-placed in a queue. To prevent deluges of calls from incron, only allow
-one command of each type in the queue.
+placed in a queue. Only allow one command of each type in the queue.
 
 'System' commands run and then process the queue before releasing the
 lock.
@@ -130,11 +129,9 @@ class Scheduler:
             from whitelist import WhiteList
             wt = WhiteList(cf)
             changes = wt.whitelist()
-            # rebuild the firewall if needed and
-            # not using incron
-            if not cf.using_incron \
-               and changes > 0:
-                fw_manage(cf)
+            # rebuild the firewall if needed
+            if changes > 0:
+                self.enqueue('load')
 
         elif command == 'blacklist':
             bl = BlackList(cf)
@@ -143,12 +140,10 @@ class Scheduler:
             if self.cf.create_build_only:
                 bl.blacklist_scan()
             else:
-                # rebuild the firewall if needed and
-                # not using incron
                 changes = bl.blacklist()
-                if not cf.using_incron \
-                   and changes > 0:
-                    fw_manage(cf)
+                # rebuild the firewall if needed
+                if changes > 0:
+                    self.enqueue('load')
 
         elif command == 'tidy':
             bl = BlackList(cf)
@@ -171,6 +166,5 @@ class Scheduler:
             from nf_edit_dbfns import DbFns
             dbf = DbFns(cf)
             changes = dbf.execute()
-            if not cf.using_incron \
-               and changes > 0:
-                fw_manage(cf)
+            if changes > 0:
+                self.enqueue('load')

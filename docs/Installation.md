@@ -40,7 +40,7 @@ Well, what you need to do depends on what's running in your system. Buster comes
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-if your version output looks like that, then you are OK and can just skip over what follows to **[incron](#incron)**.
+if your version output looks like that, then you are OK and can just skip over what follows to **[Python](#python)**.
 
 If the words in brackets says _legacy_ then you need to swap to the _nf_tables_ version. Here's what you do:
 
@@ -74,22 +74,6 @@ $ sudo ip6tables-legacy -F
 ```
 
 All done, and it's painless. You have a system that works for both _iptables_  commands and _nftables_ _nft_ command.
-
-### incron
-
-_nftfw_ uses incron. It monitors files on the file system and triggers events when the files change. If you don't have it:
-
-``` sh
-$ sudo apt install incron
-```
-
-As I write, the available version of _incron_ is 0.5.12-1. It has a nasty bug where it will leave processes hanging around on the system. On a busy system, dormant processes can cause problems. There is a fixed version 0.5.12-2, stuck in the Debian testing system. It apparently has a bug which doesn't affect system use, but as a consequence is not released for mortals at the time of writing. If it is now available, I suggest you install it.
-
-I am using a work-around. I have an entry for _cron_ which restarts the program every 24 hours. This removes all the dormant processes. See the sample _cron_ entry in the _cronfiles_ directory.
-
-_nftfw_ doesn't need_incron_, see the note [How do I: do without _incron_?](How_do_I.md#how-do-i-do-without-incron) in the How do I document.
-
-_sympl_ no longer installs _incron_, but I think I like the idea of instant actions when the _nftfw_ control directories change.
 
 ### Python
 
@@ -319,11 +303,65 @@ $ sudo systemctl status nftables
 
 On a boot of a Symbiosis or Sympl system, the firewall starts at network up time and closes at network down time. Change into _/etc/network_ and delete _if-up.d/{symbiosis|sympl}-firewall_ and _if-down.d/{symbiosis|sympl}-firewall}_. The file is a symbolic link to the firewall script. This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the _nftables_ settings  are loaded before the Symbiosis/Sympl ones.
 
-### Setting _cron_ and _incron_
+### Setting up _cron_
 
-Like Symbiosis/Sympl, _nftfw_ uses _cron_ to drive regular polls by the firewall loader, and blacklist and whitelist scanners. _nftfw_ will rebuild its tables when triggered from _incron_ monitoring the four control directories in _/usr/local/etc/nftfw_. You'll find sample _cron_ and _incron_ control files in the _cronfiles_ directory in the distribution. Hopefully, by now, you've moved the Symbiosis or Sympl versions to somewhere where they are  not activ4.
+Like Symbiosis/Sympl, _nftfw_ uses _cron_ to drive regular polls by the firewall loader, and blacklist and whitelist scanners. You'll find a sample _cron_ control file in the _cronfiles_ directory in the distribution. Hopefully, by now, you've moved the Symbiosis or Sympl versions to somewhere where they are not active.
 
-Look in _cronfiles_ in the _nftfw_ distribution. The files there have _/usr/local/_ in them, if your system is installed from root, you'll need to edit both files to point to the correct locations. Install _cron.d-nftfw_ in _/etc/cron.d/nftfw_, and if you are using _incron_, install _incron-nftfw_ in _/etc/incron.d/nftfw_ (if not, remember to edit _config.ini_ to tell _nftfw_).
+Check _cron-nftfw_ in the _cronfiles_ directory. The file contains _/usr/local/_ as a pathname, if your system is installed from root, you'll need to edit the file to point to the correct location.
+
+Install _cron-nftfw_ in _/etc/cron.d/nftfw_.
+
+``` sh
+# go to the nftfw distribution to find cronfiles
+$ cd cronfiles
+$ sudo cp cron-nftfw /etc/cron.d/nftfw
+$ cd ..
+```
+
+### Making _nftfw_ control directories 'active'
+
+The original Symbiosis system used the _incron_ system to make the _nftfw_ control directories active, ensuring firewall updates when files alter, appear or disappear. Sympl stopped using _incron_ because it's poorly maintained and buggy. Without automatic updates, the system needs reloading whenever a user changes the contents of one of the directories, and forgetting to run the reload command is a source of errors. _nftfw_ will work  happily without active directories, but it makes the life of the system admin easier.
+
+_nftfw_ supplies control files for _systemd_ using its ability to track file changes and starting a firewall reload when a change is detected in one of the control directories. This system replaces the _incron_ support supplied before version 0.6.
+
+To install the files and start the system:
+
+``` sh
+# stop incron for nftfw if needed
+$ sudo rm /etc/incron.d/nftfw
+
+# check that _/etc/cron.d/nftfw doesn't start incron
+# if it does, delete the lines, or see above to install the new cron file
+
+# go to the nftfw distribution to find systemd files
+$ cd systemd
+
+# check that the nftfw files contain the correct paths, edit if necessary
+# install the files
+$ sudo cp nftfw.* /etc/systemd/system
+$ cd ..
+
+# start the units
+$ sudo systemctl enable nftfw.path
+$ sudo systemctl start nftfw.path
+$ sudo systemctl status
+```
+The last command should show that the unit is active.
+
+You can test this by going to the _whitelist.d_ directory and adding and removing 8.8.8.8 while monitoring _/var/log/syslog_. The _nftfw_ command should run and update the firewall.
+
+Finally, you can turn off _incron_, if it's running:
+
+``` sh
+$ sudo systemctl stop incron
+$ sudo systemctl disable incron
+```
+
+Finally a tip that's hard to find: reload  _systemd_ if you change the _nftfw_ files after installation and starting:
+
+``` sh
+$ sudo systemctl daemon-reload
+```
 
 ### Geolocation
 

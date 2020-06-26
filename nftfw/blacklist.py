@@ -20,7 +20,6 @@ import logging
 from logreader import log_reader
 from listreader import ListReader
 from fwdb import FwDb
-from filemanager import FileManager
 from whitelistcheck import WhiteListCheck
 from stats import duration, frequency
 log = logging.getLogger('nftfw')
@@ -30,12 +29,11 @@ class BlackList:
 
     Steps:
     1. Load pattern files
-    2. Set up filemanager to defer filesystem actions
-    3. Scan log files using logreader, maintain database.
+    2. Scan log files using logreader, maintain database.
        Store actions to create any files in blacklist.d
-    4. Check for files in blacklist.d that need expiry
-    5. Update files
-    6. Clean database
+    3. Check for files in blacklist.d that need expiry
+    4. Update files
+    5. Clean database
     """
 
     # pylint: disable=too-many-instance-attributes
@@ -60,8 +58,6 @@ class BlackList:
         self.expire_after = int(logvars['expire_after'])
         self.clean_before = int(logvars['clean_before'])
         self.sync_check = int(logvars['sync_check'])
-        # file manager instance
-        self.manager = None
 
     def blacklist(self):
         """Black list entry point from scheduler
@@ -84,7 +80,6 @@ class BlackList:
         # happen as fast as possible
         # so cache all the actions
         # and do them in a loop at the end
-        self.open_file_manager()
 
         # count changes
         changes = 0
@@ -102,9 +97,6 @@ class BlackList:
         # Expiry code
         log.info("Blacklist expiry scan")
         changes += self.scan_for_expires()
-
-        # write / delete files
-        self.action_file_manager()
 
         log.info('Blacklist scan ends - changes: %d', changes)
 
@@ -461,11 +453,11 @@ class BlackList:
         if not ipfile.exists() \
            or ports_have_changed:
             p = '\n'.join(ports.split(','))
-            self.manager.write(ipfile, p+'\n')
+            self.write(ipfile, p+'\n')
             log.info("%s created from %s", fname, current['pattern'])
             return 1
 
-        self.manager.touch(ipfile)
+        self.touch(ipfile)
         log.info("%s updated from %s", fname, current['pattern'])
         return 0
 
@@ -556,7 +548,7 @@ class BlackList:
         changes = 0
         for p in bld.glob('[0-9a-z]*.auto'):
             if int(p.stat().st_mtime) < threshold:
-                self.manager.delete(p)
+                p.unlink()
                 log.info('Blacklist %s expired', p.stem)
                 changes += 1
         return changes
@@ -615,13 +607,14 @@ class BlackList:
 
         log.info("Blacklist database clean ends")
 
-    # Placed into separate functions for nftfwedit access
-    def open_file_manager(self):
-        """Open filemanager"""
+    def write(self, path, contents):
+        """ Write file contents and ensure ownership """
 
-        self.manager = FileManager(self.cf)
+        path.write_text(contents)
+        self.cf.chownpath(path)
 
-    def action_file_manager(self):
-        """Write files"""
+    def touch(self, path):
+        """ Touch file and ensure ownership """
 
-        self.manager.action()
+        path.touch()
+        self.cf.chownpath(path)

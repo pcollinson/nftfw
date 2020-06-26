@@ -41,4 +41,52 @@ Successfully installed nftfw-<version>
 
 ## Re-run the Install.sh script
 
-Will update files in your _etc/nftfw_ directory, but will not touch any working files. The _original_ directory may contain changes that are useful to you. You can use _diff_ to compare your working versions with the distribution.
+Will update files in your _etc/nftfw_ directory, but will not touch any working files. The _original_ directory may contain changes that are useful to you. You can use _diff_ to compare your working versions with files in the _original_ directory.
+
+The [Incron] section in the _config.ini_ file can be deleted as it's no longer used.
+
+## Changes for _nftfw_ version 0.6 and onwards
+
+_ntftw_ no longer recommends the use of _incron_ to provide a 'active' directory so changes in directories in_/usr/local/nftfw_ cause automatic running of the _nftfw load_ command. A _systemd_ unit that watches directories and calls the command replaces _incron_. If you've installed a previous version then you need to unwind parts of the _incron_ support system.
+
+Take these steps if you ran versions of _nftfw_ before 0.6 and used _incron_. These steps are shown in other files, but it seems sensible to emphasise them here. These can be done before or after you install the new version. The _systemd_ can run with version before 0.6, but 0.6 contains some coding changes to make it work a little better.
+
+First, move to the _nftfw_ distribution and replace the _cron.d_ file
+``` sh
+$ cd cronfiles
+# check that the paths used in cron-nftfw are correct for you
+$ sudo cp cron-nftfw /etc/cron.d/nftfw
+$ cd ..
+```
+
+then stop _incron_ from running _nftfw_:
+``` sh
+$ sudo rm /etc/incron.d/nftfw
+```
+
+Install _systemd_ control files from _systemd_ in the _nftfw_ distribution:
+``` sh
+$ cd systemd
+# check nftfw.path and nftfw.service have correct paths
+$ sudo cp nftfw.* /etc/systemd/system
+$ cd ..
+
+# start the path unit only
+$ sudo systemctl enable nftfw.path
+$ sudo systemctl start nftfw.path
+$ sudo systemctl status
+
+# DON'T start or enable nftfw.service
+# it will be started when needed by nftfw.path
+```
+
+Stop incron if it's running and you no longer need it
+``` sh
+$ sudo systemctl stop incron
+$ sudo systemctl disable incron
+```
+
+Finally a tip that's hard to find: reload  _systemd_ if you change the _nftfw_ files after installation and starting:
+``` sh
+$ sudo systemctl daemon-reload
+```

@@ -379,22 +379,6 @@ used to access the list in the DNS lookup.
 \ \ ;SpamCop=bl.spamcop.net
 \f[]
 .fi
-.PP
-\f[B][Incron]\f[]
-.PP
-\f[I]use_incron\f[] \f[B]nftfw\f[] uses \f[I]incron\f[] so that the
-firewall files in \f[I]/usr/local/etc/nftfw\f[] are updated, changes are
-actioned automatically.
-Set the \f[I]use_incron\f[] variable to `No' if \f[I]incron\f[] is not
-available.
-Background processing of black and white lists will action the changes,
-\f[B]nftfw load\f[] will need to be run after any changes made by hand.
-.IP
-.nf
-\f[C]
-\ \ use_incron\ =\ Yes
-\f[]
-.fi
 .SH FILES
 .PP
 Files can be located in \f[I]/\f[] rather than \f[I]/usr/local\f[].

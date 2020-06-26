@@ -181,13 +181,6 @@ Sample entries are supplied in the distributed file, and require un-commenting b
       ;Barracuda=b.barracudacentral.org
       ;SpamCop=bl.spamcop.net
 
-**\[Incron]**
-
-_use_incron_
-**nftfw** uses _incron_ so that the firewall files in _/usr/local/etc/nftfw_ are updated, changes are actioned automatically. Set the _use_incron_ variable to 'No' if _incron_ is not available. Background processing of black and white lists will action the changes, **nftfw load** will need to be run after any changes made by hand.
-
-      use_incron = Yes
-
 FILES
 =====
 

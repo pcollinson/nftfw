@@ -83,7 +83,7 @@ $ touch 07-516
 
 It may be that you don't have access to write in the directory, on Symbiosis the directory belongs to the 'admin' user, on Sympl it's the 'sympl' user. Make sure you log in as the right user, or use _sudo_ to get access.
 
-Now if you _ls -l_, you'll see the empty file. If you are using _incron_, _nftfw_ will run in the background and will add a new rule to the firewall enabling access via port 516. Otherwise you'll need to run:
+Now if you _ls -l_, you'll see the empty file. If you are using the _systemd_ active directory, _nftfw_ will run in the background and will add a new rule to the firewall enabling access via port 516. Otherwise you'll need to run:
 
 ``` sh
 $ sudo nftfw load
@@ -155,7 +155,7 @@ The first IP address is a version 4 address, and the second a version 6 address.
 
 An empty blacklist file will block access to all ports to the IP address given by the name. Adding port numbers into the file, one per line, will restrict access to only those port numbers. The word 'all' can also be added, blocking all incoming ports. If a file contains 'all', other port numbers are ignored.
 
-If your system doesn't have incron installed, you will need to run
+If your system doesn't have _systemd_ active directory installed, you will need to run
 
 ``` sh
 $ sudo nftfw load
@@ -168,7 +168,7 @@ The whitelist directory follows the same basic pattern used to manage the blackl
 
 The whitelist scanner will create files ending in _.auto_. See below.
 
-If your system doesn't have incron installed, you will need to run
+If your system doesn't have _systemd_ active directory installed, you will need to run
 
 ``` sh
 $ sudo nftfw load
@@ -183,11 +183,11 @@ The root user runs_nftfw_ from the command line to create the firewall:
 $ sudo nftfw load
 ```
 
-Mostly it's run from the _incron_ daemon which triggers a call to _nftfw_ when files change in one of the action directories. As a catch-all, _cron_ will run the command once an hour.
+It can be run from the _systemd_ daemon whose _nftfw.path_ service (when installed) triggers a call to _nftfw_ when files change in one of the action directories. As a catch-all, _cron_ will run the command once an hour.
 
 The _load_ command tries not to make changes to the kernel's tables unless it has to. It creates a set of files that are needed for the complete ruleset and then compares those files with the set that was made on the last run. If the files are identical, no change is needed. The blacklist and whitelist rule sets can be replaced without changing the whole ruleset. The blacklist rules change most frequently, and an update to the blacklist is done without disturbing the remainder of the firewall. In general, all the rules maintain counts of matches, and these counts are reloaded when the complete firewall is replaced. By updating only parts of the firewall, these counts become a good indicator of activity on your system.
 
-The _-f_ or _--full_ flag to the _load_ command forces the new files to be loaded without reference to the last run.
+The _-f_ or _--full_ flag to the _load_ command forces the new files to be loaded without reference to the last run. Consider  using the _-f_ flag to force a full reload if you think that the firewall isn't working.
 
 _nftfw_ uses a configuration file in _/usr/local/etc/nftfw/config.ini_ to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The _-i_ flag to _nftfw_ lists all the values that are in force.
 
@@ -204,7 +204,7 @@ _nftfw_ contains a scanner whose job is to watch log files and add offending IP 
 ``` sh
 $ sudo nftfw blacklist
 ```
-and that's usually run from _cron_ every 15 minutes.
+and that's usually run from _cron_ every 15 minutes. If it makes any changes, it will reload the firewall, usually only changing the parts of the firewall that it uses.
 
 The rules for scanning are supplied by a set of files in _/usr/local/etc/nftfw/patterns.d_. Files here are named by _'pattern-name'.pattern_. Here's part of my _apache2.pattern_ file:
 
@@ -243,11 +243,11 @@ Regular expressions use several characters to mean something special, and if you
 \ . ^ $ * + ? ( ) { } [ ] |
 
 ```
-It's important to use backslash before these characters to ensure that the expression means what you want it to mean. You can use any of the Python regular expression syntax to match lines, but _nftfw_ will complain if unescaped (..) strings appear, these indicate a 'match group', there should only be one - the ```__IP__``` . You _can_ use 'non-capturing groups'. For example,  to provide alternation,  an expression containing ```(?:word1|word2)```  will match 'word1' or 'word2' at that position in the line.
+It's important to use backslash before these characters to make sure that the expression means what you want it to mean. You can use any of the Python regular expression syntax to match lines, but _nftfw_ will complain if unescaped (..) strings appear, these indicate a 'match group', there should only be one - the ```__IP__``` . You _can_ use 'non-capturing groups'. For example,  to provide alternation,  an expression containing ```(?:word1|word2)```  will match 'word1' or 'word2' at that position in the line.
 
 _nftfw_ will ignore matched addresses that are not 'global', so if your system is a gateway with a local network running from it,  local network addresses are not blacklisted. It also ignores addresses found in the _whitelist.d_ directory. Using the whitelist avoids any entry for 'good' addresses appearing in the blacklist database.
 
-When  _nftfw_ finds a match, it stores the IP address, the ports, the time of first encounter, the time of last encounter and the matching pattern name in a database. It also stores a running count of matches found and the number of 'incidents', the latter is the number of runs of the scanner it has taken to make the match count.
+When  _nftfw_ finds a match, it stores the IP address, the ports, the time of first encounter, the time of last encounter and the matching pattern name  in a database. It also stores a running count of matches found and the number of 'incidents', the latter is the number of runs of the scanner it has taken to make the match count.
 
 If the match count is over a threshold number, defaulting to 10, and settable in the _config.ini_ file, the scanner will add a file to the _blacklist.d_ directory, triggering a run of _nftfw load_ to put the ip address into the blacklist blocking against the nominated ports. When the match count gets over a second threshold, default 100, and also settable in _config.ini_, the blacklist entry is promoted to blocking all ports.
 
@@ -313,9 +313,9 @@ The whitelist scanner is started by
 $ sudo nftfw whitelist
 ```
 
-and is usually run from _cron_ every 15 minutes, usually 5 minutes after the blacklist run.
+and is usually run from _cron_ every 15 minutes, usually 5 minutes after the blacklist run. If it makes any changes, it will reload the firewall, usually only changing the parts of the firewall that it uses.
 
-It's job is a little simpler than the task faced by the blacklist, it adds the IP addresses used by users of the machine that have logged in from a global IP address into the _whitelist.d_ directory. The _whitelist.d_ directory is tracked by _incron_ and _nftfw load_ will be run to set any changed addresses into the firewall.
+It's job is a little simpler than the task faced by the blacklist, it adds the IP addresses used by users of the machine that have logged in from a global IP address into the _whitelist.d_ directory.
 
 The whitelist command looks in the system's _wtmp_ file that records all user logins and system reboots. It can be set to look in the _wtmp_ file that just contains today's activity by changing the _wtmp_ value in _config.
 

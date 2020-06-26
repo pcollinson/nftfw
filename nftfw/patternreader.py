@@ -186,6 +186,8 @@ def _pattern_scan(contents, filename):
 
     """
 
+    # pylint: disable=too-many-branches
+
     # re used to pick out value setting lines
     commandre = re.compile(r'^([a-z]*)\s*=\s*(.*)(:?#.*)?')
     ports = None
@@ -236,8 +238,9 @@ def _pattern_scan(contents, filename):
             try:
                 cm = re.compile(linere, re.IGNORECASE)
                 if cm.groups != 1:
-                    log.error('Pattern in %s, Line %s ignored - extra regex match groups found - use \ before ( and )',
-                              filename, lineno)
+                    fmt = '%s, Line %s ignored ' \
+                            + ' - extra regex match groups found - use \\ before ( and )'
+                    log.error(fmt, filename, lineno)
                 else:
                     regex.append(cm)
             except re.error:

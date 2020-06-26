@@ -1,4 +1,0 @@
-/usr/local/etc/nftfw/incoming.d IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR,loopable=true /usr/local/bin/nftfw -q load
-/usr/local/etc/nftfw/outgoing.d IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR,loopable=true /usr/local/bin/nftfw -q load
-/usr/local/etc/nftfw/whitelist.d IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR,loopable=true /usr/local/bin/nftfw -q load
-/usr/local/etc/nftfw/blacklist.d IN_DELETE,IN_MOVE,IN_CLOSE_WRITE,IN_ONLYDIR,loopable=true /usr/local/bin/nftfw -q load

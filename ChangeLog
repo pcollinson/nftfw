@@ -1,5 +1,14 @@
-v0.5.2  Revised some comments that were a little obscure.
-	Change to the How Do I Document
+v0.6.0  Revised some comments that were a little obscure.
+	Add new entry to the How Do I Document
+	Replace incron use by systemd path service
+	Revise scheduler to remove incron flag which isn't needed.
+	Replace use of incron by a systemd path service
+	which seems to do the job.
+	Code changed to remove incron flag and change to
+	scheduler which makes it work without either incron
+	or systemd.
+	Incron references removed from documentation.
+	Installation instructions updated
 
 v0.5.1  Pure FTP needs to allow access to a port range on input
 	for it to work. Add new rule - ftp-passive.sh to determine

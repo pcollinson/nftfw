@@ -48,14 +48,17 @@
 </ol>
 <p>The steps from (4) above could result in a broken system if parts of the installation fails. <strong>nftfw</strong> avoids the possible disaster by storing a backup copy of the kernel’s rules before attempting any update. On failure, <strong>nftfw</strong> reverts to the backup rules.</p>
 <p><strong>whitelist</strong></p>
-<p>The <strong>whitelist</strong> action is a scanner for the system’s wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. <strong>nftfw</strong> creates a file named for the IP address in <em>/usr/local/etc/nftfw/whitelist.d</em> as long as the IP address is global. On the next <strong>load</strong> run, these addresses will find their way into the firewall accepting connections before any further checking. The effect is to whitelist remote users of the system.</p>
-<p>The <strong>whitelist</strong> command expires addresses that were automatically created (identified by the suffix <em>.auto</em>) after a set number of days given in <strong>nftfw</strong>’s config file. <strong>nftfw</strong> uses incrond(8) to trigger a call the <strong>load</strong> function when the contents of the whitelist directory alters. See nftfw-files(5) for information on the file formats used for whitelist control files.</p>
+<p>The <strong>whitelist</strong> action is a scanner for the system’s wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. <strong>nftfw</strong> creates a file named for the IP address in <em>/usr/local/etc/nftfw/whitelist.d</em> as long as the IP address is global.</p>
+<p>The <strong>whitelist</strong> command expires addresses that were automatically created (identified by the suffix <em>.auto</em>) after a set number of days given in <strong>nftfw</strong>’s config file.</p>
+<p>If the scanner makes any changes, <strong>whitelist</strong> invokes the <strong>load</strong> command automatically installing the changes in the firewall.</p>
+<p>See nftfw-files(5) for information on the file formats used for whitelist control files.</p>
 <p><strong>blacklist</strong></p>
 <p>The <strong>blacklist</strong> command is a file scanner creating IP address files in <em>/usr/local/etc/nftfw/blacklist.d</em>. The scanner reads pattern files from <em>/usr/local/etc/nftfw/patterns.d</em>. Pattern files contain a file name (or a range of files given by shell <em>glob</em> rules), the relevant ports for blocking and a set of regular expressions matching offending lines in the nominated log files.</p>
 <p>When <strong>nftfw</strong> finds a match, it updates a sqlite3(1) database with the information and uses the frequency of matches (given in the config file) to decide whether to blacklist the IP.</p>
 <p>When scanning log files, the blacklist engine remembers the position in the file at the end of the last scan, so only examines new entries on every pass. The <strong>blacklist</strong> command also expires blacklisted IPs after a set number of days. See nftfw-files(5) for information on the file formats used for blacklist control files.</p>
+<p>If the scanner makes any changes, <strong>blacklist</strong> invokes the <strong>load</strong> command automatically installing the changes in the firewall.</p>
 <p><strong>tidy</strong></p>
-<p>The <strong>tidy</strong> command removes old entries from the blacklist database stopping it from growing to immense proportions. Records are removed if the IPs they refer to haven’t been seen for a set number of days given in the configuration file, see nftfw-config(5).</p>
+<p>The <strong>tidy</strong> command removes old entries from the blacklist database stopping it from growing to immense proportions. <strong>tidy</strong> removes IP’s that haven’t appeared for a set number of days. The configuration file (see nftfw-config(5)) supplies the number of days.</p>
 <p>These are the available options to the program:</p>
 <dl>
 <dt><strong>-h</strong>, <strong>--help</strong></dt>
@@ -67,7 +70,7 @@
 <dt><strong>-x</strong>, <strong>--no-exec</strong></dt>
 <dd><p>Create rules in _/var/lib/nftfw/test.d and test them. When used with the <strong>blacklist</strong> command, prints the result of scanning for matches without saving any information and without updating stored log file positions.</p>
 </dd>
-<dt><strong>-C</strong>, <strong>--ConfigO</strong> CONFIG</dt>
+<dt><strong>-C</strong>, <strong>--config</strong> CONFIG</dt>
 <dd><p>Supply a alternate configuration file, overriding any values from the default system settings.</p>
 </dd>
 <dt><strong>-p</strong>,<strong>--pattern</strong></dt>

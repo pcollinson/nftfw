@@ -17,15 +17,3 @@
 
 # Keep firewall database under control
 02 10 * * * root /usr/local/bin/nftfw -q tidy
-
-# On Buster, The currently installed incron is
-# version 0.5.12-1
-# It has a nasty bug. When it runs a script it leaves
-# a process running, and these eventually fill up
-# the process table. Version 0.5.12-2 apparently
-# fixes this problem. But Debian releases are slow
-# and it seems to be stuck in the system.
-# This is a work-around. Every day restart incron
-# which drops all the dead processes and starts afresh.
-# reset incron
-03 01 * * * root systemctl restart incron

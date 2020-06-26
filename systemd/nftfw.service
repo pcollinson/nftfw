@@ -1,0 +1,12 @@
+# Service to be run when files change in /usr/local/etc/nftfw directories
+# When started, systemd will not make any further calls until
+# nftfw completes
+#
+# NB This service doesn't need starting by systemctl
+# see note in nftfw.path
+[Unit]
+Description="nftfw systemd trigger"
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/nftfw -q load

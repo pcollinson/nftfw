@@ -186,11 +186,6 @@ class Config:
     Name=domain name for lookup
     only handles IPv4 addresses
 
-    [Incron]
-    using_incron :bool Yes  Set to no if not using incron on the system
-                            remember that hand changes to the control
-                            files will need you to run nftfw load
-                            by hand to set up the firewall
 
     """
 
@@ -396,13 +391,6 @@ pattern_split = No
 ;Barracuda=b.barracudacentral.org
 ;SpamCop=bl.spamcop.net
 
-[Incron]
-# Set to no if not using incron on the system
-# remember that hand changes to the control
-# files will need you to run nftfw load
-# by hand to set up the firewall
-using_incron = Yes
-
 """
 
     # Where to look for root files
@@ -486,7 +474,7 @@ using_incron = Yes
         'blacklist_counter', 'whitelist_counter',
         'blacklist_set_auto_merge',
         'whitelist_set_auto_merge',
-        'pattern_split', 'using_incron')
+        'pattern_split')
 
 
     def __init__(self, dosetup=True):
@@ -548,9 +536,6 @@ using_incron = Yes
         self.group = None
         self.fileuid = None
         self.filegid = None
-
-        # cache and flag for preset for using_incron property
-        self._using_incron = None
 
         # now setup loggermanager
         self.logger_mgr = LoggerManager(self, log)
@@ -932,11 +917,3 @@ using_incron = Yes
 
         s = self.get_ini_value_from_section('Locations', 'nftables_conf')
         return Path(s)
-
-    @property
-    def using_incron(self):
-        """Returns a boolean"""
-
-        if self._using_incron is None:
-            self._using_incron = self.get_ini_value_from_section('Incron', 'using_incron')
-        return self._using_incron

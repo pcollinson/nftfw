@@ -2,7 +2,6 @@
 
 import logging
 from normaliseaddress import NormaliseAddress
-from filemanager import FileManager
 from fwdb import FwDb
 from blacklist import BlackList
 log = logging.getLogger('nftfw')
@@ -27,8 +26,7 @@ class DbFns:
 
         Pick up commands and args from cf.editargs
 
-        Return changes to files - so if running
-        without incron things get updated
+        Return changes to files as int
 
         Values are in cf.editargs[]
         cmd : str
@@ -106,8 +104,6 @@ class DbFns:
         Return number of files added
         """
 
-        bl = BlackList(self.cf)
-
         normalise = NormaliseAddress(self.cf, 'nftfwedit blacklist')
         iplist = self.normalise_ip_list(normalise, iplist)
         if iplist is None:
@@ -155,9 +151,6 @@ class DbFns:
         # create files
         added = 0
 
-        # blacklist needs filemanager
-        bl.open_file_manager()
-
         for ip in iplist:
             current = work[ip]
             # fake matchcount
@@ -165,7 +158,6 @@ class DbFns:
             added += bl.install_file(fwdb, current, True)
             log.info('%s added to blacklist.d', ip)
 
-        bl.action_file_manager()
         fwdb.close()
         return added
 
@@ -191,8 +183,6 @@ class DbFns:
 
         blacklistpath = self.cf.nftfwpath('blacklist')
 
-        manager = FileManager(self.cf)
-
         fwdb = FwDb(self.cf)
 
         # do database update first
@@ -209,11 +199,10 @@ class DbFns:
             file += '.auto'
             path = blacklistpath / file
             if path.exists():
-                manager.delete(path)
+                path.unlink()
                 filesdeleted += 1
 
         fwdb.close()
-        manager.action()
 
         if ipsdeleted + filesdeleted > 0:
             log.info('Deleted - ips: %d, files: %d',
