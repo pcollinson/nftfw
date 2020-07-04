@@ -37,7 +37,7 @@ The location for the initial nft setup file containing the framework used by the
       nftfw_init = ${sysetc}/nftfw_init.nft
 
 _nftfw_base_
-*nftfw* expects to find the five working directories, _incoming.d_, _outgoing.d_, _blacklist.d_, _whitelist.d_ and _patterns.d_ under this directory. It you want to run the system from the  Symbiosis control directory, then the _nftfw_base_ option needs to be changed from the default to _/etc/symbiosis/firewall_. *Nftfw* expects to find its _rule.d_ directory in its own _sysetc_ directory. Symbiosis files in _firewall/local.d_ are not supported by this system. To provide local changes, edit _/etc/nftfw_init.nft_.
+*nftfw* expects to find the five working directories, _incoming.d_, _outgoing.d_, _blacklist.d_, _whitelist.d_ and _patterns.d_ under this directory. It you want to run the system from the  Symbiosis control directory, then the _nftfw_base_ option needs to be changed from the default to _/etc/symbiosis/firewall_. You'll need to create a _blacknets.d_ directory. *Nftfw* expects to find its _rule.d_ directory in its own _sysetc_ directory. Symbiosis files in _firewall/local.d_ are not supported by this system. To provide local changes, edit _/etc/nftfw_init.nft_.
 
       nftfw_base = ${sysetc}
 
@@ -52,12 +52,13 @@ The _owner_ variable needs to be set to the username of the owner of the files i
 
 **\[Rules]**
 
-This section provides tailoring of the default rules used in the four processing sections of the program when rules are not explicitly given.
+This section provides tailoring of the default rules used in the five processing sections of the program when rules are not explicitly given.
 
       incoming = accept
       outgoing = reject
       whitelist = accept
       blacklist = reject
+	  blacknets = drop
 
 The key on the left is a program section name and the value is the name of a rule.  A possible choice for 'reject' is the 'drop' rule which simply throws inbound packets away. The 'reject' rule jumps to a table in the initialisation script that actively rejects the packet.
 
@@ -98,6 +99,7 @@ Do we want counters on the statements?
       outgoing_counter = True
       blacklist_counter = True
       whitelist_counter = True
+	  blacknets_counter = True
 
 
 Do we want nftables logging? By adding a different prefix for each of the tables, it's possible to scan the syslog for events and get feedback from the firewall. To stop logging, just use the name.
@@ -106,6 +108,7 @@ Do we want nftables logging? By adding a different prefix for each of the tables
       outgoing_logging
       blacklist_logging = Blacklist
       whitelist_logging
+	  blacknets_logging
 
 Two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, _nftfw_ uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.
 
@@ -115,6 +118,7 @@ The bug has been reported to the _nftables_ development team, but no fix has bee
 
       blacklist_set_auto_merge = False
       whitelist_set_auto_merge = False
+	  blacknets_set_auto_merge = False
 
 **\[Whitelist]**
 

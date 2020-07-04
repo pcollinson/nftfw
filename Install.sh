@@ -147,7 +147,23 @@ echo "File installation in ${DESTROOT}/etc/nftfw"
 echo
 # Basic directory in /etc
 DOINSTALL=Y
+# Set to not empty if the distribution has changed the
+# config.ini or nftfw_init.nft files
+DISTRIBUTION=""
 if [ -e ${DESTROOT}/etc/nftfw ]; then
+    # See if the distribution has changed config.ini or nftfw_init.nft
+    if [ -e ${DESTROOT}/etc/nftfw/original ]; then
+	if [ -f ${DESTROOT}/etc/nftfw/original/config.ini ]; then
+	    if ! cmp -s etc_nftfw/original/config.ini ${DESTROOT}/etc/nftfw/original/config.ini; then
+		DISTRIBUTION="config.ini"
+	    fi
+	fi
+	if [ -f ${DESTROOT}/etc/nftfw/original/nftfw_init.nft ]; then
+	    if ! cmp -s etc_nftfw/original/nftfw_init.nft ${DESTROOT}/etc/nftfw/original/nftfw_init.nft; then
+		DISTRIBUTION="$(echo ${DISTRIBUTION} "nftfw_init.nft")"
+	    fi
+	fi
+    fi
     echo
     echo "Step 1 is to install ${DESTROOT}/etc/nftfw."
     echo "Existing control files and content in '*.d' will not be replaced"
@@ -179,7 +195,7 @@ if [ ${DOINSTALL} = 'Y' ]; then
     (
 	cd ${ETCSRC}
 	DEST=${DESTROOT}/etc/nftfw
-	DIRS="blacklist.d incoming.d outgoing.d patterns.d rule.d whitelist.d"
+	DIRS="blacklist.d blacknets.d incoming.d outgoing.d patterns.d rule.d whitelist.d"
 	for name in ${DIRS}; do
 	    if [ ! -d ${DEST}/$name ]; then
 		${INSTALL} ${SETUSER} -d ${DEST}/$name
@@ -267,5 +283,29 @@ else
 	      ${INSTALL} ${FILEMODE} -t ${MAN}/${m} ${FILES}
 	  done
 	)
+fi
+if [ "${DISTRIBUTION}" != "" ]; then
+    if [ ${DOINSTALL} = 'Y' ]; then
+	echo
+	echo '***************************************************'
+	echo ' WARNING - hand update may be needed'
+	echo '***************************************************'
+	echo
+	echo "The update has modified this file or files: ${DISTRIBUTION}"
+	echo "in ${DESTROOT}/etc/nftfw/original"
+	echo
+	echo "You need to replace your active version(s) in ${DESTROOT}/etc/nftfw"
+	echo "with updated copies."
+	echo
+	echo "If you have not changed the active versions you can copy files"
+	echo "from ${DESTROOT}/etc/nftfw/original to ${DESTROOT}/etc/nftfw."
+	echo
+	echo "If you have changed the active versions, then a manual compare"
+	echo "and edit is needed."
+	echo
+	echo '***************************************************'
+	echo ' WARNING - hand update may be needed'
+	echo '***************************************************'
+    fi
 fi
 echo "End of install script"

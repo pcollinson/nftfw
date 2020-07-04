@@ -79,6 +79,7 @@ class Config:
     outgoing = reject
     whitelist = accept
     blacklist = reject
+    blacknets = drop
 
     [Logging]
     logfmt : str        Logger format string for logger use
@@ -94,17 +95,19 @@ class Config:
     outgoing_counter :  bool
     blacklist_counter : bool
     whitelist_counter : bool
+    blacknets_counter : bool
 
     incoming_logging  :  str  String to add to logging for incoming rules
     outgoing_logging  : str
     blacklist_logging : str
     whitelist_logging : str
+    blacknets_logging : str
 
-                          These two variables control the type of sets
-                          automatically generated for blacklist and
-                          whitelist tables. When true, nftfw uses
-                          auto_merged, interval sets for the blacklist
-                          or whitelist sets it makes. This set type
+                          The three variables below control the type
+                          of sets automatically generated for
+                          blacklist, blacknets and whitelist tables.
+                          When true, nftfw uses auto_merged, interval
+                          sets for the sets it makes. This set type
                           automatically create single entries
                           containing an address range for adjacent IP
                           addresses. The feature is desirable because
@@ -128,6 +131,7 @@ class Config:
 
     blacklist_set_auto_merge : bool
     whitelist_set_auto_merge : bool
+    blacknets_set_auto_merge : bool
 
     [Whitelist]
     wtmp_file : str        Wtmp file to scan, empty to use the system
@@ -257,6 +261,7 @@ incoming = accept
 outgoing = reject
 whitelist = accept
 blacklist = reject
+blacknets = drop
 
 [Logging]
 #  System Logging constants
@@ -287,6 +292,8 @@ incoming_counter = True
 outgoing_counter = True
 blacklist_counter = True
 whitelist_counter = True
+blacknets_counter = True
+
 #  do we want nftables logging?
 #  this adds a different prefix for each of the tables
 #  when logged
@@ -295,13 +302,14 @@ incoming_logging
 outgoing_logging
 blacklist_logging = Blacklist
 whitelist_logging
+blacknets_logging
 
-# These two variables control the type of sets automatically generated
-# for blacklist and whitelist tables. When true, nftfw uses
-# auto_merged, interval sets for the blacklist or whitelist sets it
-# makes. This set type automatically create single entries containing
-# an address range for adjacent IP addresses. The feature is desirable
-# because it reduces the number of matches.
+# The three variables below control the type of sets automatically
+# generated for blacklist, blacknets and whitelist tables. When true,
+# nftfw uses auto_merged, interval sets for the sets it makes. This
+# set type automatically create single entries containing an address
+# range for adjacent IP addresses. The feature is desirable because it
+# reduces the number of matches.
 #
 # However, at present, the auto-merged, interval sets can cause the
 # nft program to fail, flagging an error. There is a bug causing
@@ -315,8 +323,9 @@ whitelist_logging
 # provide a way of turning this feature on and default to not using
 # the feature.
 #
-blacklist_set_auto_merge: False
-whitelist_set_auto_merge: False
+blacklist_set_auto_merge = False
+whitelist_set_auto_merge = False
+blacknets_set_auto_merge = False
 
 [Whitelist]
 #
@@ -405,6 +414,7 @@ pattern_split = No
                  'outgoing':  'outgoing.d',
                  'whitelist': 'whitelist.d',
                  'blacklist': 'blacklist.d',
+                 'blacknets': 'blacknets.d',
                  'patterns':  'patterns.d'}
 
     # Directories we expect to find in the etc/nftfw directory
@@ -420,7 +430,8 @@ pattern_split = No
                 'filepos'  : 'filepos.db',
                 'backup'   : 'nftables.backup',
                 'lastutmp' : 'whitelist_scan',
-                'missingsync' : 'blacklist_missing_check'}
+                'missingsync' : 'blacklist_missing_check',
+                'blacknets_cache': 'blacknets_cache.json'}
 
     #   Values obtained from nftfw command line
     #
@@ -459,12 +470,13 @@ pattern_split = No
         'sysetc', 'sysvar',
         'nftables_conf', 'nftfw_init', 'nftfw_base',
         'owner', 'group',
-        'wtmp_file', 'whitelist_scan',
-        'incoming', 'outgoing', 'whitelist', 'blacklist',
+        'incoming', 'outgoing', 'whitelist',
+        'blacklist', 'blacknets',
         'logfmt', 'loglevel',
         'logfacility', 'incoming_logging',
         'outgoing_logging', 'blacklist_logging',
-        'whitelist_logging', 'whitelist_expiry',
+        'whitelist_logging', 'blacknets_logging',
+        'whitelist_expiry', 'wtmp_file',
         'block_after', 'block_all_after',
         'expire_after', 'clean_before', 'date_fmt')
 
@@ -472,8 +484,10 @@ pattern_split = No
         'logprint', 'logsyslog',
         'incoming_counter', 'outgoing_counter',
         'blacklist_counter', 'whitelist_counter',
+        'blacknets_counter',
         'blacklist_set_auto_merge',
         'whitelist_set_auto_merge',
+        'blacknets_set_auto_merge',
         'pattern_split')
 
 

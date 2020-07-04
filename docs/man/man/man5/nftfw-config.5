@@ -73,6 +73,7 @@ this directory.
 It you want to run the system from the Symbiosis control directory, then
 the \f[I]nftfw_base\f[] option needs to be changed from the default to
 \f[I]/etc/symbiosis/firewall\f[].
+You'll need to create a \f[I]blacknets.d\f[] directory.
 \f[I]Nftfw\f[] expects to find its \f[I]rule.d\f[] directory in its own
 \f[I]sysetc\f[] directory.
 Symbiosis files in \f[I]firewall/local.d\f[] are not supported by this
@@ -108,7 +109,7 @@ The default is to use the root user.
 .PP
 \f[B][Rules]\f[]
 .PP
-This section provides tailoring of the default rules used in the four
+This section provides tailoring of the default rules used in the five
 processing sections of the program when rules are not explicitly given.
 .IP
 .nf
@@ -117,6 +118,7 @@ processing sections of the program when rules are not explicitly given.
 \ \ outgoing\ =\ reject
 \ \ whitelist\ =\ accept
 \ \ blacklist\ =\ reject
+\ \ blacknets\ =\ drop
 \f[]
 .fi
 .PP
@@ -191,6 +193,7 @@ Do we want counters on the statements?
 \ \ outgoing_counter\ =\ True
 \ \ blacklist_counter\ =\ True
 \ \ whitelist_counter\ =\ True
+\ \ blacknets_counter\ =\ True
 \f[]
 .fi
 .PP
@@ -205,6 +208,7 @@ To stop logging, just use the name.
 \ \ outgoing_logging
 \ \ blacklist_logging\ =\ Blacklist
 \ \ whitelist_logging
+\ \ blacknets_logging
 \f[]
 .fi
 .PP
@@ -232,6 +236,7 @@ on and default to not using the feature.
 \f[C]
 \ \ blacklist_set_auto_merge\ =\ False
 \ \ whitelist_set_auto_merge\ =\ False
+\ \ blacknets_set_auto_merge\ =\ False
 \f[]
 .fi
 .PP

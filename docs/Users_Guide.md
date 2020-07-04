@@ -5,7 +5,7 @@
 
 _nftfw_ provides a simple-to-use framework generating rules for the latest flavour of packet filtering for Linux, known as _nftables_. It generates a set of incoming rules, outgoing rules, supports a whitelist for 'friends' and a blacklist for miscreants. _nftfw_  glues these rules together and loads them into the system's kernel to act as your firewall.
 
-There are four control directories in _/usr/local/etc/nftfw_ (or it may be _/etc/nftfw_ on your machine). You tell _nftfw_ to make a rule by adding a file, that's often empty, to one of these directories. _nftfw_ uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.
+There are five control directories in _/usr/local/etc/nftfw_ (or it may be _/etc/nftfw_ on your machine). You tell _nftfw_ to make a rule by adding a file, that's often empty, to one of these directories. _nftfw_ uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.
 
 Here are the directories:
 
@@ -21,13 +21,18 @@ The whitelist directory contains files named for IP addresses, it makes rules to
 - _blacklist.d_
 The blacklist directory has similar contents to the whitelist but will block any attempt to access the system from the IP address. Adding port numbers as contents to the files modifies the rules to only block access to those services. There's an automatic system that looks in log files for people doing bad things and adds their IP address into this directory.
 
+- _blacknets.d_
+The blacknets directory contains files ending in _.nets_, each file can contain a list of IP network address ranges in CIDR format. Ranges enable the firewall to use fast logical operations on numbers to see if an IP address should be be blocked rather than needing a single rule for each IP. Using blacknets, it's possible to cheaply stop access to your server from one or more countries, or from other large organisations with a diverse address range.
+
+
 All of these directories create a list of rules. The order of the list is important. The firewall passes each packet  from one rule to the next trying to match the data in the packet with the tests in the rule. Some rules will be looking for matching IP addresses, some for ports and some for both addresses and ports. When the firewall finds a match, the rule tells it to make one of two decisions: accept the packet or reject it.
 
 The firewall is a filter, continuing with testing until it finds a decision. For inbound packets, the firewall passes the packet into:
 
-- the whitelist rules that will accept good guys, then
-- the blacklist rules that will reject bad guys
-- and finally the incoming rules that will make decisions about all others.
+- the whitelist rules accepting good guys, then
+- the blacknet rules blocking a wide range of addresses, then
+- the blacklist rules rejecting known bad guys, then
+- and finally the incoming rules making decisions about all others.
 - If the packet falls out the bottom, then it's automatically rejected.
 
  For outbound packets, the firewall will accept packets that have no match with any rule.
@@ -67,56 +72,6 @@ The _07-ftp-helper_ file adds in essential glue that makes the _ftp_ server work
 If you need to create a special script for a standard service, then you can do so. _nftfw_ gives precedence to action files in _rule.d_ with the same name as a service.
 
 There are several unused rules in the _rule.d_ directory, a text file called _README_ lists them.
-
-### An example for incoming.d
-
-[Skip this example](#outgoingd)
-
-As an _ssh_ user, I frequently install support for a private port for the ssh protocol which helps to keep the script kiddies away.
-
-Let's say we pick port 516 for this, it's not assigned to anything in _/etc/services_. To enable port 516 in the firewall, I'd use _touch_ to make a zero length file:
-
-``` sh
-$ cd incoming.d
-$ touch 07-516
-```
-
-It may be that you don't have access to write in the directory, on Symbiosis the directory belongs to the 'admin' user, on Sympl it's the 'sympl' user. Make sure you log in as the right user, or use _sudo_ to get access.
-
-Now if you _ls -l_, you'll see the empty file. If you are using the _systemd_ active directory, _nftfw_ will run in the background and will add a new rule to the firewall enabling access via port 516. Otherwise you'll need to run:
-
-``` sh
-$ sudo nftfw load
-```
-
-We now need to convince the _sshd_ process which is listening on port 22  that it should also listen for port 516. Change directory to _/etc/ssh_ and edit the _sshd_config_ file. At the top of the file you'll see:
-
-``` sh
-Port 22
-```
-
-and you need to edit that to read:
-
-``` sh
-Port 22
-Port 516
-```
-You now need to restart the sshd service. If you are on a remote machine and are using *ssh* to connect, this can be somewhat scary to restart the program you need to run to talk to the system. Firewalls will allow current connections to continue, so login using the Port 22 connection in a separate window and stay logged in until you are happy that things are working.
-
-Restart the _sshd_ service and find out what happened:
-
-``` sh
-$ sudo systemctl restart sshd
-$ sudo systemctl status sshd
-```
-If all is well, the status should show lines like 'Listening on port 516' and 'Listening on port 22'. Now open a new window on your machine and try it.
-
-``` sh
-$ ssh -p 516 MACHINE_NAME
-```
-and hopefully it should connect. Incidentally if you use _scp_ to copy into the system, you need to enter a capital _-P_ to use the port number.
-
-We have _ssh_ running on a new port, what about port 22? It's still open to the world. You can delete it, or you can add one or more fixed IP addresses into the contents of that file to force it only to work for the addresses that it contains. If you don't have the need for fixed IP addresses, one strategy is to remove it from _incoming.d_ but leave it active. You can use the whitelist system to permit selected users from known IP addresses into the system using _ssh_.
 
 ### outgoing.d
 
@@ -174,6 +129,12 @@ If your system doesn't have _systemd_ active directory installed, you will need 
 $ sudo nftfw load
 ```
 after you've changed the directory contents, or wait for the next automatic update.
+
+### blacknets.d
+
+The only rule about filenames in the _blacknets.d_ directory is that they should end with _.nets_. Each file should contain a list of network address ranges, one per line, in CIDR format. See [Wikipedia](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation) if you need more information on the notation. The files support comments starting with '#'.
+
+Mostly, you can find suitable lists on the web, see [Getting CIDR Lists](Getting-cidr-lists.md) for how to install them. However, there's nothing to stop you creating your own lists.
 
 ## Starting with _nftfw_
 

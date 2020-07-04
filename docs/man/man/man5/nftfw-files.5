@@ -28,6 +28,9 @@ the system;
 \f[I]blacklist.d\f[] \- specifies IP addresses and ports in the inbound
 packets that should not have access;
 .IP \[bu] 2
+\f[I]blacknets.d\f[] \- contains lists of network address ranges
+allowing bulk blocking;
+.IP \[bu] 2
 \f[I]patterns.d\f[] \- contain pattern files for matching lines in log
 files for blacklist; and
 .IP \[bu] 2
@@ -112,6 +115,43 @@ writes the IP addresses into nftables sets.
 The program writes the information into two separate files and uses file
 comparison with the last loaded files to see If it can update the sets
 of IP addresses without reloading the whole firewall.
+.SS blacknets.d
+.PP
+Files in this directory make nftables rules in a single set that block
+ranges of IP addresses.
+To be included, a file must end in \f[I].nets\f[].
+.PP
+Each file contains a list of IP network addresses, expressed in CIDR
+notation, one to a line.
+The file can also contain comments with the usual use of # to indicate
+them.
+Lines can contain the following formats:
+.RS
+.PP
+# IPv4 CIDR 203.0.113.0/24
+.PP
+# IPv6 Compressed 2001:DB8::/32
+.PP
+# IPv6 Exploded 2001:0db8:0000:0000:0000:0000:0000:0000/32
+.PP
+# IPv4 embedded in IPv6 (will be converted to IPv4) # Format used by
+ip2location ::FFFF:203.0.113.0/120
+.PP
+# IPv4 embedded in IPv6 (will be converted to IPv4) ::ffff:cb00:7100/120
+.RE
+.PP
+Theoretically, these are addresses of networks and not interfaces.
+The parts of the address that are `local' should be zero.
+For example in 203.0.113.5/24, the `24' means that the leftmost 24 bits
+of the 32 bits are the network address and the 5 is the local part, that
+should be zero.
+However, \f[B]nftfw\f[] will accept addresses where bits are set in
+these supposedly zero sections and will clear them.
+.PP
+The system can deal with lists for the same country from different
+sources, which will inevitably diverge.
+The system will remove exact duplicates, and will minimise overlapping
+address ranges where possible
 .SS patterns.d
 .PP
 Patterns define rules for the \f[B]blacklist\f[] module containing the

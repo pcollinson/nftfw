@@ -54,6 +54,9 @@ fwmanage.py	       fw_manage manages creation and installation of nftables
  listprocess.py	       Class ListProcess - generates nft commands from
                        the two directories, generates nftable sets
                        with ip addresses
+ netreader.py          Class NetReader - reads files from blacknets directory
+                       validates entries and creates lists that can be used
+                       in listprocess to output the sets.
  nft.py		       Interface to nftables, calls the nft program
                        to do its work, tested with Python 3.6
 

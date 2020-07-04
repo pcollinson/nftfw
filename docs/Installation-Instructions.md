@@ -284,7 +284,7 @@ $ sudo systemctl daemon-reload
 
 ## Installing Geolocation
 
-This will add country detection to _nftfwls_, which is optional but desirable. See the [document](Installing-GeoLocation.md).
+This will add country detection to _nftfwls_, which is optional but desirable. See the [document](Installing-GeoLocation.md). If you plan on blocking addresses by country, then the Geolocation system from Maxmind can provide tools to generate lists of IP addresses in the correct format.
 
 ### Sympl users: Update your mail system after installation
 
@@ -296,10 +296,16 @@ Now look at:
 
 -  [Updating _nftfw_](Updating-nftfw.md)
    - How to update _nftfw_.
+- [Installing Geolocation](Installing-GeoLocation.md)
+   - How to install GeoIP2
+- [Getting CIDR lists](Getting-cidr-lists.md)
+   - How to obtain blocking lists for countries
 -  [User's Guide to nftfw](Users_Guide.md)
    - The full User guide, the first section explains how the system is controlled.
 -  [How do I.. or a User's Quick Guide](How_do_I.md)
    - Answers a bunch of questions about the system.
+- [_nftfw_ web site](https://nftfw.uk)
+   - All documents are available on the _nftfw_ web site.
 
 ## Acknowledgement
 

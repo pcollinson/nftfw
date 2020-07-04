@@ -1,4 +1,4 @@
-% NFTFW(1) | Nftfw documentation
+% Nftfwo(1) | Nftfw documentation
 
 NAME
 ====
@@ -14,7 +14,7 @@ SYNOPSIS
 DESCRIPTION
 =========
 
-**nftfw** is the front-end for the firewall system that generates rules for nftables. It uses files in four directories in _/usr/local/etc/nftfw_ to create firewall rules.  The directories create  incoming and outgoing firewalls, and also  tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system's root or  below _/usr/local_.
+**nftfw** is the front-end for the firewall system that generates rules for nftables. It uses files in five directories in _/usr/local/etc/nftfw_ to create firewall rules.  The directories create  incoming and outgoing firewalls, and also  tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system's root or  below _/usr/local_.
 
 The **nftfw** command has several options, and most of these don't change that often when the system is in operation. Editing the ini format file _/etc/nftfw/config.ini_  changes the values of options - see nftfw-config(5). You may make temporary variable changes to configuration values from the command line using the **-o** option to **nftfw** (see below).
 
@@ -32,14 +32,15 @@ The **load** command builds the firewall files by taking input from files in dir
 
 -  _incoming.d_  contains rules controlling  access to services on the system;
 -  _outbound.d_ sets any rules controlling packets leaving the system;
--  _whitelist.d_ contains files named for the IP addresses that are to have full access to the system and
--  _blacklist.d_ contains files named for IP addresses  in the inbound packets that should not have access.
+-  _whitelist.d_ contains files named for the IP addresses that are to have full access to the system;
+-  _blacknets.d_ contains files holding IP network addresses allowing bulk blocking for countries; and
+-  _blacklist.d_ contains files named for IP addresses in the inbound packets that should not have access
 
 nftfw-files(5) describes the contents and formats of files in these directories.
 
 **nftfw load** performs these steps, creating files in directories in _/usr/local/var/lib/nftfw_:
 
-1. The command builds a  firewall ruleset in several files in _build.d_, and copies _nftfw_init.nft_  into the directory creating the initial framework. Rules generated from _incoming.d_ and _outgoing.d_  support the basic system services. Rules formed from the _whitelist.d_ and _blacklist.d_ directories make use of nftables sets. These sources change more often than the other directories, and the use of sets allows **nftfw** to change parts of the installed ruleset without completely reloading the firewall.
+1. The command builds a  firewall ruleset in several files in _build.d_, and copies _nftfw_init.nft_  into the directory creating the initial framework. Rules generated from _incoming.d_ and _outgoing.d_  support the basic system services. Rules formed from the _whitelist.d_.  _blacklist.d_ and _blacknets.d_ directories make use of nftables sets. These sources change more often than the other directories, and the use of sets allows **nftfw** to change parts of the installed ruleset without completely reloading the firewall.
 
 2. **nftfw** now runs the **nft -c** command validating the rules. Errors cause  **nftfw** to abandon any further processing.
 
@@ -49,7 +50,7 @@ nftfw-files(5) describes the contents and formats of files in these directories.
 
 5. Finally **nftfw** captures the kernel settings and stores them in _/etc/nftables.conf_, which is where the Debian system expects to find the rules on system start-up.
 
-The steps from (4) above could result in a broken system if parts of the installation fails. **nftfw** avoids the possible disaster by storing a backup copy of the kernel's rules before attempting any update. On failure, **nftfw** reverts to the backup rules.
+The steps from (4) above could result in a broken system if parts of the installation fails. **nftfw** avoids the possible disaster by storing a backup Ocopy of the kernel's rules before attempting any update. On failure, **nftfw** reverts to the backup rules.
 
 **whitelist**
 

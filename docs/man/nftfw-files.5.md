@@ -16,6 +16,7 @@ The _etc/nftfw_ directory contains:
 -  _outbound.d_ - sets any rules controlling packets leaving the system;
 -  _whitelist.d_ - contains IP addresses that have full access to the system;
 -  _blacklist.d_ - specifies IP addresses and ports in the inbound packets that should not have access;
+-  _blacknets.d_ - contains lists of network address ranges allowing bulk blocking;
 -  _patterns.d_ - contain pattern files for matching lines in log files for blacklist; and
 -  _rule.d_  - hold  files for generating **nft** commands from rule names.
 
@@ -61,6 +62,33 @@ The system has no way of distinguishing between TCP and UDP protocols and the sy
 Administrators can disable the  blacklist and whitelist systems separately by creating a file called 'disabled' in the relevant directory.
 
 When building the firewall from these two directories, **nftfw** writes the IP addresses into nftables sets. The program writes the information into two separate files and uses file comparison with the last loaded files to see If it can update the sets of IP addresses without reloading the whole firewall.
+
+blacknets.d
+----------
+Files in this directory make nftables rules in a single set that block ranges of IP addresses. To be included, a file must end in _.nets_.
+
+Each file contains a list of IP network addresses, expressed in CIDR notation, one to a line. The file can also contain comments with the usual use of # to indicate them. Lines can contain the following formats:
+
+> \# IPv4 CIDR
+> 203.0.113.0/24
+>
+> \# IPv6 Compressed
+> 2001:DB8::/32
+>
+> \# IPv6 Exploded
+>2001:0db8:0000:0000:0000:0000:0000:0000/32
+>
+> \# IPv4 embedded in IPv6 (will be converted to IPv4)
+> \# Format used by ip2location
+>::FFFF:203.0.113.0/120
+>
+> \# IPv4 embedded in IPv6 (will be converted to IPv4)
+>::ffff:cb00:7100/120
+>
+
+Theoretically, these are addresses of networks and not interfaces. The parts of the address that are 'local' should be zero. For example in 203.0.113.5/24, the '24' means that the leftmost 24 bits of the 32 bits are the network address and the 5 is the local part, that should be zero.  However, **nftfw** will accept addresses where bits are set in these supposedly zero sections and will clear them.
+
+The system can deal with lists for the same country from different sources, which will inevitably diverge. The system will remove exact duplicates, and will minimise overlapping address ranges where possible
 
 patterns.d
 ---------

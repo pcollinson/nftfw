@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>NFTFW(1) | Nftfw documentation</title>
+  <title>Nftfwo(1) | Nftfw documentation</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -16,14 +16,14 @@
 </head>
 <body>
 <header>
-<h1 class="title">NFTFW(1) | Nftfw documentation</h1>
+<h1 class="title">Nftfwo(1) | Nftfw documentation</h1>
 </header>
 <h1 id="name">NAME</h1>
 <p><strong>nftfw</strong> — manage the Nftfw firewall generator</p>
 <h1 id="synopsis">SYNOPSIS</h1>
 <div class="line-block"><strong>nftfw</strong> [<strong>-h</strong>] [<strong>-c</strong> <em>config</em>] [<strong>-p</strong> <em>patternname</em>] [<strong>-o</strong> <em>option</em>] [<strong>-x | -f | -i | -q | -v </strong>] [<strong><em>load|blacklist|whitelist|tidy</em></strong>]</div>
 <h1 id="description">DESCRIPTION</h1>
-<p><strong>nftfw</strong> is the front-end for the firewall system that generates rules for nftables. It uses files in four directories in <em>/usr/local/etc/nftfw</em> to create firewall rules. The directories create incoming and outgoing firewalls, and also tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system’s root or below <em>/usr/local</em>.</p>
+<p><strong>nftfw</strong> is the front-end for the firewall system that generates rules for nftables. It uses files in five directories in <em>/usr/local/etc/nftfw</em> to create firewall rules. The directories create incoming and outgoing firewalls, and also tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system’s root or below <em>/usr/local</em>.</p>
 <p>The <strong>nftfw</strong> command has several options, and most of these don’t change that often when the system is in operation. Editing the ini format file <em>/etc/nftfw/config.ini</em> changes the values of options - see nftfw-config(5). You may make temporary variable changes to configuration values from the command line using the <strong>-o</strong> option to <strong>nftfw</strong> (see below).</p>
 <p>The optional command argument to <strong>nftfw</strong> runs main modules of the program. All actions need users to have root access permission. A lock file ensures the running of only one instance of the program, <strong>nftfw</strong> queues actions if it’s busy, and runs queued actions at the finish of the task in hand.</p>
 <p><strong>nftfw</strong> uses an initial setup file <em>/usr/local/etc/nftfw/nftfw_init.nft</em> to form the framework for the completed ruleset. When <strong>nftfw</strong> builds the firewall rules, the <em>nftfw_init.nft</em> file is copied into the build system, and uses include statements to pull in rules from the separate files created from the four directories.</p>
@@ -34,19 +34,20 @@
 <ul>
 <li><em>incoming.d</em> contains rules controlling access to services on the system;</li>
 <li><em>outbound.d</em> sets any rules controlling packets leaving the system;</li>
-<li><em>whitelist.d</em> contains files named for the IP addresses that are to have full access to the system and</li>
-<li><em>blacklist.d</em> contains files named for IP addresses in the inbound packets that should not have access.</li>
+<li><em>whitelist.d</em> contains files named for the IP addresses that are to have full access to the system;</li>
+<li><em>blacknets.d</em> contains files holding IP network addresses allowing bulk blocking for countries; and</li>
+<li><em>blacklist.d</em> contains files named for IP addresses in the inbound packets that should not have access</li>
 </ul>
 <p>nftfw-files(5) describes the contents and formats of files in these directories.</p>
 <p><strong>nftfw load</strong> performs these steps, creating files in directories in <em>/usr/local/var/lib/nftfw</em>:</p>
 <ol type="1">
-<li><p>The command builds a firewall ruleset in several files in <em>build.d</em>, and copies <em>nftfw_init.nft</em> into the directory creating the initial framework. Rules generated from <em>incoming.d</em> and <em>outgoing.d</em> support the basic system services. Rules formed from the <em>whitelist.d</em> and <em>blacklist.d</em> directories make use of nftables sets. These sources change more often than the other directories, and the use of sets allows <strong>nftfw</strong> to change parts of the installed ruleset without completely reloading the firewall.</p></li>
+<li><p>The command builds a firewall ruleset in several files in <em>build.d</em>, and copies <em>nftfw_init.nft</em> into the directory creating the initial framework. Rules generated from <em>incoming.d</em> and <em>outgoing.d</em> support the basic system services. Rules formed from the <em>whitelist.d</em>. <em>blacklist.d</em> and <em>blacknets.d</em> directories make use of nftables sets. These sources change more often than the other directories, and the use of sets allows <strong>nftfw</strong> to change parts of the installed ruleset without completely reloading the firewall.</p></li>
 <li><p><strong>nftfw</strong> now runs the <strong>nft -c</strong> command validating the rules. Errors cause <strong>nftfw</strong> to abandon any further processing.</p></li>
 <li><p>If all is well, <strong>nftfw</strong> compares the files with those in <em>install.d</em> retained from the last run of the program. File comparison allows <strong>nftfw</strong> to decide on doing nothing, making a full update, or just updating the blacklist and/or whitelist sets.</p></li>
 <li><p><strong>nftfw</strong> copies all the files into the <em>install.d</em> directory and loads these rules into the system’s kernel depending on the decision above.</p></li>
 <li><p>Finally <strong>nftfw</strong> captures the kernel settings and stores them in <em>/etc/nftables.conf</em>, which is where the Debian system expects to find the rules on system start-up.</p></li>
 </ol>
-<p>The steps from (4) above could result in a broken system if parts of the installation fails. <strong>nftfw</strong> avoids the possible disaster by storing a backup copy of the kernel’s rules before attempting any update. On failure, <strong>nftfw</strong> reverts to the backup rules.</p>
+<p>The steps from (4) above could result in a broken system if parts of the installation fails. <strong>nftfw</strong> avoids the possible disaster by storing a backup Ocopy of the kernel’s rules before attempting any update. On failure, <strong>nftfw</strong> reverts to the backup rules.</p>
 <p><strong>whitelist</strong></p>
 <p>The <strong>whitelist</strong> action is a scanner for the system’s wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. <strong>nftfw</strong> creates a file named for the IP address in <em>/usr/local/etc/nftfw/whitelist.d</em> as long as the IP address is global.</p>
 <p>The <strong>whitelist</strong> command expires addresses that were automatically created (identified by the suffix <em>.auto</em>) after a set number of days given in <strong>nftfw</strong>’s config file.</p>

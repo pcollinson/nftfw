@@ -217,7 +217,7 @@ The _nftfw_ command builds the firewall, installs it in the kernel and saves a c
 
 If your system has a running firewall that's not _nftfw_ then you probably don't want to be too hasty about installing the system. I have no expectation that things *will* go wrong, but the ability to go back is important. The steps below provides ways to revert, and explain how to do the installation safely.
 
-First, make sure you open another window to the system and login to the machine with it, this will keep the connection open and you can recover if something goes wrong. See the Users Guide for  [An example of incoming.d](Users_guide.md#an_example_of_incoming.d) to see how to do that.
+First, make sure you open another window to the system and login to the machine with it, this will keep the connection open and you can recover if something goes wrong.
 
 Let's look at where you might be now:
 
@@ -369,6 +369,10 @@ The listing program _nftfwls_ will print out the country that originated packets
 
 See  [Installing Geolocation](Installing-GeoLocation.md).
 
+If you want to use the _blacknets_ feature of _nftfw_ v0.7.0 and later to block countries, then _geoip2_ can be used to supply lists of IP networks.
+
+See [Getting CIDR lists](Getting-cidr-lists.md).
+
 ### Sympl users: Update your mail system after installation
 
  A repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs - see  [Sympl mail system update](https://github.com/pcollinson/sympl-email-changes).
@@ -383,6 +387,8 @@ Now look at:
    -  The full User guide, the first section explains how the system is controlled.
 -  [How do I.. or a User's Quick Guide](How_do_I.md)
    -  Answers a bunch of questions about the system.
+- [_nftfw_ web site](https://nftfw.uk)
+   - All documents are available on the _nftfw_ web site.
 
 ## Acknowledgement
 

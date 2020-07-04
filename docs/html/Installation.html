@@ -190,7 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="migrating-to-nftfw">Migrating to nftfw</h2>
 <p>The <em>nftfw</em> command builds the firewall, installs it in the kernel and saves a copy of what it has created in <em>/etc/nftables.conf</em>. Debian expects to reload <em>nftables</em> from the file in <em>/etc</em> on a reboot.</p>
 <p>If your system has a running firewall that’s not <em>nftfw</em> then you probably don’t want to be too hasty about installing the system. I have no expectation that things <em>will</em> go wrong, but the ability to go back is important. The steps below provides ways to revert, and explain how to do the installation safely.</p>
-<p>First, make sure you open another window to the system and login to the machine with it, this will keep the connection open and you can recover if something goes wrong. See the Users Guide for <a href="Users_guide.md#an_example_of_incoming.d">An example of incoming.d</a> to see how to do that.</p>
+<p>First, make sure you open another window to the system and login to the machine with it, this will keep the connection open and you can recover if something goes wrong.</p>
 <p>Let’s look at where you might be now:</p>
 <ul>
 <li>The system runs a Symbiosis or Sympl system using <em>iptables</em>. In this case, the running firewall can be re-installed using the <em>{symbiosis|sympl}-firewall</em> command. You should move <em>/etc/cron.d/symbiosis-firewall</em> and <em>/etc/incron.d/symbiosis-firewall</em> (or equivalent <em>sympl</em> files if present) to a safe place to stop their firewalls from running for now.</li>
@@ -272,6 +272,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 id="geolocation">Geolocation</h3>
 <p>The listing program <em>nftfwls</em> will print out the country that originated packets in the firewall using the <em>geoip2</em> country database available from MaxMind. MaxMind don’t charge but want you to create an account with them to access their files.</p>
 <p>See <a href="Installing-GeoLocation.md">Installing Geolocation</a>.</p>
+<p>If you want to use the <em>blacknets</em> feature of <em>nftfw</em> v0.7.0 and later to block countries, then <em>geoip2</em> can be used to supply lists of IP networks.</p>
+<p>See <a href="Getting-cidr-lists.md">Getting CIDR lists</a>.</p>
 <h3 id="sympl-users-update-your-mail-system-after-installation">Sympl users: Update your mail system after installation</h3>
 <p>A repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs - see <a href="https://github.com/pcollinson/sympl-email-changes">Sympl mail system update</a>.</p>
 <h2 id="you-are-there">You Are There</h2>
@@ -288,6 +290,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="How_do_I.md">How do I.. or a User’s Quick Guide</a>
 <ul>
 <li>Answers a bunch of questions about the system.</li>
+</ul></li>
+<li><a href="https://nftfw.uk"><em>nftfw</em> web site</a>
+<ul>
+<li>All documents are available on the <em>nftfw</em> web site.</li>
 </ul></li>
 </ul>
 <h2 id="acknowledgement">Acknowledgement</h2>

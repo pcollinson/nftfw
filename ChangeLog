@@ -1,3 +1,15 @@
+v0.7.0	Add blacknets.d to etc/nftfw - containing files with lists of
+	network CIDR ranges that can block countries and other
+	unwanted groups based on ip range. The code understands that
+	ipv4 addresses can be expressed as ipv6 addresses.
+	The code checks that overlapping ranges are suppressed.
+
+	Provide sample infrastructure to allow automatic downloads
+	of GeoIP country CIDR ranges.
+	Updated documentation
+	Update Install.sh to flag if config.ini and nftfw_init.nft
+	needs updating.
+
 v0.6.0  Revised some comments that were a little obscure.
 	Add new entry to the How Do I Document
 	Replace incron use by systemd path service

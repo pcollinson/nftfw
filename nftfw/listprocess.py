@@ -178,7 +178,7 @@ class ListProcess:
         setinfo = self.records[key]
 
         if proto in setinfo.keys():
-            l = '{' + ",".join(setinfo[proto]) + '}'
+            l = '{' + ",\n".join(setinfo[proto]) + '}'
             fmt = "# Set for ports {0}\nadd element {1} {2} {3} {4}\n"
             return fmt.format(key, proto,
                               'filter', setinfo['name'], l)

@@ -45,6 +45,17 @@ Will update files in your _etc/nftfw_ directory, but will not touch any working 
 
 The [Incron] section in the _config.ini_ file can be deleted as it's no longer used.
 
+## Changes for _nftfw_ version 0.7 and onwards
+
+_nftfw_ has gained a new control directory _etc/nftfw/blacknets.d_ which allows you to install files of IP address ranges coded as using CIDR notation. The _blacknets_ system provides blocking of a large number of IP networks based on lists of addresses. It can be used to keep whole countries out, or stop access from large organisations with complex address ranges. There's a document [Getting CIDR lists](Getting-cidr-lists.md) explaining how to get the country lists onto your system. There are other sources of bulk blacklists.
+
+To support the new category of blocking there are some changes to _etc/nftfw/nftfw_init.nft_ that need to be installed, when updating - remember to run the _Install.sh_ script and then copy _etc/nftfw/originals/nftfw_init.nft_ to _etc/nftfw/nftfw_init.nft_. If you've made changes to the installed file, you'll need to edit them in again. It's wise then run
+
+``` sh
+$ sudo nftfw -f load
+```
+to ensure that you have a clean installation.
+
 ## Changes for _nftfw_ version 0.6 and onwards
 
 _ntftw_ no longer recommends the use of _incron_ to provide a 'active' directory so changes in directories in_/usr/local/nftfw_ cause automatic running of the _nftfw load_ command. A _systemd_ unit that watches directories and calls the command replaces _incron_. If you've installed a previous version then you need to unwind parts of the _incron_ support system.

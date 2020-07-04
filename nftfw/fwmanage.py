@@ -53,6 +53,7 @@ from firewallreader import FirewallReader
 from firewallprocess import FirewallProcess
 from listreader import ListReader
 from listprocess import ListProcess
+from netreader import NetReader
 import nft
 
 log = logging.getLogger('nftfw')
@@ -417,7 +418,7 @@ def check_for_update_type(files):
         return None
 
     ret = None
-    for li in ['whitelist', 'blacklist']:
+    for li in ['whitelist', 'blacklist', 'blacknets']:
         # if the rules have changed
         # full install needed
         if li+'.nft' in files:
@@ -473,7 +474,7 @@ def loadinfo(cf):
         process = FirewallProcess(cf, fw, fr.records)
         files[fw+'.nft'] = process.generate()
 
-    # Blacklist and Whitelist are somewhat more complicated
+    # Blacklist, Blacknets and Whitelist are somewhat more complicated
     # Need a file for sets and one for nft commands
     # need to generate two variants for set initialisation
     # one for a complete load
@@ -484,8 +485,10 @@ def loadinfo(cf):
     # <name>_sets_reload.nft - includes _update_ and _sets_
     # <name>_sets.nft
     # <name>.nft
-    for fw in ('whitelist', 'blacklist'):
-        read = ListReader(cf, fw)
+    for fw, reader in (('whitelist', ListReader),
+                       ('blacklist', ListReader),
+                       ('blacknets', NetReader)):
+        read = reader(cf, fw)
         process = ListProcess(cf, fw, read.records)
         process.generate()
         files[fw+'_sets_init.nft'] = process.get_set_init_create()

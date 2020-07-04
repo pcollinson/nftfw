@@ -6,9 +6,11 @@ _nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any De
 
 ## Features
 
-- **Easy-to-use firewall admin**.  Four directories control the firewall. Placing files in the directories create firewall rules configured from the file names. Two directories, _incoming.d_ and _outgoing.d_, supply rules allowing access to ports for incoming and outgoing connections. These files are usually empty, but can contain IP addresses to make the rule more specific. Two more directories, _blacklist.d_ and _whitelist.d_, contain IP addresses, blocking or allowing access for specific addresses. These files can contain ports, again modifying the action of the rule. Changing the firewall is simply a matter of making or removing a file in one of these directories. The directory contents are described in detail in the [User's Guide](docs/Users_Guide.md), while the [How do I... or Quick Users' Guide](docs/How_do_I.md) gives a more task oriented decription.
+- **Easy-to-use firewall admin**.  Five directories control the firewall. Placing files in the directories create firewall rules configured from the file names. Two directories, _incoming.d_ and _outgoing.d_, supply rules allowing access to ports for incoming and outgoing connections. These files are usually empty, but can contain IP addresses to make the rule more specific. Two more directories, _blacklist.d_ and _whitelist.d_, contain IP addresses, blocking or allowing access for specific addresses. These files can contain ports, again modifying the action of the rule. The final directory, _blacknets.d_ can contain files with lists of IP address ranges and makes rules that block access to all the addresses. Changing the firewall is simply a matter of making or removing a file in one of these directories. The directory contents are described in detail in the [User's Guide](docs/Users_Guide.md), while the [How do I... or Quick Users' Guide](docs/How_do_I.md) gives a more task oriented decription.
 
 - **Automatic blacklisting**. The system contains a log file scanner that uses regular expressions to detect unwanted access and then creates files in the _blacklist.d_ directory to block access to any matched IP address. Files to scan, the relevant ports to block for the file and the regular expressions for matching are all contained in a set of files in _patterns.d_. Pattern files are small text files, easy to add and edit,  and the system contains a method of testing them. The _nftfw_ configuration file controls the number of matched lines needed for blocking and how long to wait before removing the IP address from the blacklist.
+
+- **Blacklisting by address range**. The system may be supplied with lists of IP address ranges used to block all the addresses in the ranges. This can be used to block access to specific countries, or unwanted access from organisations.
 
 - **Firewall feedback**.  The blacklist scanner can be told how to scan the _syslog_ file looking for log entries from _nftables_ and updates the blacklist database when a blocked IP address returns, keeping it in the firewall until it stops being active.
 
@@ -28,6 +30,8 @@ _nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any De
 
 ## Other documents
 
+All documents can be found on the web from the [_nftfw_ website](https://nftfw.uk).
+
 See documents in the _docs_ directory:
 
 - [Installing _nftfw_](docs/Installation.md)
@@ -46,6 +50,7 @@ See documents in the _docs_ directory:
   - Answers a bunch of questions about the system.
 - [Manual Page index](docs/man/index.md)
   - Manual Page index
+
 
 ## Request for help
 

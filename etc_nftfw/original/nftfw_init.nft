@@ -22,6 +22,7 @@ table ip filter {
 		ct state invalid counter drop
 
 		counter jump whitelist
+		counter jump blacknets
 		counter jump blacklist
 		counter jump incoming
 	}
@@ -55,6 +56,9 @@ table ip filter {
 
 	# empty chains to be supplied by included files
 	chain whitelist {
+	}
+
+	chain blacknets {
 	}
 
 	chain blacklist {
@@ -85,6 +89,7 @@ table ip6 filter {
 		ct state invalid counter drop
 
 		counter jump whitelist
+		counter jump blacknets
 		counter jump blacklist
 		counter jump incoming
 	}
@@ -120,6 +125,9 @@ table ip6 filter {
 	chain whitelist {
 	}
 
+	chain blacknets {
+	}
+
 	chain blacklist {
 	}
 
@@ -135,7 +143,7 @@ table ip6 myhelpers {
 	}
       }
 #
-# The plan is put firewall, blacklist and whitelist
+# The plan is put firewall, blacknets, blacklist and whitelist
 # into separate files. These files will use the 'incremental' syntax.
 # The intention is to optimise changes to the firewall by making only
 # the changes that are needed. When active, changes are mostly to the
@@ -161,6 +169,15 @@ include "whitelist_sets.nft"
 
 # whitelist rules
 include "whitelist.nft"
+
+# create empty sets
+include "blacknets_sets_init.nft"
+
+# set contents
+include "blacknets_sets.nft"
+
+#blacklist rules
+include "blacknets.nft"
 
 # create empty sets
 include "blacklist_sets_init.nft"

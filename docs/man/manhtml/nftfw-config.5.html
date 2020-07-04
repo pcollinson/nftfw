@@ -34,18 +34,19 @@
 <pre><code>  nftables_conf = $(root}/etc/nftables.conf</code></pre>
 <p><em>nftfw_init</em> The location for the initial nft setup file containing the framework used by the firewall.</p>
 <pre><code>  nftfw_init = ${sysetc}/nftfw_init.nft</code></pre>
-<p><em>nftfw_base</em> <em>nftfw</em> expects to find the five working directories, <em>incoming.d</em>, <em>outgoing.d</em>, <em>blacklist.d</em>, <em>whitelist.d</em> and <em>patterns.d</em> under this directory. It you want to run the system from the Symbiosis control directory, then the <em>nftfw_base</em> option needs to be changed from the default to <em>/etc/symbiosis/firewall</em>. <em>Nftfw</em> expects to find its <em>rule.d</em> directory in its own <em>sysetc</em> directory. Symbiosis files in <em>firewall/local.d</em> are not supported by this system. To provide local changes, edit <em>/etc/nftfw_init.nft</em>.</p>
+<p><em>nftfw_base</em> <em>nftfw</em> expects to find the five working directories, <em>incoming.d</em>, <em>outgoing.d</em>, <em>blacklist.d</em>, <em>whitelist.d</em> and <em>patterns.d</em> under this directory. It you want to run the system from the Symbiosis control directory, then the <em>nftfw_base</em> option needs to be changed from the default to <em>/etc/symbiosis/firewall</em>. You’ll need to create a <em>blacknets.d</em> directory. <em>Nftfw</em> expects to find its <em>rule.d</em> directory in its own <em>sysetc</em> directory. Symbiosis files in <em>firewall/local.d</em> are not supported by this system. To provide local changes, edit <em>/etc/nftfw_init.nft</em>.</p>
 <pre><code>  nftfw_base = ${sysetc}</code></pre>
 <p><strong>[Owner]</strong></p>
 <p><em>owner</em>, <em>group</em> The <em>owner</em> variable needs to be set to the username of the owner of the files in <em>${sysetc}/nftfw</em>. The intention is to allow a user to have easy non-root access to control the firewall. If the <em>group</em> variable is empty, the group will be set to the main group of the owner, but can be set to another group if this assists. The blacklist and whitelist scanners will make files owned by the user in their control directories. The default is to use the root user.</p>
 <pre><code>   owner=root
    group</code></pre>
 <p><strong>[Rules]</strong></p>
-<p>This section provides tailoring of the default rules used in the four processing sections of the program when rules are not explicitly given.</p>
+<p>This section provides tailoring of the default rules used in the five processing sections of the program when rules are not explicitly given.</p>
 <pre><code>  incoming = accept
   outgoing = reject
   whitelist = accept
-  blacklist = reject</code></pre>
+  blacklist = reject
+  blacknets = drop</code></pre>
 <p>The key on the left is a program section name and the value is the name of a rule. A possible choice for ‘reject’ is the ‘drop’ rule which simply throws inbound packets away. The ‘reject’ rule jumps to a table in the initialisation script that actively rejects the packet.</p>
 <p><strong>[Logging]</strong></p>
 <p><em>logfmt</em> Set the format of log statements (see the Python <em>logging</em> documentation for possible formats)</p>
@@ -64,17 +65,20 @@
 <pre><code>  incoming_counter = True
   outgoing_counter = True
   blacklist_counter = True
-  whitelist_counter = True</code></pre>
+  whitelist_counter = True
+  blacknets_counter = True</code></pre>
 <p>Do we want nftables logging? By adding a different prefix for each of the tables, it’s possible to scan the syslog for events and get feedback from the firewall. To stop logging, just use the name.</p>
 <pre><code>  incoming_logging
   outgoing_logging
   blacklist_logging = Blacklist
-  whitelist_logging</code></pre>
+  whitelist_logging
+  blacknets_logging</code></pre>
 <p>Two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, <em>nftfw</em> uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.</p>
 <p>However, at present, the auto-merged, interval sets can cause the <em>nft</em> program to fail in some circumstances, flagging an error. There is a bug causing <em>nft</em> to succeed in loading the set when a full install is performed but failing when attempting a reload.</p>
 <p>The bug has been reported to the <em>nftables</em> development team, but no fix has been generated as of the current releases. <em>nftfw</em> will work around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.</p>
 <pre><code>  blacklist_set_auto_merge = False
-  whitelist_set_auto_merge = False</code></pre>
+  whitelist_set_auto_merge = False
+  blacknets_set_auto_merge = False</code></pre>
 <p><strong>[Whitelist]</strong></p>
 <p><em>wtmp_file</em> The <strong>whitelist</strong> command scans the wtmp file, and this variable is normally empty to use the system default. Set <em>wtmp_file=utmp</em> to use the system utmp file, otherwise set a filename in the variable.</p>
 <pre><code>  wtmp_file</code></pre>

@@ -11,6 +11,7 @@
     - [How do I: Give full access my server to known set of machines?](#how-do-i-give-full-access-my-server-to-known-set-of-machines)
     - [How do I: Restrict the services accessed by a whitelisted address?](#how-do-i-restrict-the-services-accessed-by-a-whitelisted-address)
     - [How do I: Block access to abusive sites?](#how-do-i-block-access-to-abusive-sites)
+    - [How do I: Block access to countries?](#how-do-i-block-access-to-countries)
     - [How do I: See what the firewall is doing?](#how-do-i-see-what-the-firewall-is-doing)
     - [How do I: Check what the blacklist scanner is doing?](#how-do-i-check-what-the-blacklist-scanner-is-doing)
     - [How do I: Find the country sending me blacklisted packets?](#how-do-i-find-the-country-sending-me-blacklisted-packets)
@@ -106,6 +107,10 @@ The _blacklist.d_ directory uses the same convention for files used for the whit
 
 The blacklist scanner will automatically create files in the directory ending in _.auto_ when it finds sites that are misbehaving. The scanner uses files in the _patterns.d_ directory to find log files to scan, and how to interpret lines in the log files as bad.
 
+## How do I: Block access to countries?
+
+The _blacknets.d_ directory can contain a set of files each with a list of IP addresses, one to a line, expressed in CIDR notation. To block a country, you'll need the list of all the networks that the country uses and these are available from several places on the web, see [Getting CIDR Lists](Getting-cidr-lists.md) for how to install them.
+
 ## How do I: See what the firewall is doing?
 
 The _nft_ command prints the contents of the firewall with the command:
@@ -183,7 +188,7 @@ The blacklist scanner normally ignores pattern files with _ports=test_, so it's 
 
 ## How do I: Change the settings for _nftfw_?
 
-The file _/usr/local/etc/nftfw.ini_ is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.
+The file _/usr/local/etc/nftfw/config.ini_ is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.
 
 See the manual page [_nftfw-config_](man/nftfw-config.5.md) for a description.
 

@@ -28,6 +28,7 @@
 <li><em>outbound.d</em> - sets any rules controlling packets leaving the system;</li>
 <li><em>whitelist.d</em> - contains IP addresses that have full access to the system;</li>
 <li><em>blacklist.d</em> - specifies IP addresses and ports in the inbound packets that should not have access;</li>
+<li><em>blacknets.d</em> - contains lists of network address ranges allowing bulk blocking;</li>
 <li><em>patterns.d</em> - contain pattern files for matching lines in log files for blacklist; and</li>
 <li><em>rule.d</em> - hold files for generating <strong>nft</strong> commands from rule names.</li>
 </ul>
@@ -60,6 +61,18 @@
 <p>The system has no way of distinguishing between TCP and UDP protocols and the system generates two rules for each rule it finds.</p>
 <p>Administrators can disable the blacklist and whitelist systems separately by creating a file called ‘disabled’ in the relevant directory.</p>
 <p>When building the firewall from these two directories, <strong>nftfw</strong> writes the IP addresses into nftables sets. The program writes the information into two separate files and uses file comparison with the last loaded files to see If it can update the sets of IP addresses without reloading the whole firewall.</p>
+<h2 id="blacknets.d">blacknets.d</h2>
+<p>Files in this directory make nftables rules in a single set that block ranges of IP addresses. To be included, a file must end in <em>.nets</em>.</p>
+<p>Each file contains a list of IP network addresses, expressed in CIDR notation, one to a line. The file can also contain comments with the usual use of # to indicate them. Lines can contain the following formats:</p>
+<blockquote>
+<p># IPv4 CIDR 203.0.113.0/24</p>
+<p># IPv6 Compressed 2001:DB8::/32</p>
+<p># IPv6 Exploded 2001:0db8:0000:0000:0000:0000:0000:0000/32</p>
+<p># IPv4 embedded in IPv6 (will be converted to IPv4) # Format used by ip2location ::FFFF:203.0.113.0/120</p>
+<p># IPv4 embedded in IPv6 (will be converted to IPv4) ::ffff:cb00:7100/120</p>
+</blockquote>
+<p>Theoretically, these are addresses of networks and not interfaces. The parts of the address that are ‘local’ should be zero. For example in 203.0.113.5/24, the ‘24’ means that the leftmost 24 bits of the 32 bits are the network address and the 5 is the local part, that should be zero. However, <strong>nftfw</strong> will accept addresses where bits are set in these supposedly zero sections and will clear them.</p>
+<p>The system can deal with lists for the same country from different sources, which will inevitably diverge. The system will remove exact duplicates, and will minimise overlapping address ranges where possible</p>
 <h2 id="patterns.d">patterns.d</h2>
 <p>Patterns define rules for the <strong>blacklist</strong> module containing the log file (or files) for scanning, the port numbers for the blocking firewall rules, and a list of regular expressions matching lines in the log file.</p>
 <p>Pattern files are text files named <em>name.pattern</em>. The files support comments when the first character of the line contains ‘#’.</p>

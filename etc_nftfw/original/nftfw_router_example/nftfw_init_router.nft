@@ -1,22 +1,22 @@
 #!/usr/sbin/nft -f
 #
 # Local multiinterface version for
-# gateway machine
+# craggy, my gateway machine
 
 # First remove all rulesets
 flush ruleset
 
 #
 # Variables
-# interface for router
+# interface for gateway
 define gateif = "enp4s0"
 # interface for local network
 define localif = "enp1s0"
-# ip of our router interface
-define gateip = 203.0.113.234
-# ip for router
-define gatesrcip = 203.0.113.238
-# router uses this for admin
+# ip of our gateway interface
+define gateip = xx.xx.xx.xx
+# ip for gateway
+define gatesrcip = xx.xx.xx.xx
+# ip for admin access
 # allow these addresses to be routed to the gateway
 define gateadminnet = 192.168.1.0/24
 
@@ -45,6 +45,7 @@ table ip filter {
 		ct state invalid counter drop
 
 		counter jump whitelist
+		counter jump blacknets
 		counter jump blacklist
 		counter jump incoming
 	}
@@ -62,13 +63,14 @@ table ip filter {
 		ct state invalid counter drop
 
 		counter jump whitelist
+		counter jump blacknets
 		counter jump blacklist
 		counter jump incoming
 	}
 
 	chain output {
 		type filter hook output priority 0; policy accept;
-		oif "lo" counter counter accept
+		oif "lo" counter accept
 		ct state {established,related} counter accept
 		ct state invalid counter drop
 		counter jump outgoing
@@ -87,11 +89,14 @@ table ip filter {
 		counter drop
 	}
 
-	# empty chains to
+	# empty chains
 	chain whitelist {
 	}
 
 	chain blacklist {
+	}
+
+	chain blacknets {
 	}
 
 	chain incoming {
@@ -110,11 +115,13 @@ table ip nat {
 		oif $gateif counter snat to $gateip
 	}
 }
+
 table ip myhelpers {
 	chain prerouting {
 		type filter hook prerouting priority 0;
 	}
       }
+
 #
 # Don't have ipv6 from outside
 # but some internal systems use it
@@ -130,6 +137,7 @@ table ip6 filter {
 		iif $localif counter accept
 
 		counter jump whitelist
+		counter jump blacknets
 		counter jump blacklist
 		counter jump incoming
 	}
@@ -145,6 +153,7 @@ table ip6 filter {
 		iif $localif counter accept
 
 		counter jump whitelist
+		counter jump blacknets
 		counter jump blacklist
 		counter jump incoming
 	}
@@ -174,19 +183,24 @@ table ip6 filter {
 	chain blacklist {
 	}
 
+	chain blacknets {
+	}
+
 	chain incoming {
 	}
 
 	chain outgoing {
 	}
 }
+
 table ip6 myhelpers {
 	chain prerouting {
 		type filter hook prerouting priority 0;
 	}
       }
+
 #
-# The plan is put firewall, blacklist and whitelist
+# The plan is put firewall, blacklist, blacknets and whitelist
 # into separate files. These files will use the 'incremental' syntax
 # The intention is to optimise changes to the firewall by making only the changes
 # that are needed. When active, changes are mostly to the blacklist
@@ -206,6 +220,9 @@ include "outgoing.nft"
 include "whitelist_sets_init.nft"
 include "whitelist_sets.nft"
 include "whitelist.nft"
+include "blacknets_sets_init.nft"
+include "blacknets_sets.nft"
+include "blacknets.nft"
 include "blacklist_sets_init.nft"
 include "blacklist_sets.nft"
 include "blacklist.nft"

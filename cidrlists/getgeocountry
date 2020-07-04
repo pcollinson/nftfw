@@ -1,0 +1,136 @@
+#!/bin/sh
+# Script to download the Maxmind public
+# country CSV file and create an sqlite3 database from it,
+# this can be used to generate cidr lists for nftfw
+#
+# It assumes that you have an Geolite2 licence number
+# installed in /etc/GeoIP.conf
+#
+# The script should be installed in /var/lib/GeoLite2
+# and a cron entry added in /etc/cron.d/geoipupdate
+#
+# 30 7    * * 3   root	/var/lib/GeoIP/getgeocountry
+#
+# this runs on the same day that the other databases are
+# updated but an hour later - choose your own hours and
+# minutes
+#
+# The sqlite3 database is called GeoLite2-Country.db
+#
+if [ $(whoami) != 'root' ]; then
+   echo 'Must be run by root'
+   exit 1
+fi
+DESTDIR=/var/lib/GeoIP
+if [ ! -d $DESTDIR ]; then
+    echo "Cannot find $DESTDIR"
+    exit 127
+fi
+cd $DESTDIR
+# constants for import
+OUTPUT=GeoLite2-Country-CSV
+TEMP=downloadcountry.zip
+# constants for makesql
+IP4FILE=$OUTPUT/GeoLite2-Country-Blocks-IPv4.csv
+IP6FILE=$OUTPUT/GeoLite2-Country-Blocks-IPv6.csv
+LOCATIONS=$OUTPUT/GeoLite2-Country-Locations-en.csv
+# working file
+NEWDB=newdb.db
+# final destination
+OPDB=GeoLite2-Country.db
+#
+# Import new data
+# don't update things if not needed
+#
+import() {
+   if [ ! -f /etc/GeoIP.conf ]; then
+       echo 'Cannot find /etc/GeoIP.conf - have you installed geoipupdate?'
+       return 127
+   fi
+   # get our key
+   KEY=$(grep '^LicenseKey' /etc/GeoIP.conf| sed -e 's/^LicenseKey //')
+   if [ "$KEY" = "" ]; then
+       echo 'Cannot find license key in /etc/GeoIP.conf - have you registered with Maxmind?'
+       return 127
+   fi
+   # delete last download file
+   rm -rf $TEMP
+   # see if we have a previous version of the database online
+   PREVIOUS=""
+   if [ -h $OUTPUT ]; then
+       PREVIOUS=$(readlink $OUTPUT)
+   fi
+
+   if wget -q -O $TEMP "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=$KEY&suffix=zip"; then
+       # see if we have a zip file
+       if unzip -l -qq $TEMP > /dev/null; then
+	   # get directory name
+ 	   DIR=$(unzip -l -qq $TEMP | grep $OUTPUT | head -1 | sed -e 's/^.*Geo/Geo/' -e 's,/.*$,,')
+	   if [ ! -d "${DIR}" ]; then
+	       unzip -qq $TEMP
+	       rm -f $OUTPUT
+	       ln -s $DIR $OUTPUT
+	       if [ "$PREVIOUS" != '' -a -d $PREVIOUS ]; then
+		   rm -rf $PREVIOUS
+	       fi
+	   fi
+	   rm -rf $TEMP
+           return 0
+       fi
+   fi
+   return 127
+}
+# Make sqlite3 database
+makesql() {
+
+	  if [ -h $OUTPUT -a -f $IP4FILE -a -f $IP6FILE ]; then
+	     rm -f $NEWDB
+	     sqlite3 $NEWDB <<- EOH
+	CREATE TABLE ip4 (
+	       network TEXT NOT NULL,
+	       geoname_id INTEGER NOT NULL,
+	       registered_country_geoname_id INTEGER NOT NULL,
+	       represented_country_geoname_id INTEGER NOT NULL,
+	       is_anonymous_proxy INTEGER NOT NULL,
+	       is_satellite_provider INTEGER NOT NULL
+	);
+	CREATE TABLE ip6 (
+	       network TEXT NOT NULL,
+	       geoname_id INTEGER NOT NULL,
+	       registered_country_geoname_id INTEGER NOT NULL,
+	       represented_country_geoname_id INTEGER NOT NULL,
+	       is_anonymous_proxy INTEGER NOT NULL,
+	       is_satellite_provider INTEGER NOT NULL
+	);
+	CREATE TABLE locations (
+	       geoname_id INTEGER NOT NULL,
+               locale_code TEXT NOT NULL,
+               continent_code TEXT NOT NULL,
+	       continent_name TEXT NOT NULL,
+	       country_iso_code TEXT NOT NULL,
+	       country_name TEXT NOT NULL,
+	       is_in_european_union INTEGER NOT NULL
+	);
+	.mode csv
+	.import $IP4FILE ip4
+	.import $IP6FILE ip6
+	.import $LOCATIONS locations
+	CREATE INDEX ip4_id_ix ON ip4(geoname_id);
+	CREATE INDEX ip6_id_ix ON ip6(geoname_id);
+	CREATE INDEX geoname_id_ix ON locations(geoname_id);
+	CREATE INDEX iso_ix on locations(country_iso_code);
+EOH
+	     # check for success
+             if [ $? -eq 0 ]; then
+		 # now move it into place
+		 rm -f $OPDB;mv $NEWDB $OPDB
+             fi
+	  fi
+}
+if [ -f /etc/GeoIP.conf ]; then
+    if import; then
+	makesql
+    fi
+    exit 1
+fi
+exit 127

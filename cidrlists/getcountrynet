@@ -1,0 +1,35 @@
+#!/bin/sh
+# usage: getcountrynet ISO-CODE [ ISO-CODE]
+# ISO-CODE is two character country code, several can be supplied
+# as arguments.  ISO_CODE can be upper or lower case
+# Generates ISO_CODE.nets containing ip4 and ip6 networks
+# in current directory
+# Uses GeoLite2-Country.db based on the GeoLite2-Country-CSV source
+
+db=/var/lib/GeoIP/GeoLite2-Country.db
+destination=/usr/local/etc/nftfw/blacknets.d
+
+if [ ! -f $db ]; then
+    exit 0
+fi
+for code in "$@"
+do
+    sqlite3 $db > /tmp/$code.$$ <<EOF
+select network from ip4 left join locations on locations.geoname_id = ip4.geoname_id where country_iso_code = '${code}' COLLATE NOCASE;
+select network from ip6 left join locations on locations.geoname_id = ip6.geoname_id where country_iso_code = '${code}' COLLATE NOCASE;
+EOF
+    destfile=${destination}/${code}.nets
+
+    if [ -z /tmp/$code.$$ ]; then
+	echo "Failed to create $destfile"
+	continue
+    fi
+    if [ ! -f $destfile ]; then
+	mv /tmp/$code.$$ $destfile
+    elif cmp -s /tmp/$code.$$ $destfile; then
+	rm -f /tmp/$code.$$
+    else
+	mv /tmp/$code.$$ $destfile
+    fi
+done
+exit 0

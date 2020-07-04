@@ -234,7 +234,7 @@ nftables_conf = /etc/nftables.conf</code></pre>
 <p>Finally a tip that’s hard to find: reload <em>systemd</em> if you change the <em>nftfw</em> files after installation and starting:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1">$ <span class="fu">sudo</span> systemctl daemon-reload</a></code></pre></div>
 <h2 id="installing-geolocation">Installing Geolocation</h2>
-<p>This will add country detection to <em>nftfwls</em>, which is optional but desirable. See the <a href="Installing-GeoLocation.md">document</a>.</p>
+<p>This will add country detection to <em>nftfwls</em>, which is optional but desirable. See the <a href="Installing-GeoLocation.md">document</a>. If you plan on blocking addresses by country, then the Geolocation system from Maxmind can provide tools to generate lists of IP addresses in the correct format.</p>
 <h3 id="sympl-users-update-your-mail-system-after-installation">Sympl users: Update your mail system after installation</h3>
 <p>A repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs - see <a href="https://github.com/pcollinson/sympl-email-changes">Sympl mail system update</a>.</p>
 <h2 id="you-are-there">You Are There</h2>
@@ -244,6 +244,14 @@ nftables_conf = /etc/nftables.conf</code></pre>
 <ul>
 <li>How to update <em>nftfw</em>.</li>
 </ul></li>
+<li><a href="Installing-GeoLocation.md">Installing Geolocation</a>
+<ul>
+<li>How to install GeoIP2</li>
+</ul></li>
+<li><a href="Getting-cidr-lists.md">Getting CIDR lists</a>
+<ul>
+<li>How to obtain blocking lists for countries</li>
+</ul></li>
 <li><a href="Users_Guide.md">User’s Guide to nftfw</a>
 <ul>
 <li>The full User guide, the first section explains how the system is controlled.</li>
@@ -251,6 +259,10 @@ nftables_conf = /etc/nftables.conf</code></pre>
 <li><a href="How_do_I.md">How do I.. or a User’s Quick Guide</a>
 <ul>
 <li>Answers a bunch of questions about the system.</li>
+</ul></li>
+<li><a href="https://nftfw.uk"><em>nftfw</em> web site</a>
+<ul>
+<li>All documents are available on the <em>nftfw</em> web site.</li>
 </ul></li>
 </ul>
 <h2 id="acknowledgement">Acknowledgement</h2>

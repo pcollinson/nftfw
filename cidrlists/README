@@ -1,0 +1,9 @@
+These two files provide support to automate download of GeoIP files to provide
+CIDR files for blocking access by country.
+
+See the document Getting-cidr-lists.md on ../docs
+
+getgeocountry - add into /var/lib/GeoIP to download the zip file, unpack it and
+	      create a sqlite3 database.
+
+getcountrynet - install to obtain CIDR lists for a specific country or countries.
