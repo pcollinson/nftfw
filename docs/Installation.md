@@ -383,12 +383,18 @@ Now look at:
 
 -  [Updating _nftfw_](Updating-nftfw.md)
    -  How to update _nftfw_.
+- [Installing Geolocation](Installing-GeoLocation.md)
+  - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
+- [Getting CIDR lists](Getting-cidr-lists.md)
+  - How to get CIDR files for use with the _blacknet_ feature..
 -  [User's Guide to nftfw](Users_Guide.md)
    -  The full User guide, the first section explains how the system is controlled.
 -  [How do I.. or a User's Quick Guide](How_do_I.md)
    -  Answers a bunch of questions about the system.
 - [_nftfw_ web site](https://nftfw.uk)
    - All documents are available on the _nftfw_ web site.
+
+All documents can be found on the web from the [_nftfw_ website](https://nftfw.uk).
 
 ## Acknowledgement
 

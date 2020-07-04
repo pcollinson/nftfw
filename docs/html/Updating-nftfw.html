@@ -110,33 +110,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>To support the new category of blocking there are some changes to <em>etc/nftfw/nftfw_init.nft</em> that need to be installed, when updating - remember to run the <em>Install.sh</em> script and then copy <em>etc/nftfw/originals/nftfw_init.nft</em> to <em>etc/nftfw/nftfw_init.nft</em>. If you’ve made changes to the installed file, you’ll need to edit them in again. It’s wise then run</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> nftfw -f load</a></code></pre></div>
 <p>to ensure that you have a clean installation.</p>
+<p>If you’ve installed the <em>systemd</em> based active file system, then you will need to update <em>/etc/systemd/system/nftfw.path</em> to include the new <em>blacknets.d</em> directory. Copy the <em>nftfw.path</em> from the <em>systemd</em> directory in the release to <em>/etc/systemd/system/nftfw.path</em>, the file contains the five lines that are needed. Then tell <em>systemd</em> to reload:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># sudo systemctl daemon-reload</span></a></code></pre></div>
 <h2 id="changes-for-nftfw-version-0.6-and-onwards">Changes for <em>nftfw</em> version 0.6 and onwards</h2>
 <p><em>ntftw</em> no longer recommends the use of <em>incron</em> to provide a ‘active’ directory so changes in directories in_/usr/local/nftfw_ cause automatic running of the <em>nftfw load</em> command. A <em>systemd</em> unit that watches directories and calls the command replaces <em>incron</em>. If you’ve installed a previous version then you need to unwind parts of the <em>incron</em> support system.</p>
 <p>Take these steps if you ran versions of <em>nftfw</em> before 0.6 and used <em>incron</em>. These steps are shown in other files, but it seems sensible to emphasise them here. These can be done before or after you install the new version. The <em>systemd</em> can run with version before 0.6, but 0.6 contains some coding changes to make it work a little better.</p>
 <p>First, move to the <em>nftfw</em> distribution and replace the <em>cron.d</em> file</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="bu">cd</span> cronfiles</a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="co"># check that the paths used in cron-nftfw are correct for you</span></a>
-<a class="sourceLine" id="cb6-3" title="3">$ <span class="fu">sudo</span> cp cron-nftfw /etc/cron.d/nftfw</a>
-<a class="sourceLine" id="cb6-4" title="4">$ <span class="bu">cd</span> ..</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="bu">cd</span> cronfiles</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="co"># check that the paths used in cron-nftfw are correct for you</span></a>
+<a class="sourceLine" id="cb7-3" title="3">$ <span class="fu">sudo</span> cp cron-nftfw /etc/cron.d/nftfw</a>
+<a class="sourceLine" id="cb7-4" title="4">$ <span class="bu">cd</span> ..</a></code></pre></div>
 <p>then stop <em>incron</em> from running <em>nftfw</em>:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> rm /etc/incron.d/nftfw</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="fu">sudo</span> rm /etc/incron.d/nftfw</a></code></pre></div>
 <p>Install <em>systemd</em> control files from <em>systemd</em> in the <em>nftfw</em> distribution:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="bu">cd</span> systemd</a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="co"># check nftfw.path and nftfw.service have correct paths</span></a>
-<a class="sourceLine" id="cb8-3" title="3">$ <span class="fu">sudo</span> cp nftfw.* /etc/systemd/system</a>
-<a class="sourceLine" id="cb8-4" title="4">$ <span class="bu">cd</span> ..</a>
-<a class="sourceLine" id="cb8-5" title="5"></a>
-<a class="sourceLine" id="cb8-6" title="6"><span class="co"># start the path unit only</span></a>
-<a class="sourceLine" id="cb8-7" title="7">$ <span class="fu">sudo</span> systemctl enable nftfw.path</a>
-<a class="sourceLine" id="cb8-8" title="8">$ <span class="fu">sudo</span> systemctl start nftfw.path</a>
-<a class="sourceLine" id="cb8-9" title="9">$ <span class="fu">sudo</span> systemctl status</a>
-<a class="sourceLine" id="cb8-10" title="10"></a>
-<a class="sourceLine" id="cb8-11" title="11"><span class="co"># DON&#39;T start or enable nftfw.service</span></a>
-<a class="sourceLine" id="cb8-12" title="12"><span class="co"># it will be started when needed by nftfw.path</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$ <span class="bu">cd</span> systemd</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="co"># check nftfw.path and nftfw.service have correct paths</span></a>
+<a class="sourceLine" id="cb9-3" title="3">$ <span class="fu">sudo</span> cp nftfw.* /etc/systemd/system</a>
+<a class="sourceLine" id="cb9-4" title="4">$ <span class="bu">cd</span> ..</a>
+<a class="sourceLine" id="cb9-5" title="5"></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="co"># start the path unit only</span></a>
+<a class="sourceLine" id="cb9-7" title="7">$ <span class="fu">sudo</span> systemctl enable nftfw.path</a>
+<a class="sourceLine" id="cb9-8" title="8">$ <span class="fu">sudo</span> systemctl start nftfw.path</a>
+<a class="sourceLine" id="cb9-9" title="9">$ <span class="fu">sudo</span> systemctl status</a>
+<a class="sourceLine" id="cb9-10" title="10"></a>
+<a class="sourceLine" id="cb9-11" title="11"><span class="co"># DON&#39;T start or enable nftfw.service</span></a>
+<a class="sourceLine" id="cb9-12" title="12"><span class="co"># it will be started when needed by nftfw.path</span></a></code></pre></div>
 <p>Stop incron if it’s running and you no longer need it</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$ <span class="fu">sudo</span> systemctl stop incron</a>
-<a class="sourceLine" id="cb9-2" title="2">$ <span class="fu">sudo</span> systemctl disable incron</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">sudo</span> systemctl stop incron</a>
+<a class="sourceLine" id="cb10-2" title="2">$ <span class="fu">sudo</span> systemctl disable incron</a></code></pre></div>
 <p>Finally a tip that’s hard to find: reload <em>systemd</em> if you change the <em>nftfw</em> files after installation and starting:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">sudo</span> systemctl daemon-reload</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">sudo</span> systemctl daemon-reload</a></code></pre></div>
 </body>
 </html>

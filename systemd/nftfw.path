@@ -16,6 +16,7 @@ PathModified=/usr/local/etc/nftfw/incoming.d
 PathModified=/usr/local/etc/nftfw/outgoing.d
 PathModified=/usr/local/etc/nftfw/whitelist.d
 PathModified=/usr/local/etc/nftfw/blacklist.d
+PathModified=/usr/local/etc/nftfw/blacknets.d
 
 [Install]
 WantedBy=multi-user.target

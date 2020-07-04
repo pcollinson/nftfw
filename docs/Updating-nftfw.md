@@ -56,6 +56,12 @@ $ sudo nftfw -f load
 ```
 to ensure that you have a clean installation.
 
+If you've installed the _systemd_ based active file system, then you will need to update _/etc/systemd/system/nftfw.path_ to include the new _blacknets.d_ directory. Copy the _nftfw.path_ from the _systemd_ directory in the release to _/etc/systemd/system/nftfw.path_, the file contains the five lines that are needed. Then tell _systemd_ to reload:
+
+``` sh
+# sudo systemctl daemon-reload
+```
+
 ## Changes for _nftfw_ version 0.6 and onwards
 
 _ntftw_ no longer recommends the use of _incron_ to provide a 'active' directory so changes in directories in_/usr/local/nftfw_ cause automatic running of the _nftfw load_ command. A _systemd_ unit that watches directories and calls the command replaces _incron_. If you've installed a previous version then you need to unwind parts of the _incron_ support system.

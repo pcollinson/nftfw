@@ -40,6 +40,8 @@ See documents in the _docs_ directory:
   - For those who want a bare bones list of tasks.
 - [Installing Geolocation](docs/Installing-GeoLocation.md)
   - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
+- [Getting CIDR lists](docs/Getting-cidr-lists.md)
+  - How to get CIDR files for use with the _blacknet_ feature..
 - [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
   - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
 - [Updating _nftfw_](docs/Updating-nftfw.md)

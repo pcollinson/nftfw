@@ -297,6 +297,29 @@ The _rule_ directory contains small shell scripts that translate firewall action
 
 There are several examples of these scripts in the _/usr/local/etc/nftfw/rule.d_ and the README file in that directory explains what they do.
 
+## Other documents
+
+All documents can be found on the web from the [_nftfw_ website](https://nftfw.uk).
+
+See documents in the _docs_ directory:
+
+- [Installing _nftfw_](Installation.md)
+  - Full installation of the system for Debian Buster.
+- [Installation Instructions](Installation-Instructions.md)
+  - For those who want a bare bones list of tasks.
+- [Installing Geolocation](Installing-GeoLocation.md)
+  - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
+- [Getting CIDR lists](Getting-cidr-lists.md)
+  - How to get CIDR files for use with the _blacknet_ feature..
+- [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
+  - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
+- [Updating _nftfw_](Updating-nftfw.md)
+  - How to update _nftfw_.
+- [How do I.. or Quick User's Guide](How_do_I.md)
+  - Answers a bunch of questions about the system.
+- [Manual Page index](docs/man/index.md)
+  - Manual Page index
+
 ## Acknowledgement
 
 All of this is made possible by shamelessly borrowing ideas from Patrick Cherry who created the Symbiosis hosting package for Bytemark of which the firewall system is part.
