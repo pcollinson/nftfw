@@ -747,6 +747,72 @@ pattern_split = No
                 out[o] = s
         self.inireverse = out
 
+    def get_ini_changed_values(self):
+        """ Compare working ini setting with default
+
+        Returns
+        -------
+        String that can be printed
+        """
+
+        # Strategy - get a new empty parser object
+        # from default settings
+        # Fix up programmed changes
+        # cycle through removing values that are
+        # the same
+        # Remove any empty sections
+        # Return what's left as a repr
+
+        base = ConfigParser(allow_no_value=True,
+                                   strict=False,
+                                   interpolation=ExtendedInterpolation())
+        base.read_string(self.default_parser_settings)
+
+        # remove root
+        base.remove_option('Locations', 'root')
+        self.parser.remove_option('Locations', 'root')
+
+        # fix up initial logging value
+        # so it gives the same result when not a tty
+        if not sys.stdout.isatty():
+            base.set('Logging', 'logprint', 'False')
+
+        # now scan the base and compare with installed values
+        sects = self.parser.sections()
+        # Information found that should not be there
+        should_delete = []
+        for sect in sects:
+            # section not in base
+            if not base.has_section(sect):
+                e = f"# Delete section {sect} from config.ini"
+                should_delete.append(e)
+                continue
+
+            # scan through parser
+            # insert any options that don't exist into base
+            # or compare and remove identical values
+            for opt in self.parser[sect]:
+                if not base.has_option(sect, opt):
+                    curr_val = self.parser.get(sect, opt, raw=True)
+                    base.set(sect, opt, curr_val)
+                else:
+                    base_val = base.get(sect, opt, raw=True)
+                    curr_val = self.parser.get(sect, opt, raw=True)
+                    if base_val == curr_val:
+                        base.remove_option(sect, opt)
+                    else:
+                        base.set(sect, opt, curr_val)
+
+            # remove empty sections
+            if not any(base.items(sect, raw=True)):
+                 base.remove_section(sect)
+
+        # prepare output
+        out = self.config_settings(base)
+        if any(should_delete):
+            out += "\n" + "\n".join(should_delete)
+        return out
+
     @staticmethod
     def am_i_root():
         """Check if running as root and die if not"""
@@ -785,24 +851,29 @@ pattern_split = No
             return
         os.chown(path, self.fileuid, self.filegid)
 
-    def __repr__(self):
+    def config_settings(self, parser):
         """Return config settings as str"""
 
         out = []
-        sects = self.parser.sections()
+        sects = parser.sections()
         for s in sects:
             out.append('['+s+']')
-            for o in self.parser[s]:
+            for o in parser[s]:
                 if o in self.ini_boolean_change:
-                    v = self.parser.getboolean(s, o)
+                    v = parser.getboolean(s, o)
                     out.append(f'{o} = {str(v)}')
                 else:
-                    v = self.parser.get(s, o, raw=True)
+                    v = parser.get(s, o, raw=True)
                     if v is None:
                         out.append(o)
                     else:
                         out.append(f'{o} = {v}')
         return "\n".join(out)
+
+    def __repr__(self):
+        """Return config settings as str"""
+
+        return self.config_settings(self.parser)
 
     #
     # Directory and file location API

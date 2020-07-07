@@ -8,7 +8,7 @@ NAME
 SYNOPSIS
 ======
 
-| **nftfw** \[**-h**\] \[**-c** _config_] \[**-p** _patternname_] \[**-o** _option_] \[**-x | -f | -i | -q | -v **] \[**_load|blacklist|whitelist|tidy_**\]
+| **nftfw** \[**-h**\] \[**-c** _config_] \[**-p** _patternname_] \[**-o** _option_] \[**-x | -f | -i | -a | -q | -v **] \[**_load|blacklist|whitelist|tidy_**\]
 
 
 DESCRIPTION
@@ -101,6 +101,10 @@ These are the available options to the program:
 **-i**, **-\-info**
 
 :    List all the configuration names and settings
+
+**-a**, **-\-altered**
+
+:    List all the configuration names and settings that are different from those compiled into the program. Useful to telling what configuration options have been changed in _config.ini_.
 
 **-o**, **-\-option** OPTION
 

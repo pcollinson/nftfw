@@ -50,6 +50,9 @@ def main():
     ap.add_argument('-i', '--info',
                     help='Display current config settings and exit',
                     action='store_true')
+    ap.add_argument('-a', '--altered',
+                    help='Display changed config settings and exit',
+                    action='store_true')
     ap.add_argument('-o', '--option',
                     help='Specify comma separated list of option=value. ' \
                     + 'Overrides values from compiled values and config file. ' \
@@ -88,6 +91,11 @@ def main():
     # list options and exit
     if args.info:
         print(repr(cf))
+        sys.exit(0)
+
+    # list options that have changed and exit
+    if args.altered:
+        print(cf.get_ini_changed_values())
         sys.exit(0)
 
     # Check on actions

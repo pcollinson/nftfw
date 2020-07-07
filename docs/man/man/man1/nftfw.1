@@ -9,7 +9,7 @@
 .PP
 \f[B]nftfw\f[] [\f[B]\-h\f[]] [\f[B]\-c\f[] \f[I]config\f[]]
 [\f[B]\-p\f[] \f[I]patternname\f[]] [\f[B]\-o\f[] \f[I]option\f[]]
-[\f[B]\-x | \-f | \-i | \-q | \-v \f[]]
+[\f[B]\-x | \-f | \-i | \-a | \-q | \-v \f[]]
 [\f[B]\f[BI]load|blacklist|whitelist|tidy\f[B]\f[]]
 .SH DESCRIPTION
 .PP
@@ -207,6 +207,14 @@ pattern files.
 .TP
 .B \f[B]\-i\f[], \f[B]\-\-info\f[]
 List all the configuration names and settings
+.RS
+.RE
+.TP
+.B \f[B]\-a\f[], \f[B]\-\-altered\f[]
+List all the configuration names and settings that are different from
+those compiled into the program.
+Useful to telling what configuration options have been changed in
+\f[I]config.ini\f[].
 .RS
 .RE
 .TP

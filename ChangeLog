@@ -1,3 +1,7 @@
+v0.7.2  Add -a (altered) flag to nftfw to print changes in
+	config from the compiled in values. Can replace config.ini
+	by the values.
+
 v0.7.1  Add necessary change to the systemd setup to report on
 	the blacknets.d directory.
 	Documentation update

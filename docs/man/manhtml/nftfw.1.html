@@ -21,7 +21,7 @@
 <h1 id="name">NAME</h1>
 <p><strong>nftfw</strong> — manage the Nftfw firewall generator</p>
 <h1 id="synopsis">SYNOPSIS</h1>
-<div class="line-block"><strong>nftfw</strong> [<strong>-h</strong>] [<strong>-c</strong> <em>config</em>] [<strong>-p</strong> <em>patternname</em>] [<strong>-o</strong> <em>option</em>] [<strong>-x | -f | -i | -q | -v </strong>] [<strong><em>load|blacklist|whitelist|tidy</em></strong>]</div>
+<div class="line-block"><strong>nftfw</strong> [<strong>-h</strong>] [<strong>-c</strong> <em>config</em>] [<strong>-p</strong> <em>patternname</em>] [<strong>-o</strong> <em>option</em>] [<strong>-x | -f | -i | -a | -q | -v </strong>] [<strong><em>load|blacklist|whitelist|tidy</em></strong>]</div>
 <h1 id="description">DESCRIPTION</h1>
 <p><strong>nftfw</strong> is the front-end for the firewall system that generates rules for nftables. It uses files in five directories in <em>/usr/local/etc/nftfw</em> to create firewall rules. The directories create incoming and outgoing firewalls, and also tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system’s root or below <em>/usr/local</em>.</p>
 <p>The <strong>nftfw</strong> command has several options, and most of these don’t change that often when the system is in operation. Editing the ini format file <em>/etc/nftfw/config.ini</em> changes the values of options - see nftfw-config(5). You may make temporary variable changes to configuration values from the command line using the <strong>-o</strong> option to <strong>nftfw</strong> (see below).</p>
@@ -79,6 +79,9 @@
 </dd>
 <dt><strong>-i</strong>, <strong>--info</strong></dt>
 <dd><p>List all the configuration names and settings</p>
+</dd>
+<dt><strong>-a</strong>, <strong>--altered</strong></dt>
+<dd><p>List all the configuration names and settings that are different from those compiled into the program. Useful to telling what configuration options have been changed in <em>config.ini</em>.</p>
 </dd>
 <dt><strong>-o</strong>, <strong>--option</strong> OPTION</dt>
 <dd><p>OPTION is keyword=value and may be comma separated list of configuration options. The values override any settings in the configuration file.</p>
