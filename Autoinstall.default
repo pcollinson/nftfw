@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# To use the auto install feature for Install.sh,
+# copy this file to Autoinstall.conf where it will be loaded
+# when you run Install.sh.
+# You can edit the values below.
+#
+# Autoinstall.conf is ignored by git, so will not impact on any future
+# pull requests.
+#
+
+# Default for installation destination
+# NB nftfw only knows about / or /usr/local
+# when looking for control files
+# Values: 'Y' to install in /usr/local
+#         'N' to install in /
+#	  '' or comment out to ask the question
+AUTO_DESTROOT=Y
+
+# Default for installation confirmation
+# Values: 'Y' to continue
+#         'N' to exit
+#	  '' or comment out to ask the question
+AUTO_DESTCONFIRM=Y
+
+# Default for displaying all files when installing
+# Values: 'Y' to see files
+#         'N' to be quieter
+#	  '' or comment out to ask the question
+AUTO_SEEFILES=N
+
+# Default for installing files in etc/nftfw and var/nftfw
+# Values: 'Y' to install files
+#         'N' to skip
+#	  '' or comment out to ask the question
+AUTO_ETCINSTALL=Y
+
+# Default user for installing files in etc/nftfw
+# Values: user id
+#         '' or comment out to ask the question
+# Change this to sympl for Sympl or admin for Symbiosis if applicable
+AUTO_USER=root
+
+# Default for installing manual pages
+# Values: 'Y' to install files
+#         'N' to skip
+#	  '' or comment out to ask the question
+AUTO_MANINSTALL=Y
+
+# Version for Autoinstall - don't change this
+# it's used by Install to cope with future changes
+AUTO_VERSION=1
+
+export AUTO_DESTROOT AUTO_DESTCONFIRM AUTO_SEEFILES AUTO_ETCINSTALL AUTO_USER AUTO_MANINSTALL AUTO_VERSION
