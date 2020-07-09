@@ -25,10 +25,12 @@ EOF
 	continue
     fi
     if [ ! -f $destfile ]; then
+	rm -f $destfile
 	mv /tmp/$code.$$ $destfile
     elif cmp -s /tmp/$code.$$ $destfile; then
 	rm -f /tmp/$code.$$
     else
+	rm -f $destfile
 	mv /tmp/$code.$$ $destfile
     fi
 done

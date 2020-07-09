@@ -1,14 +1,22 @@
 #!/bin/sh
 # System installation / update script for nftfw
 # Set the destination root for the copy
+# Version number for Autoinstall.conf
+CURRENT_AUTO_VERSION=1
+
 echon() {
     printf "%s" "$*"
 }
 yesno() {
+    auto=$1
     while true
     do
-	echon "$1" "[y|n|q]? "
-	read ans
+	if [ "$auto" = "" ]; then
+	    echon "$2" "[y|n|q]? "
+	    read ans
+	else
+	    ans=$auto
+	fi
 	case "$ans" in
 	    ""|y|Y|yes|YES)
 		return 1
@@ -22,6 +30,7 @@ yesno() {
 		;;
 	    *)
 		echo Answer y or n
+		auto=""
 		;;
 	esac
     done
@@ -59,17 +68,6 @@ getuser() {
 	fi
     fi
 }
-echo "nftfw installation - ensure you are in the directory"
-echo "that contains Install.sh"
-echo "This is designed to run with dash - which is probably"
-echo "the default for sh on your system, it's been tested with bash"
-echo
-echo "Answer questions with"
-echo "y - for yes"
-echo "n - for no - will usually skip that section"
-echo "q - for quit - which will abandon the script"
-
-export DESTROOT
 
 # Mode to use for file installation
 FILEMODE='-m 0644'
@@ -116,29 +114,64 @@ DESTROOT=/usr/local
 if [ $DESTROOT = '/' ]; then
    DESTROOT=''
 fi
+export DESTROOT
+HAVEAUTO=N
+if [ -f Autoinstall.conf ]; then
+    . Autoinstall.conf
+    if [ "$AUTO_VERSION" -ne $CURRENT_AUTO_VERSION ]; then
+	echo "Automatic nftfw installation problem"
+	echo "The version number in Autoinstall.conf does not match the expected"
+	echo "value. There's probably been a change in this script needing a new"
+	echo "value in Autoinstall.default."
+
+	echo "Please recreate Autoinstall.conf from the current Autoinstall.default,"
+	echo "or delete the file to run this script interactively."
+	exit 0
+    else
+	HAVEAUTO=Y
+    fi
+fi
+
+if [ "$HAVEAUTO" = "N" ]; then
+   echo "nftfw installation"
+   echo "This is designed to run with dash - which is probably"
+   echo "the default for sh on your system, it's been tested with bash"
+   echo
+   echo "Answer questions with"
+   echo "y - for yes"
+   echo "n - for no - will usually skip that section"
+   echo "q - for quit - which will abandon the script"
+else
+   echo "nftfw installation"
+   echo "Using settings from Autoinstall.conf"
+fi
 echo
 echo '***************************************************'
 echo 'Setting things up'
-echo
-echo "Choose the base of the installation, answering 'y'"
-echo "will install all files under ${DESTROOT}, answering 'n'"
-echo "will install under the root of the system (i.e starts with /)"
-if yesno "Install files under ${DESTROOT}?" ; then
-    DESTROOT=''
-    echo "Installing under /"
-else
-    echo "Installing under ${DESTROOT}"
+if [ "$HAVEAUTO" = 'N' ]; then
+    echo
+    echo "Choose the base of the installation, answering 'y'"
+    echo "will install all files under ${DESTROOT}, answering 'n'"
+    echo "will install under the root of the system (i.e starts with /)"
+    echo
 fi
-if yesno "Happy with that?" ; then
+if yesno "$AUTO_DESTROOT" "Install files under ${DESTROOT}?" ; then
+    DESTROOT=''
+    echo "Installing files under /"
+else
+    echo "Installing files under ${DESTROOT}"
+fi
+if yesno "$AUTO_DESTCONFIRM" "Happy with that?" ; then
     echo "Exit"
     exit 0
 fi
 echo
 echo "Do you want see the directories and files that are installed, or "
 echo "do you prefer for it to be quieter?"
-if yesno "See the files?" ; then
-    :
+if yesno "$AUTO_SEEFILES"  "See the files?" ; then
+    echo "Quiet installation selected"
 else
+    echo "Files will be displayed"
     INSTALL="/usr/bin/install -v"
 fi
 echo
@@ -165,18 +198,25 @@ if [ -e ${DESTROOT}/etc/nftfw ]; then
 	fi
     fi
     echo
-    echo "Step 1 is to install ${DESTROOT}/etc/nftfw."
+    echo "Install control files in ${DESTROOT}/etc/nftfw."
     echo "Existing control files and content in '*.d' will not be replaced"
     echo "The distribution files may be updated if they exist."
-    if yesno "Install?"; then
+    if yesno "$AUTO_ETCINSTALL" "Install?"; then
+	echo "Installation skipped"
 	DOINSTALL=N
     fi
 fi
 if [ ${DOINSTALL} = 'Y' ]; then
 
+    echo "Installing control files"
     GROUPNAME=''
     # get the user to install as
-    getuser INSTALLAS
+    if [ "$AUTO_USER" = "" ]; then
+	getuser INSTALLAS
+    else
+	INSTALLAS=$AUTO_USER
+	echo "File ownership set to user $AUTO_USER"
+    fi
     if [ ${INSTALLAS} = 'Fail' ]; then
 	exit 1
     else
@@ -232,6 +272,21 @@ if [ ${DOINSTALL} = 'Y' ]; then
 	      fi
 	  done
 	)
+
+	# check on file ownership
+	# a past install may have the wrong person
+	CHOWNARGS=${INSTALLAS}
+	if [ "$GROUPNAME" != '' ]; then
+	    CHOWNARGS=${CHOWNARGS}':'${GROUPNAME}
+	fi
+	FILES=$(find ${DESTROOT}/etc/nftfw \! -user ${INSTALLAS} -print)
+	if [ "$FILES" != "" ]; then
+	    chown $CHOWNARGS $FILES
+	fi
+	FILES=$(find ${DESTROOT}/etc/nftfw \! -group ${GROUPNAME} -print)
+	if [ "$FILES" != "" ]; then
+	    chgrp $GROUPNAME $FILES
+	fi
     )
 fi
 echo
@@ -270,19 +325,19 @@ echo '***************************************************'
 echo 'Install Manual pages'
 echo
 
-if yesno "Install Manual pages in ${DESTROOT}/usr/man?" ; then
-    :
+if yesno "$AUTO_MANINSTALL" "Install Manual pages in ${DESTROOT}/usr/man?" ; then
+    echo "Manual pages not installed"
 else
- 	echo "Installing in ${DESTROOT}/share/man"
-	# And the manual pages
-	( cd docs/man/man
-	  MAN=${DESTROOT}/share/man
-	  for m in man1 man5; do
-	      ${INSTALL} -d $MAN/$m
-	      FILES=$(find ${m} -maxdepth 1 -type f -print)
-	      ${INSTALL} ${FILEMODE} -t ${MAN}/${m} ${FILES}
-	  done
-	)
+    echo "Installing in ${DESTROOT}/share/man"
+    # And the manual pages
+    ( cd docs/man/man
+      MAN=${DESTROOT}/share/man
+      for m in man1 man5; do
+	  ${INSTALL} -d $MAN/$m
+	  FILES=$(find ${m} -maxdepth 1 -type f -print)
+	  ${INSTALL} ${FILEMODE} -t ${MAN}/${m} ${FILES}
+      done
+    )
 fi
 if [ "${DISTRIBUTION}" != "" ]; then
     if [ ${DOINSTALL} = 'Y' ]; then
@@ -308,4 +363,11 @@ if [ "${DISTRIBUTION}" != "" ]; then
 	echo '***************************************************'
     fi
 fi
+echo
+echo
 echo "End of install script"
+if [ "$HAVEAUTO" = 'N' ]; then
+    echo
+    echo 'You can automate this process, see instructions in Autoinstall.default'
+    echo
+fi

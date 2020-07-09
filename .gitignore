@@ -42,3 +42,6 @@ docs/_build/
 # Emacs files
 *~
 *_flymake.*
+
+# Local installation configuration file
+Autoinstall.conf

@@ -82,8 +82,11 @@ _nftfw_ is coded on Python 3 and the standard Python version on Buster is 3.7.  
 We will use pip3 to install the _nftfw_ package.
 
 ``` sh
-$ sudo apt install python3-pip
+$ sudo apt install python3-pip python3-setuptools python3-wheel
 ```
+You may find that ```python3-setuptools``` and ```python3-wheel``` are already installed.
+
+
 The _nftfwls_ command uses Python's _prettytable_, which may not be installed:
 
 ```
@@ -138,6 +141,8 @@ Answers for default installation:
 - _Install?_ yes
 - _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root
 - _Install Manual pages?_ yes
+
+Alternatively, you can run the script without user interaction. Copy _Autoinstall.default_ to _Autoinstall.conf_, edit the ```AUTO_USER``` to the user you want to use, and then run the script. _Autoinstall.conf_ will be ignored by _git_, so this file can be used for later automated runs.
 
 In _/usr/local/etc/nftfw_, you will find two files: _config.ini_ and _nftfw_init.nft_. _config.ini_ provides configuration information overriding coded-in settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. _nftfw_init.nft_ is the framework template file for the firewall. It's copied into the build system whenever a _nftfw_ creates a firewall. Also, you'll find the  _original_ directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.
 

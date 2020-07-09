@@ -28,7 +28,7 @@ $ sudo apt -t buster-backports install nftables
 Install Python packages ([Explanation](Installation.md#python))
 
 ``` sh
-$ sudo apt install python3-pip
+$ sudo apt install python3-pip python3-setuptools python3-wheel
 $ sudo apt install python3-prettytable
 ```
 
@@ -86,6 +86,13 @@ Answers for default installation:
 - _Install?_ yes
 - _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root
 - _Install Manual pages?_ yes
+
+Alternatively, without any user interaction:
+
+``` sh
+$ cp Autoinstall.default Autoinstall.conf
+```
+edit the _AUTO_USER_ line to the user you want to use own the files in _etc/nftfw_ and run the script as above. The _Autoinstall.conf_ file will be ignored by _git_ so this script can be used to update any future releases.
 
 ## Setting up _config.ini_
 Edit _/usr/local/etc/nftfw/config.ini_. Change: ([Explanation](Installation.md#paying_attention_to_configini))

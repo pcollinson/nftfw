@@ -1,3 +1,8 @@
+v0.7.3	Automate Install.sh as suggest by mrbluecoat on github.
+	The install script now looks for Autoinstall.conf and takes
+	its answers from there. This file is ignored by git so can be
+	retained and used for later updates.
+
 v0.7.2  Add -a (altered) flag to nftfw to print changes in
 	config from the compiled in values. Can replace config.ini
 	by the values.
