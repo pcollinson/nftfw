@@ -2,6 +2,9 @@
 # System installation / update script for nftfw
 # Set the destination root for the copy
 # Version number for Autoinstall.conf
+if [ "$ZSH_VERSION" != "" ]; then
+   emulate -L sh
+fi
 CURRENT_AUTO_VERSION=1
 
 echon() {
@@ -117,7 +120,7 @@ fi
 export DESTROOT
 HAVEAUTO=N
 if [ -f Autoinstall.conf ]; then
-    . Autoinstall.conf
+    . ./Autoinstall.conf
     if [ "$AUTO_VERSION" -ne $CURRENT_AUTO_VERSION ]; then
 	echo "Automatic nftfw installation problem"
 	echo "The version number in Autoinstall.conf does not match the expected"
@@ -281,11 +284,11 @@ if [ ${DOINSTALL} = 'Y' ]; then
 	fi
 	FILES=$(find ${DESTROOT}/etc/nftfw \! -user ${INSTALLAS} -print)
 	if [ "$FILES" != "" ]; then
-	    chown $CHOWNARGS $FILES
+	    chown "$CHOWNARGS" $FILES
 	fi
 	FILES=$(find ${DESTROOT}/etc/nftfw \! -group ${GROUPNAME} -print)
 	if [ "$FILES" != "" ]; then
-	    chgrp $GROUPNAME $FILES
+	    chgrp "$GROUPNAME" $FILES
 	fi
     )
 fi

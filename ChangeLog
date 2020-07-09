@@ -1,4 +1,17 @@
-v0.7.3	Automate Install.sh as suggest by mrbluecoat on github.
+v0.7.4	Fix shell coding error in Install.sh. POSIX shells need
+	explicit path names when using '.' commands unless . is in
+	PATH.
+
+	Test and supply a zsh 'workaround' to cope with the
+	problem it supplies when dealing with spaces in variables.
+
+	Make the ftp-passive more robust. It's really intended to
+	be used with pure-ftp, and will need hand editing if pure
+	is not installed. Now it will just generate nothing if it's not
+	set up properly. Not sure if this is a good thing, will people
+	look to see if it's working?
+
+v0.7.3	Automate Install.sh as suggested by mrbluecoat on github.
 	The install script now looks for Autoinstall.conf and takes
 	its answers from there. This file is ignored by git so can be
 	retained and used for later updates.
@@ -9,7 +22,7 @@ v0.7.2  Add -a (altered) flag to nftfw to print changes in
 
 v0.7.1  Add necessary change to the systemd setup to report on
 	the blacknets.d directory.
-	Documentation update
+	Documentation update.
 
 v0.7.0	Add blacknets.d to etc/nftfw - containing files with lists of
 	network CIDR ranges that can block countries and other

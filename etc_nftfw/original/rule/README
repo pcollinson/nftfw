@@ -1,5 +1,8 @@
 These scripts are called from within python to generate text
-lines for the nftables setup. So job of the code is to echo add rule commands
+lines for the nftables setup. The job of the code is to add rule commands
+using echo and other shell output techniques.
+Active versions are in ../../rule.d
+
 Each is called twice, once for ip and once of ip6
 
 The environment is set up as follows:
@@ -27,6 +30,8 @@ established.sh         - accept established connections
 ftp-helper.sh          - Add ftp helper for the ftp
 ftp-passive.sh	       - Add Passive inbound ports needed for pure-ftpd
 		         If not using pure-ftp edit the script to provide ports
+			 NB this script does nothing unless it's edited to
+			 supply a port range or pure-ftp is installed.
 http-meter.sh          - replace http and https by a metering
                        - call to stop http(s) flooding
                        - needs load-http-meter
