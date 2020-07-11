@@ -8,10 +8,13 @@ NAME
 DESCRIPTION
 =========
 
-This page documents the file formats used in the **nftfw** firewall system.  The system stores various control files in _/etc/nftfw_ or _/usr/local/etc/nftfw_ depending on the installation. You can find a manual page for the configuration file _config.ini_ living in the directory in nftfw-config(5).
+This page documents the file formats used in the **nftfw** firewall system.  The system stores
+various control files in _/etc/nftfw_ or _/usr/local/etc/nftfw_ depending on the installation.
 
 The _etc/nftfw_ directory contains:
 
+- _config.ini_ - configuration file supplying most 'constants' for the code, see nftfw_config(5).
+-  _nftfw_init.nft_ - template file holding the basic nftables framework for **nftfw**.
 -  _incoming.d_ -   contains rules controlling  access to services on the system;
 -  _outbound.d_ - sets any rules controlling packets leaving the system;
 -  _whitelist.d_ - contains IP addresses that have full access to the system;
@@ -146,14 +149,22 @@ The pattern script uses the DIRECTION parameter in both incoming and outgoing co
 
 A rule script will usually create a simpler version of the command when called with no ports.
 
-Other files in _etc/nftfw_
----------------------
+_config.ini_
+----------
 
-The _etc_ directory contains the config.ini file for **nftfw**. nftfw_config(5) contains a description
+The _etc_ directory contains the _config.ini_ file for **nftfw**. nftfw_config(5) contains a description of the lines in this file.
 
-The file _nftfw_init.nft_ contains the basic rule set for nftables, it's used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. **nftfw** copies the file into the build directory at the start of the build process. The basic setup assumes that it's running on a system with a single network connection attached to the internet, however, it's been successfully changed to support a router system with local and remote networks attached.
+_nftfw_init.nft_
+--------------
 
-Finally, the _original_ directory contains the starting point for all control files, and some examples.
+The file _nftfw_init.nft_ contains the template rule set for nftables, it's used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. **nftfw** copies the file into the build directory at the start of the build process.
+
+The file is user-editable, allowing the framework to be changed. The basic setup assumes that it's running on a system with a single network connection attached to the internet. See the example supplied in _etc/nftfw/original/nftfw_router_example_ which provides a router setup with WAN and LAN connections using _nat_ and _forward_ tables.
+
+_original_ directory
+-----------------
+
+Finally, the _original_ directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system.
 
 Files in _var/lib/nftfw_
 ---------------------

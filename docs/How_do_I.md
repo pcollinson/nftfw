@@ -19,6 +19,7 @@
     - [How do I: Add a new reason for blacklisting?](#how-do-i-add-a-new-reason-for-blacklisting)
     - [How do I: Debug my new blacklisting expression?](#how-do-i-debug-my-new-blacklisting-expression)
     - [How do I: Change the settings for _nftfw_?](#how-do-i-change-the-settings-for-nftfw)
+    - [How to I: Add my own tables and rules to _nftfw_?](#how-to-i-add-my-own-tables-and-rules-to-nftfw)
     - [How do I: Get more information on _nftfw_?](#how-do-i-get-more-information-on-nftfw)
     - [Acknowledgement](#acknowledgement)
 
@@ -191,6 +192,16 @@ The blacklist scanner normally ignores pattern files with _ports=test_, so it's 
 The file _/usr/local/etc/nftfw/config.ini_ is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.
 
 See the manual page [_nftfw-config_](man/nftfw-config.5.md) for a description.
+
+## How to I: Add my own tables and rules to _nftfw_?
+
+The file _/usr/local/etc/nftfw/nftfw_init.nft_ contains the template _nftables_ framework for _nftfw_. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with  WAN and LAN interfaces  in _/usr/local/etc/nftfw/original/nftfw_router_example_. Rules for a router  adds a _nat_ table and uses the _forward_ table.
+
+_nftfw_init.nft_ uses _nft_'s readable file format. When deciding what to add or change, the best strategy is to add your new rules to the system using the _nft_ command line interface to check that they work and use:
+``` sh
+$ sudo nft list ruleset
+```
+to see how _nft_ 'sees' the rules. Rules expressed on the command line can contain syntax that _nft_ thinks is unnessary, and can also use some assumptions about defaults that _nft_ will add to the compiled rules. Extract any changes from the _nft_ output and edit _nftfw_init.nft_.
 
 ## How do I: Get more information on _nftfw_?
 

@@ -21,9 +21,11 @@
 <h1 id="name">NAME</h1>
 <p><strong>nftfw-files</strong> — documentation of file formats used in nftfw</p>
 <h1 id="description">DESCRIPTION</h1>
-<p>This page documents the file formats used in the <strong>nftfw</strong> firewall system. The system stores various control files in <em>/etc/nftfw</em> or <em>/usr/local/etc/nftfw</em> depending on the installation. You can find a manual page for the configuration file <em>config.ini</em> living in the directory in nftfw-config(5).</p>
+<p>This page documents the file formats used in the <strong>nftfw</strong> firewall system. The system stores various control files in <em>/etc/nftfw</em> or <em>/usr/local/etc/nftfw</em> depending on the installation.</p>
 <p>The <em>etc/nftfw</em> directory contains:</p>
 <ul>
+<li><em>config.ini</em> - configuration file supplying most ‘constants’ for the code, see nftfw_config(5).</li>
+<li><em>nftfw_init.nft</em> - template file holding the basic nftables framework for <strong>nftfw</strong>.</li>
 <li><em>incoming.d</em> - contains rules controlling access to services on the system;</li>
 <li><em>outbound.d</em> - sets any rules controlling packets leaving the system;</li>
 <li><em>whitelist.d</em> - contains IP addresses that have full access to the system;</li>
@@ -108,10 +110,13 @@
 </blockquote>
 <p>The pattern script uses the DIRECTION parameter in both incoming and outgoing contexts and must set directional keywords in <strong>nft</strong> commands correctly. For an incoming rule, an IP address (if present) will be a ‘source’ address. For an outgoing rule, an IP address (if present) will be a ‘destination’ address.</p>
 <p>A rule script will usually create a simpler version of the command when called with no ports.</p>
-<h2 id="other-files-in-etcnftfw">Other files in <em>etc/nftfw</em></h2>
-<p>The <em>etc</em> directory contains the config.ini file for <strong>nftfw</strong>. nftfw_config(5) contains a description</p>
-<p>The file <em>nftfw_init.nft</em> contains the basic rule set for nftables, it’s used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. <strong>nftfw</strong> copies the file into the build directory at the start of the build process. The basic setup assumes that it’s running on a system with a single network connection attached to the internet, however, it’s been successfully changed to support a router system with local and remote networks attached.</p>
-<p>Finally, the <em>original</em> directory contains the starting point for all control files, and some examples.</p>
+<h2 id="config.ini"><em>config.ini</em></h2>
+<p>The <em>etc</em> directory contains the <em>config.ini</em> file for <strong>nftfw</strong>. nftfw_config(5) contains a description of the lines in this file.</p>
+<h2 id="nftfw_init.nft"><em>nftfw_init.nft</em></h2>
+<p>The file <em>nftfw_init.nft</em> contains the template rule set for nftables, it’s used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. <strong>nftfw</strong> copies the file into the build directory at the start of the build process.</p>
+<p>The file is user-editable, allowing the framework to be changed. The basic setup assumes that it’s running on a system with a single network connection attached to the internet. See the example supplied in <em>etc/nftfw/original/nftfw_router_example</em> which provides a router setup with WAN and LAN connections using <em>nat</em> and <em>forward</em> tables.</p>
+<h2 id="original-directory"><em>original</em> directory</h2>
+<p>Finally, the <em>original</em> directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system.</p>
 <h2 id="files-in-varlibnftfw">Files in <em>var/lib/nftfw</em></h2>
 <p>The <em>lib/nftfw</em> directory provides working space for the system. It contains three directories and several working files.</p>
 <ul>

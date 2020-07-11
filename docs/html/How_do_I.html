@@ -101,6 +101,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#how-do-i-add-a-new-reason-for-blacklisting">How do I: Add a new reason for blacklisting?</a></li>
 <li><a href="#how-do-i-debug-my-new-blacklisting-expression">How do I: Debug my new blacklisting expression?</a></li>
 <li><a href="#how-do-i-change-the-settings-for-nftfw">How do I: Change the settings for <em>nftfw</em>?</a></li>
+<li><a href="#how-to-i-add-my-own-tables-and-rules-to-nftfw">How to I: Add my own tables and rules to <em>nftfw</em>?</a></li>
 <li><a href="#how-do-i-get-more-information-on-nftfw">How do I: Get more information on <em>nftfw</em>?</a></li>
 <li><a href="#acknowledgement">Acknowledgement</a></li>
 </ul></li>
@@ -181,6 +182,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="how-do-i-change-the-settings-for-nftfw">How do I: Change the settings for <em>nftfw</em>?</h2>
 <p>The file <em>/usr/local/etc/nftfw/config.ini</em> is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.</p>
 <p>See the manual page <a href="man/nftfw-config.5.md"><em>nftfw-config</em></a> for a description.</p>
+<h2 id="how-to-i-add-my-own-tables-and-rules-to-nftfw">How to I: Add my own tables and rules to <em>nftfw</em>?</h2>
+<p>The file <em>/usr/local/etc/nftfw/nftfw_init.nft</em> contains the template <em>nftables</em> framework for <em>nftfw</em>. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with WAN and LAN interfaces in <em>/usr/local/etc/nftfw/original/nftfw_router_example</em>. Rules for a router adds a <em>nat</em> table and uses the <em>forward</em> table.</p>
+<p><em>nftfw_init.nft</em> uses <em>nft</em>’s readable file format. When deciding what to add or change, the best strategy is to add your new rules to the system using the <em>nft</em> command line interface to check that they work and use:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
+<p>to see how <em>nft</em> ‘sees’ the rules. Rules expressed on the command line can contain syntax that <em>nft</em> thinks is unnessary, and can also use some assumptions about defaults that <em>nft</em> will add to the compiled rules. Extract any changes from the <em>nft</em> output and edit <em>nftfw_init.nft</em>.</p>
 <h2 id="how-do-i-get-more-information-on-nftfw">How do I: Get more information on <em>nftfw</em>?</h2>
 <p>The <a href="Users_Guide.md">User’s Guide to nftfw</a> documents the system and there are also <a href="man/index.md">UNIX manual pages</a>.</p>
 <h2 id="acknowledgement">Acknowledgement</h2>

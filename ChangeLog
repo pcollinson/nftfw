@@ -1,3 +1,6 @@
+v0.7.5  Expand documentation on nftfw_init.nft changing the
+	How Do I document and the nftfw_files man page.
+
 v0.7.4	Fix shell coding error in Install.sh. POSIX shells need
 	explicit path names when using '.' commands unless . is in
 	PATH.

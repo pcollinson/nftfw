@@ -11,10 +11,14 @@ This page documents the file formats used in the \f[B]nftfw\f[] firewall
 system.
 The system stores various control files in \f[I]/etc/nftfw\f[] or
 \f[I]/usr/local/etc/nftfw\f[] depending on the installation.
-You can find a manual page for the configuration file
-\f[I]config.ini\f[] living in the directory in nftfw\-config(5).
 .PP
 The \f[I]etc/nftfw\f[] directory contains:
+.IP \[bu] 2
+\f[I]config.ini\f[] \- configuration file supplying most `constants' for
+the code, see nftfw_config(5).
+.IP \[bu] 2
+\f[I]nftfw_init.nft\f[] \- template file holding the basic nftables
+framework for \f[B]nftfw\f[].
 .IP \[bu] 2
 \f[I]incoming.d\f[] \- contains rules controlling access to services on
 the system;
@@ -287,24 +291,32 @@ address.
 .PP
 A rule script will usually create a simpler version of the command when
 called with no ports.
-.SS Other files in \f[I]etc/nftfw\f[]
+.SS \f[I]config.ini\f[]
 .PP
-The \f[I]etc\f[] directory contains the config.ini file for
+The \f[I]etc\f[] directory contains the \f[I]config.ini\f[] file for
 \f[B]nftfw\f[].
-nftfw_config(5) contains a description
+nftfw_config(5) contains a description of the lines in this file.
+.SS \f[I]nftfw_init.nft\f[]
 .PP
-The file \f[I]nftfw_init.nft\f[] contains the basic rule set for
+The file \f[I]nftfw_init.nft\f[] contains the template rule set for
 nftables, it's used to establish the firewall framework and finally uses
 several include statements to pull in the files created by the system.
 \f[B]nftfw\f[] copies the file into the build directory at the start of
 the build process.
+.PP
+The file is user\-editable, allowing the framework to be changed.
 The basic setup assumes that it's running on a system with a single
-network connection attached to the internet, however, it's been
-successfully changed to support a router system with local and remote
-networks attached.
+network connection attached to the internet.
+See the example supplied in
+\f[I]etc/nftfw/original/nftfw_router_example\f[] which provides a router
+setup with WAN and LAN connections using \f[I]nat\f[] and
+\f[I]forward\f[] tables.
+.SS \f[I]original\f[] directory
 .PP
 Finally, the \f[I]original\f[] directory contains the starting point for
 all control files, and some examples.
+The directory allows distributions to update the standard control files
+while not changing those in use on a running system.
 .SS Files in \f[I]var/lib/nftfw\f[]
 .PP
 The \f[I]lib/nftfw\f[] directory provides working space for the system.
