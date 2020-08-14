@@ -3,6 +3,7 @@
 
 import sys
 import datetime
+from signal import signal, SIGPIPE, SIG_DFL
 from pathlib import Path
 import argparse
 import logging
@@ -246,6 +247,10 @@ def main():
     """ Main action """
 
     #pylint: disable=too-many-branches, too-many-statements
+
+    # ignore broken pipe error - thrown when using
+    # nftfwls into the head command
+    signal(SIGPIPE, SIG_DFL)
 
     cf = Config()
 

@@ -67,16 +67,16 @@ config.ini.
                     help="Add the ip to the database - requires port and pattern arguments.",
                     action='store_true')
     gp.add_argument('-b', '--blacklist',
-                    help='Add ip to blacklist directory. If necessary " \
-                    + "add the ip to the database, and then requires port and pattern arguments.',
+                    help='Add ip to blacklist directory. If necessary '\
+                    + 'add the ip to the database, and then requires port and pattern arguments.',
                     action='store_true')
     gp.add_argument('-g', '--gethostname',
                     help='Include hostname information when printing ip address information. '\
                     + 'Can be slow for ip addresses with no information.',
                     action='store_true')
     ap.add_argument('-p', '--port',
-                    help="Port for -a or -b action, \'all\' or port " \
-                    + "number or comma separated numeric port list (no spaces)")
+                    help='Port for -a or -b action, \'all\' or port '\
+                    + 'number or comma separated numeric port list (no spaces)')
     ap.add_argument('-n', '--pattern', help="Pattern name for the -a or -b action")
     ap.add_argument('-q', '--quiet',
                     help='Suppress printing of errors on console, syslog output remains active',

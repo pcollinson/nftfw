@@ -1,3 +1,8 @@
+v0.7.6  Ignore broken error in nftfwls. Happened when using
+	nftfwls -a into the head command
+	Fix incorrectly formatted help messages for
+	nftfwedit.
+
 v0.7.5  Expand documentation on nftfw_init.nft changing the
 	How Do I document and the nftfw_files man page.
 
