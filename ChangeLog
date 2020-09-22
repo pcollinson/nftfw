@@ -1,3 +1,6 @@
+v0.7.7  Ignore UTF-8 errors in logfiles. Replace offending text
+	with backslashed values.
+
 v0.7.6  Ignore broken error in nftfwls. Happened when using
 	nftfwls -a into the head command
 	Fix incorrectly formatted help messages for
