@@ -10,7 +10,7 @@ This document assumes  that you are installing on Debian Buster.
 ``` sh
 $ sudo apt install nftables
 ```
-The standard version of _nftables_ at the time of writing is: 0.9.0-2. Buster backports has a more recent version - 0.9.3-2~bpo10+1, and it's a good idea to upgrade to that. Look in _/etc/apt/sources.list_, and if necessary append:
+The standard version of _nftables_ at the time of writing is: 0.9.0-2. Buster backports (sadly not available on Raspberry Pi OS, previously known as Raspian) has a more recent version - 0.9.3-2~bpo10+1, and it's a good idea to upgrade to that. Look in _/etc/apt/sources.list_, and if necessary append:
 
 ``` sh
 # backports
@@ -26,11 +26,15 @@ $ sudo apt upgrade
 ...
 $ sudo apt -t buster-backports install nftables
 ```
-which will upgrade your system to the most recent _nftables_ release. The install action will tell you that a library is not needed before it installs things. There is a _systemctl_ entry for _nftables_, that will probably be disabled now. Check with
+will upgrade your system to the most recent _nftables_ release.
+
+The _install_ action will tell you that a library is not needed before it installs things. There is a _systemctl_ entry for _nftables_, that  will probably be disabled now. Check with:
 
 ``` sh
 $ sudo systemctl status nftables
 ```
+
+If you are not running _iptables_ or _nftables_, it's suggested that _nftables_ service stays off until later in the installation process.
 
 ### I've got a live iptables installation
 
@@ -40,7 +44,7 @@ Well, what you need to do depends on what's running in your system. Buster comes
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-if your version output looks like that, then you are OK and can just skip over what follows to **[Python](#python)**.
+If your version output looks like that, then you are OK and can just skip over what follows to **[Python](#python)**.
 
 If the words in brackets says _legacy_ then you need to swap to the _nf_tables_ version. Here's what you do:
 
@@ -77,15 +81,14 @@ All done, and it's painless. You have a system that works for both _iptables_  c
 
 ### Python
 
-_nftfw_ is coded on Python 3 and the standard Python version on Buster is 3.7.  The _nftfw_ package was developed in part using Python 3.6, and so the _nftfw_ package may run using that version.
+_nftfw_ is coded in Python 3 and the standard Python version on Buster is 3.7.  The _nftfw_ package was developed in part using Python 3.6, and so the _nftfw_ package may run using that version.
 
-We will use pip3 to install the _nftfw_ package.
+We will use _pip3_ to install the _nftfw_ package.
 
 ``` sh
 $ sudo apt install python3-pip python3-setuptools python3-wheel
 ```
 You may find that ```python3-setuptools``` and ```python3-wheel``` are already installed.
-
 
 The _nftfwls_ command uses Python's _prettytable_, which may not be installed:
 
@@ -105,14 +108,15 @@ $ sudo git clone https://github.com/pcollinson/nftfw
 ```
 which will create an _nftfw_ directory.
 
-Now change into the _nftfw_ directory and use _pip3_ to install the package. _pip3_ will allow you to uninstall the package at a later date, if you wish.
+Change into the _nftfw_ directory and use _pip3_ to install the package. _pip3_ will allow you to uninstall the package at a later date, if you wish.
 
 ``` sh
 $ sudo pip3 install .
 ...
 Successfully installed nftfw-<version>
 ```
-To uninstall, ```sudo pip3 uninstall nftfw```.
+
+_pip3_ may complain about access to files because it's being run as the superuser, it's safe to ignore that warning. To uninstall, ```sudo pip3 uninstall nftfw```.
 
 _pip3_ installs four commands: _nftfw_, _nftfwls_, _nftfwedit_ and _nftfwadm_ in _/usr/local/bin_. Since these are system commands, they ought to be in _/usr/local/sbin_, but the Python installation system doesn't allow that.
 
@@ -124,12 +128,11 @@ $ nftfw -h
 ```
 
 The next step is to install the basic control files in _/usr/local/etc/nftfw_, the working directories in _/usr/local/var/lib/nftfw_, and the manual pages in _/usr/local/share/man_.
-
-The _Install.sh_ script will copy files from the distribution into their correct places. It asks several questions and permits you to control the installation phases. It's safe to run the script again, it will not replace the contents of any directory ending with _.d_, or the two control files in _/usr/local/etc/nftfw_.  The script uses the standard system _install_ program to do its work.
+The _Install.sh_ script will ask some questions and will copy files from the distribution into their correct places. The questions permit you to control the installation phases. It's safe to run the script again, it will not replace the contents of any directory ending with _.d_, or the two control files in _/usr/local/etc/nftfw_.  The script uses the standard system _install_ program to do its work.
 
 It's a good idea to make files in _/usr/local/etc/nftfw_ owned by a non-root user, so they are easier to change without using _sudo_. For Symbiosis, the user should be _admin_, for Sympl it will _sympl_. The script asks for a user name and will create these files owned by that user. Later, it's important to edit _/usr/local/etc/nftfw/config.ini_ to tell _nftfw_ the user that you selected.
 
-Take care, and slowly...
+Take care:
 
 ``` sh
 $ sudo sh Install.sh
@@ -139,7 +142,7 @@ Answers for default installation:
 - _Install under /usr/local?_ yes
 - _See the files installed?_ your choice
 - _Install?_ yes
-- _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root
+- _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Sympl, 'return' for root on other systems
 - _Install Manual pages?_ yes
 
 Alternatively, you can run the script without user interaction. Copy _Autoinstall.default_ to _Autoinstall.conf_, edit the ```AUTO_USER``` to the user you want to use, and then run the script. _Autoinstall.conf_ will be ignored by _git_, so this file can be used for later automated runs.
@@ -157,9 +160,9 @@ The final stage of the installation is to copy manual pages into _/usr/local/sha
 - [_nftfw-config(5)_](man/nftfw-config.5.md) - describes the contents of the ini-style config file tailoring settings in _nftfw_.
 - [_nftfw-files(5)_](man/nftfw-files.5.md) - the format, names and contents of the files used to control the system.
 
-The _man_ command may need '5' in the command line to display the section 5 manual pages. Incidentally, the distribution also has these manual pages in HTML format (see _docs/man_).
+The _man_ command may need '5' in the command line to display the section 5 manual pages. Incidentally, the distribution also has these manual pages in HTML format (see _man/index.md_).
 
-As distributed, Debian Buster comes out of the box using _nfttables_ as the basic firewall with a compatibility mode for _iptables_ installed. Your system may vary. _nftfw_ introduces specific _nftables_ constructs, perhaps adding sets into the mix, the _iptables_ interface will break down. You may have listed the kernel firewall with:
+As distributed, Debian Buster comes out of the box using _nfttables_ as the basic firewall with a compatibility mode for _iptables_ installed. Your system may vary. _nftfw_ introduces specific _nftables_ constructs, perhaps adding sets into the mix, the _iptables_ interface will break down. You may have inspected the kernel firewall with:
 
 ``` sh
 $ sudo iptables -L -v -n
@@ -173,11 +176,19 @@ You are now ready to create  firewall to suit your needs.
 
 ### Paying attention to _config.ini_
 
+The values in this file are all commented out by starting the line with a semi-colon. The value shown is the default value, and doesn't need changing if the default suits your system.
+
 Find the _Owner_ section in the file and change settings for owner and group to fit the user you selected when installing the _etc/nftfw_ files.
+
+``` text
+[Owner]
+;owner=root
+```
+remove the semi-colon and after the = add the user you selected when installing the files.
 
 If you are running _nftables_ and have a live _/etc/nftables.conf_ file, you may need to alter the _nftables\_conf_ setting in _config.ini_ and please read on.  If not, [skip to  **Logging**](#logging).
 
-Debian expects systems using _nftables_ to keep a configuration file in _/etc/nfttables.conf_. The file sets up _nftables_ when the system reboots, or when _systemctl_ restarts the _nftables_ service. _nftfw_ will write this file after creating its rule set but depends on configuration in its _config.ini_ file to set its location. As distributed, the value of _nftables_conf_ in _config.ini_ is relative to the installation root. This means you need to take different actions depending on where your _nftfw_ is installed:
+Debian expects systems using _nftables_ to keep a configuration file in _/etc/nfttables.conf_. The file sets up the kernel when the system reboots, or when _systemctl_ restarts the _nftables_ service. _nftfw_ will write this file after creating its rule set but depends on configuration in its _config.ini_ file to set its location. As distributed, the value of _nftables_conf_ in _config.ini_ is relative to the installation root. This means you need to take different actions depending on where your _nftfw_ is installed:
 
 - For _nftfw_ installed  in _/usr/local_:
   The default setting of _nftables\_conf_ will be _/usr/local/etc/nftables.conf_, which is the 'wrong' location, but is safe for now.
@@ -186,6 +197,16 @@ Debian expects systems using _nftables_ to keep a configuration file in _/etc/nf
 - For _nftfw_ installed in _/_:
   The default setting of _nftables\_conf_ will be _/etc/nftables.conf_, which is the 'right' location, but maybe dangerous now.
   You probably should change the default setting in _nftfw/config.ini_ to prevent it writing or installing _/etc/nftables.conf_ until you are happy. Change the setting to place the file in perhaps _/etc/nftfw/nftables.conf.new_ for now, and change it back later.
+
+The default entry in _config.ini_ looks like:
+
+``` text
+#  Location of system nftables.conf
+#  Usually /etc/nftables.conf
+;nftables_conf = ${root}/etc/nftables.conf
+```
+
+the ```${root}``` is automatically replaced by the root defined by the installation base. So for a vanilla install, it will be set to _/usr/local/etc/nftables.conf_. To install the file in _/etc_, remove the semi-colon and delete ```${root}```.
 
 ### Logging
 
@@ -227,7 +248,7 @@ First, make sure you open another window to the system and login to the machine 
 Let's look at where you might be now:
 
 - The system runs a Symbiosis or Sympl system using _iptables_.  In this case, the running firewall can be re-installed using the _{symbiosis|sympl}-firewall_ command. You  should move _/etc/cron.d/symbiosis-firewall_ and  _/etc/incron.d/symbiosis-firewall_ (or equivalent _sympl_ files if present) to a safe place to stop their firewalls from running for now.
-- _Or_: The system runs a different system using _iptables_, you can usually use _iptables_save_ to save the settings somewhere, and _iptables_restore_ to put the old rules back.
+- _Or_: The system runs a different firewall system using _iptables_, you can usually use _iptables_save_ to save the settings somewhere, and _iptables_restore_ to put the old rules back.
 - _Or_: Your system already runs an _nftables_ based firewall, and you want to try _nftfw_ out. In this case, do make sure that _nftfw_ won't overwrite your _/etc/nftables.conf_ file.
 - _Or_: There may be other options.
 
@@ -251,7 +272,7 @@ If you have a running _nftables_ or _iptables_ installation, now is the time to 
 $ sudo nftfwadm save
 ```
 
-this saves your _nftables_ settings into _nftfw_'s backup system, so if the  install does fail, it will revert to what you had there before you started meddling. If you are using an _iptables_ based system, fear not, the _nft_ command doing the work will save the _iptables_ settings in _nftables_ format, assuming you have the _nf_tables_ version of _iptables_ installed and have working tables.
+this saves your _nftables_ settings into _nftfw_'s backup system, so if the  install does fail, it will revert to what you had there before you started meddling. If you are using an _iptables_ based system, fear not, the _nft_ command doing the work will save the _iptables_ settings in _nftables_ format, assuming you have the _nftables_ version of _iptables_ installed and have working tables.
 
 If all is well, you can try loading the rules made by _nftfw_.
 
@@ -286,19 +307,19 @@ simple deletes the backup file. Don't leave it installed, _nftfw_ makes a backup
 
 To tidy up, check that the setting of _nftables_conf_ in _nftfw_'s config file _/usr/local/etc/nftfw/config.ini_ reads:
 
-``` sh
+``` text
 #  Location of system nftables.conf
 #  Usually /etc/nftables.conf
 nftables_conf = /etc/nftables.conf
 ```
-and run
+and rerun
 
 ``` sh
 $ sudo nftfw -f load
 ```
-again to make sure that the new rules are written into _/etc/nftables.conf_.
+to make sure that the new rules are written into _/etc/nftables.conf_.
 
-Tell _systemctl_ to enable and start its _nftables_ service.
+Tell _systemctl_ to enable and start its _nftables_ service, if that's needed.
 
 ``` sh
 $ sudo systemctl enable nftables
@@ -320,6 +341,8 @@ Install _cron-nftfw_ in _/etc/cron.d/nftfw_.
 # go to the nftfw distribution to find cronfiles
 $ cd cronfiles
 $ sudo cp cron-nftfw /etc/cron.d/nftfw
+# cron wants the file to be writeable only by owner
+$ sudo chmod g-w /etc/cron.d/nftfw
 $ cd ..
 ```
 
@@ -327,17 +350,11 @@ $ cd ..
 
 The original Symbiosis system used the _incron_ system to make the _nftfw_ control directories active, ensuring firewall updates when files alter, appear or disappear. Sympl stopped using _incron_ because it's poorly maintained and buggy. Without automatic updates, the system needs reloading whenever a user changes the contents of one of the directories, and forgetting to run the reload command is a source of errors. _nftfw_ will work  happily without active directories, but it makes the life of the system admin easier.
 
-_nftfw_ supplies control files for _systemd_ using its ability to track file changes and starting a firewall reload when a change is detected in one of the control directories. This system replaces the _incron_ support supplied before version 0.6.
+_nftfw_ supplies control files for _systemd_ using its ability to track file changes and starting a firewall reload when a change is detected in one of the control directories.
 
 To install the files and start the system:
 
 ``` sh
-# stop incron for nftfw if needed
-$ sudo rm /etc/incron.d/nftfw
-
-# check that _/etc/cron.d/nftfw doesn't start incron
-# if it does, delete the lines, or see above to install the new cron file
-
 # go to the nftfw distribution to find systemd files
 $ cd systemd
 
@@ -349,7 +366,7 @@ $ cd ..
 # start the units
 $ sudo systemctl enable nftfw.path
 $ sudo systemctl start nftfw.path
-$ sudo systemctl status
+$ sudo systemctl status nftfw.path
 ```
 The last command should show that the unit is active.
 
@@ -368,13 +385,17 @@ Finally a tip that's hard to find: reload  _systemd_ if you change the _nftfw_ f
 $ sudo systemctl daemon-reload
 ```
 
+### Configuring the firewall
+
+_nftfw_ is distributed with no outbound packet control except for essential IPV6 rules. The set of inbound rules are aimed at permitting access to _ssh_, _http_ and _https_, _ftp_ and the various email subsystems. The incoming _ftp_ rules are designed to support _Pure FTP_. Firewall configuration is a matter of creating or deleting files in the directories in _/usr/local/etc/nftfw_. You probably need to change settings for your system. Scan through the  [How do I.. or a User's Quick Guide](How_do_I.md) document for a quick start on setting up access for your needs.
+
 ### Geolocation
 
 The listing program _nftfwls_ will print out the country that originated packets in the firewall using the _geoip2_ country database available from MaxMind. MaxMind don't charge but want you to create an account with them to access their files.
 
 See  [Installing Geolocation](Installing-GeoLocation.md).
 
-If you want to use the _blacknets_ feature of _nftfw_ v0.7.0 and later to block countries, then _geoip2_ can be used to supply lists of IP networks.
+If you want to use the _blacknets_ feature of _nftfw_ to block countries, then _geoip2_ can be used to supply lists of IP networks.
 
 See [Getting CIDR lists](Getting-cidr-lists.md).
 

@@ -1,23 +1,57 @@
 #!/bin/sh
-# usage: getcountrynet ISO-CODE [ ISO-CODE]
+# usage: getcountrynet [-4|-6|-a] ISO-CODE [ ISO-CODE]
 # ISO-CODE is two character country code, several can be supplied
 # as arguments.  ISO_CODE can be upper or lower case
 # Generates ISO_CODE.nets containing ip4 and ip6 networks
 # in current directory
 # Uses GeoLite2-Country.db based on the GeoLite2-Country-CSV source
-
+#
+# By default the script gets both ipv4 and ipv6 addresses
+# -4 will just get the ipv4 addresses for any subsequent country
+# -6 will just get the ipv6 addresses for any subsequent country
+# -a or -all will revert to the default of getting all addresses
+#
 db=/var/lib/GeoIP/GeoLite2-Country.db
 destination=/usr/local/etc/nftfw/blacknets.d
 
 if [ ! -f $db ]; then
     exit 0
 fi
+proto=both
 for code in "$@"
 do
-    sqlite3 $db > /tmp/$code.$$ <<EOF
+    case $code in
+	-4)
+	    proto=ip4
+	    continue
+	    ;;
+	-6)
+	    proto=ip6
+	    continue
+	    ;;
+	-all|-a)
+	    proto= both
+	    continue
+	    ;;
+    esac
+    case $proto in
+	both)
+	    sqlite3 $db > /tmp/$code.$$ <<EOF
 select network from ip4 left join locations on locations.geoname_id = ip4.geoname_id where country_iso_code = '${code}' COLLATE NOCASE;
 select network from ip6 left join locations on locations.geoname_id = ip6.geoname_id where country_iso_code = '${code}' COLLATE NOCASE;
 EOF
+	    ;;
+	ip4)
+	    sqlite3 $db > /tmp/$code.$$ <<EOF
+select network from ip4 left join locations on locations.geoname_id = ip4.geoname_id where country_iso_code = '${code}' COLLATE NOCASE;
+EOF
+	    ;;
+	ip6)
+	    sqlite3 $db > /tmp/$code.$$ <<EOF
+select network from ip6 left join locations on locations.geoname_id = ip6.geoname_id where country_iso_code = '${code}' COLLATE NOCASE;
+EOF
+	    ;;
+    esac
     destfile=${destination}/${code}.nets
 
     if [ -z /tmp/$code.$$ ]; then
@@ -25,12 +59,10 @@ EOF
 	continue
     fi
     if [ ! -f $destfile ]; then
-	rm -f $destfile
 	mv /tmp/$code.$$ $destfile
     elif cmp -s /tmp/$code.$$ $destfile; then
 	rm -f /tmp/$code.$$
     else
-	rm -f $destfile
 	mv /tmp/$code.$$ $destfile
     fi
 done

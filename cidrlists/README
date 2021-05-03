@@ -7,3 +7,6 @@ getgeocountry - add into /var/lib/GeoIP to download the zip file, unpack it and
 	      create a sqlite3 database.
 
 getcountrynet - install to obtain CIDR lists for a specific country or countries.
+	      Country is two letter ISO code
+	      can be given -4 or -6 to limit IPs to networks to that flavour
+	      for countries that follow

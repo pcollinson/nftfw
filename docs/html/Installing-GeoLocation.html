@@ -85,6 +85,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="install-the-python-modules">Install the python modules</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">sudo</span> apt install python3-geoip2</a>
 <a class="sourceLine" id="cb1-2" title="2">$ <span class="fu">sudo</span> apt install geoipupdate</a></code></pre></div>
+<h4 id="geoipupdate-is-not-found---debian"><code>geoipupdate</code> is not found - Debian</h4>
 <p>If <code>geoipupdate</code> is not found, you need to change <code>/etc/apt/sources.list</code> to include contributed packages.</p>
 <p>Edit <code>/etc/apt/sources.list</code> and look for:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">deb</span> URL/debian buster main</a></code></pre></div>
@@ -93,6 +94,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Now try the <code>apt install geoipupdate</code> again, it should work now.</p>
 <p>Debian should have installed at least the 3.1.1 version of <code>geoipupdate</code>. You’ll see the version when it installed, this becomes important later. To check it:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="ex">apt</span> show geoipupdate</a></code></pre></div>
+<h4 id="geoipupdate-is-not-found---raspberry-pi-os"><code>geoipupdate</code> is not found - Raspberry Pi OS</h4>
+<p>It seems that this package is not available on RPi servers. However, compiled versions for the 32-bit armhf architecture exists on the internet. Visit</p>
+<pre class="text"><code>https://packages.debian.org/buster/armhf/geoipupdate/download</code></pre>
+<p>Clicking on a link on that page should download a Debian package that can be installed; you should get a file called <code>geoipupdate_3.1.1-1_armhf.deb</code>. Then</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> apt install ./geoipupdate_3.1.1-1_armhf.deb</a></code></pre></div>
+<p>will install the package for you.</p>
 <p>You have all the bits we need, we’ll set them up later.</p>
 <h2 id="getting-a-maxmind-account">Getting a MaxMind Account</h2>
 <p>Visit the <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/">Maxmind web site</a>.</p>
@@ -115,11 +122,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>you can do this by copying the downloaded file into place, or by editing the file. You’ll need to <em>sudo</em> your edit or <em>cp</em>.</p>
 <p>Now run:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> geoipupdate -v</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> geoipupdate -v</a></code></pre></div>
 <p>and it should download a new set of files. These will be put in <code>/var/lib/GeoIP</code> and an <code>ls</code> will show them.</p>
 <h2 id="finally-check-on-cron">Finally check on cron</h2>
 <p>The Debian installer will have installed a cron file</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">/etc/cron.d/geoipupdate</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">/etc/cron.d/geoipupdate</span></a></code></pre></div>
 <p>that updates the files automatically once a week. I suggest that you change the time of day somewhat so that you are not clashing with other Debian systems in your timezone.</p>
 </body>
 </html>

@@ -8,6 +8,8 @@ $ sudo apt install python3-geoip2
 $ sudo apt install geoipupdate
 ```
 
+#### ```geoipupdate``` is not found - Debian
+
 If ```geoipupdate``` is not found, you need to change ```/etc/apt/sources.list``` to include contributed packages.
 
 Edit ```/etc/apt/sources.list``` and look for:
@@ -29,6 +31,19 @@ Debian should have installed at least the 3.1.1 version of ```geoipupdate```.  Y
 $ apt show geoipupdate
 ```
 
+#### ```geoipupdate``` is not found - Raspberry Pi OS
+
+It seems that this package is not available on RPi servers. However, compiled versions for the 32-bit armhf architecture exists on the internet. Visit
+
+``` text
+https://packages.debian.org/buster/armhf/geoipupdate/download
+```
+Clicking on a link on that page should download a Debian package that can be installed; you should get a file called ```geoipupdate_3.1.1-1_armhf.deb```. Then
+
+``` sh
+$ sudo apt install ./geoipupdate_3.1.1-1_armhf.deb
+```
+will install the package for you.
 
 You have all the bits we need, we'll set them up later.
 

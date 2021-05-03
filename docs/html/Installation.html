@@ -86,7 +86,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This document assumes that you are installing on Debian Buster.</p>
 <h3 id="nftables">nftables</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">sudo</span> apt install nftables</a></code></pre></div>
-<p>The standard version of <em>nftables</em> at the time of writing is: 0.9.0-2. Buster backports has a more recent version - 0.9.3-2~bpo10+1, and it’s a good idea to upgrade to that. Look in <em>/etc/apt/sources.list</em>, and if necessary append:</p>
+<p>The standard version of <em>nftables</em> at the time of writing is: 0.9.0-2. Buster backports (sadly not available on Raspberry Pi OS, previously known as Raspian) has a more recent version - 0.9.3-2~bpo10+1, and it’s a good idea to upgrade to that. Look in <em>/etc/apt/sources.list</em>, and if necessary append:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># backports</span></a>
 <a class="sourceLine" id="cb2-2" title="2"><span class="ex">deb</span> <span class="op">&lt;</span>YOUR SOURCE<span class="op">&gt;</span> buster-backports main contrib non-free</a></code></pre></div>
 <p>then</p>
@@ -95,13 +95,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb3-3" title="3">$ <span class="fu">sudo</span> apt upgrade</a>
 <a class="sourceLine" id="cb3-4" title="4"><span class="ex">...</span></a>
 <a class="sourceLine" id="cb3-5" title="5">$ <span class="fu">sudo</span> apt -t buster-backports install nftables</a></code></pre></div>
-<p>which will upgrade your system to the most recent <em>nftables</em> release. The install action will tell you that a library is not needed before it installs things. There is a <em>systemctl</em> entry for <em>nftables</em>, that will probably be disabled now. Check with</p>
+<p>will upgrade your system to the most recent <em>nftables</em> release.</p>
+<p>The <em>install</em> action will tell you that a library is not needed before it installs things. There is a <em>systemctl</em> entry for <em>nftables</em>, that will probably be disabled now. Check with:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="fu">sudo</span> systemctl status nftables</a></code></pre></div>
+<p>If you are not running <em>iptables</em> or <em>nftables</em>, it’s suggested that <em>nftables</em> service stays off until later in the installation process.</p>
 <h3 id="ive-got-a-live-iptables-installation">I’ve got a live iptables installation</h3>
 <p>Well, what you need to do depends on what’s running in your system. Buster comes ready installed with two flavours of <em>iptables</em>: the legacy version and a bridging version using the <em>iptables</em> API, which maps and loads the <em>iptables</em> formatted rules into <em>nftables</em>. You can tell which one you are using by:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> iptables -V</a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="ex">iptables</span> v1.8.2 (nf_tables)</a></code></pre></div>
-<p>if your version output looks like that, then you are OK and can just skip over what follows to <strong><a href="#python">Python</a></strong>.</p>
+<p>If your version output looks like that, then you are OK and can just skip over what follows to <strong><a href="#python">Python</a></strong>.</p>
 <p>If the words in brackets says <em>legacy</em> then you need to swap to the <em>nf_tables</em> version. Here’s what you do:</p>
 <p>FIrst, save the current <em>iptables</em> settings, you’ll need to put the settings into the kernel’s <em>nftables</em> system when you switch.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> iptables-save <span class="op">&gt;</span> ipsaved</a>
@@ -119,8 +121,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb9-2" title="2">$ <span class="fu">sudo</span> ip6tables-legacy -F</a></code></pre></div>
 <p>All done, and it’s painless. You have a system that works for both <em>iptables</em> commands and <em>nftables</em> <em>nft</em> command.</p>
 <h3 id="python">Python</h3>
-<p><em>nftfw</em> is coded on Python 3 and the standard Python version on Buster is 3.7. The <em>nftfw</em> package was developed in part using Python 3.6, and so the <em>nftfw</em> package may run using that version.</p>
-<p>We will use pip3 to install the <em>nftfw</em> package.</p>
+<p><em>nftfw</em> is coded in Python 3 and the standard Python version on Buster is 3.7. The <em>nftfw</em> package was developed in part using Python 3.6, and so the <em>nftfw</em> package may run using that version.</p>
+<p>We will use <em>pip3</em> to install the <em>nftfw</em> package.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">sudo</span> apt install python3-pip python3-setuptools python3-wheel</a></code></pre></div>
 <p>You may find that <code>python3-setuptools</code> and <code>python3-wheel</code> are already installed.</p>
 <p>The <em>nftfwls</em> command uses Python’s <em>prettytable</em>, which may not be installed:</p>
@@ -132,22 +134,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb12-3" title="3">$ <span class="bu">cd</span> /usr/local/src</a>
 <a class="sourceLine" id="cb12-4" title="4">$ <span class="fu">sudo</span> git clone https://github.com/pcollinson/nftfw</a></code></pre></div>
 <p>which will create an <em>nftfw</em> directory.</p>
-<p>Now change into the <em>nftfw</em> directory and use <em>pip3</em> to install the package. <em>pip3</em> will allow you to uninstall the package at a later date, if you wish.</p>
+<p>Change into the <em>nftfw</em> directory and use <em>pip3</em> to install the package. <em>pip3</em> will allow you to uninstall the package at a later date, if you wish.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$ <span class="fu">sudo</span> pip3 install .</a>
 <a class="sourceLine" id="cb13-2" title="2"><span class="ex">...</span></a>
 <a class="sourceLine" id="cb13-3" title="3"><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></a></code></pre></div>
-<p>To uninstall, <code>sudo pip3 uninstall nftfw</code>.</p>
+<p><em>pip3</em> may complain about access to files because it’s being run as the superuser, it’s safe to ignore that warning. To uninstall, <code>sudo pip3 uninstall nftfw</code>.</p>
 <p><em>pip3</em> installs four commands: <em>nftfw</em>, <em>nftfwls</em>, <em>nftfwedit</em> and <em>nftfwadm</em> in <em>/usr/local/bin</em>. Since these are system commands, they ought to be in <em>/usr/local/sbin</em>, but the Python installation system doesn’t allow that.</p>
 <p>Take a moment to see if the installation worked by asking <em>nftfw</em> for help:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1">$ <span class="ex">nftfw</span> -h</a>
 <a class="sourceLine" id="cb14-2" title="2"><span class="ex">...</span></a></code></pre></div>
-<p>The next step is to install the basic control files in <em>/usr/local/etc/nftfw</em>, the working directories in <em>/usr/local/var/lib/nftfw</em>, and the manual pages in <em>/usr/local/share/man</em>.</p>
-<p>The <em>Install.sh</em> script will copy files from the distribution into their correct places. It asks several questions and permits you to control the installation phases. It’s safe to run the script again, it will not replace the contents of any directory ending with <em>.d</em>, or the two control files in <em>/usr/local/etc/nftfw</em>. The script uses the standard system <em>install</em> program to do its work.</p>
+<p>The next step is to install the basic control files in <em>/usr/local/etc/nftfw</em>, the working directories in <em>/usr/local/var/lib/nftfw</em>, and the manual pages in <em>/usr/local/share/man</em>. The <em>Install.sh</em> script will ask some questions and will copy files from the distribution into their correct places. The questions permit you to control the installation phases. It’s safe to run the script again, it will not replace the contents of any directory ending with <em>.d</em>, or the two control files in <em>/usr/local/etc/nftfw</em>. The script uses the standard system <em>install</em> program to do its work.</p>
 <p>It’s a good idea to make files in <em>/usr/local/etc/nftfw</em> owned by a non-root user, so they are easier to change without using <em>sudo</em>. For Symbiosis, the user should be <em>admin</em>, for Sympl it will <em>sympl</em>. The script asks for a user name and will create these files owned by that user. Later, it’s important to edit <em>/usr/local/etc/nftfw/config.ini</em> to tell <em>nftfw</em> the user that you selected.</p>
-<p>Take care, and slowly…</p>
+<p>Take care:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> sh Install.sh</a>
 <a class="sourceLine" id="cb15-2" title="2"><span class="ex">...</span></a></code></pre></div>
-<p>Answers for default installation: - <em>Install under /usr/local?</em> yes - <em>See the files installed?</em> your choice - <em>Install?</em> yes - <em>User to replace root?</em> ‘admin’ for Symbiosis, ‘sympl’ for Symbl, ‘return’ for root - <em>Install Manual pages?</em> yes</p>
+<p>Answers for default installation: - <em>Install under /usr/local?</em> yes - <em>See the files installed?</em> your choice - <em>Install?</em> yes - <em>User to replace root?</em> ‘admin’ for Symbiosis, ‘sympl’ for Sympl, ‘return’ for root on other systems - <em>Install Manual pages?</em> yes</p>
 <p>Alternatively, you can run the script without user interaction. Copy <em>Autoinstall.default</em> to <em>Autoinstall.conf</em>, edit the <code>AUTO_USER</code> to the user you want to use, and then run the script. <em>Autoinstall.conf</em> will be ignored by <em>git</em>, so this file can be used for later automated runs.</p>
 <p>In <em>/usr/local/etc/nftfw</em>, you will find two files: <em>config.ini</em> and <em>nftfw_init.nft</em>. <em>config.ini</em> provides configuration information overriding coded-in settings in the scripts. All entries in the distributed files are commented out using a semi-colon at the start of the line. <em>nftfw_init.nft</em> is the framework template file for the firewall. It’s copied into the build system whenever a <em>nftfw</em> creates a firewall. Also, you’ll find the <em>original</em> directory holding all the original settings for the files. The intention is to provide a place for later updates to supply new and fixed default files.</p>
 <p><em>install.sh</em> also creates the necessary directories into <em>/usr/local/var/lib/nftfw</em>.</p>
@@ -160,26 +161,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="man/nftfw-config.5.md"><em>nftfw-config(5)</em></a> - describes the contents of the ini-style config file tailoring settings in <em>nftfw</em>.</li>
 <li><a href="man/nftfw-files.5.md"><em>nftfw-files(5)</em></a> - the format, names and contents of the files used to control the system.</li>
 </ul>
-<p>The <em>man</em> command may need ‘5’ in the command line to display the section 5 manual pages. Incidentally, the distribution also has these manual pages in HTML format (see <em>docs/man</em>).</p>
-<p>As distributed, Debian Buster comes out of the box using <em>nfttables</em> as the basic firewall with a compatibility mode for <em>iptables</em> installed. Your system may vary. <em>nftfw</em> introduces specific <em>nftables</em> constructs, perhaps adding sets into the mix, the <em>iptables</em> interface will break down. You may have listed the kernel firewall with:</p>
+<p>The <em>man</em> command may need ‘5’ in the command line to display the section 5 manual pages. Incidentally, the distribution also has these manual pages in HTML format (see <em>man/index.md</em>).</p>
+<p>As distributed, Debian Buster comes out of the box using <em>nfttables</em> as the basic firewall with a compatibility mode for <em>iptables</em> installed. Your system may vary. <em>nftfw</em> introduces specific <em>nftables</em> constructs, perhaps adding sets into the mix, the <em>iptables</em> interface will break down. You may have inspected the kernel firewall with:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> iptables -L -v -n</a></code></pre></div>
 <p>and now you need to re-educate yourself to run:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
 <p>You are now ready to create firewall to suit your needs.</p>
 <h3 id="paying-attention-to-config.ini">Paying attention to <em>config.ini</em></h3>
+<p>The values in this file are all commented out by starting the line with a semi-colon. The value shown is the default value, and doesn’t need changing if the default suits your system.</p>
 <p>Find the <em>Owner</em> section in the file and change settings for owner and group to fit the user you selected when installing the <em>etc/nftfw</em> files.</p>
+<pre class="text"><code>[Owner]
+;owner=root</code></pre>
+<p>remove the semi-colon and after the = add the user you selected when installing the files.</p>
 <p>If you are running <em>nftables</em> and have a live <em>/etc/nftables.conf</em> file, you may need to alter the <em>nftables_conf</em> setting in <em>config.ini</em> and please read on. If not, <a href="#logging">skip to <strong>Logging</strong></a>.</p>
-<p>Debian expects systems using <em>nftables</em> to keep a configuration file in <em>/etc/nfttables.conf</em>. The file sets up <em>nftables</em> when the system reboots, or when <em>systemctl</em> restarts the <em>nftables</em> service. <em>nftfw</em> will write this file after creating its rule set but depends on configuration in its <em>config.ini</em> file to set its location. As distributed, the value of <em>nftables_conf</em> in <em>config.ini</em> is relative to the installation root. This means you need to take different actions depending on where your <em>nftfw</em> is installed:</p>
+<p>Debian expects systems using <em>nftables</em> to keep a configuration file in <em>/etc/nfttables.conf</em>. The file sets up the kernel when the system reboots, or when <em>systemctl</em> restarts the <em>nftables</em> service. <em>nftfw</em> will write this file after creating its rule set but depends on configuration in its <em>config.ini</em> file to set its location. As distributed, the value of <em>nftables_conf</em> in <em>config.ini</em> is relative to the installation root. This means you need to take different actions depending on where your <em>nftfw</em> is installed:</p>
 <ul>
 <li><p>For <em>nftfw</em> installed in <em>/usr/local</em>: The default setting of <em>nftables_conf</em> will be <em>/usr/local/etc/nftables.conf</em>, which is the ‘wrong’ location, but is safe for now. You will eventually need to change the <em>nftables_conf</em> setting in <em>config.ini</em> to <em>/etc/nftables.conf</em>. Once you are happy with <em>nftfw</em>, you will then change the setting to its correct location in <em>/etc</em>.</p></li>
 <li><p>For <em>nftfw</em> installed in <em>/</em>: The default setting of <em>nftables_conf</em> will be <em>/etc/nftables.conf</em>, which is the ‘right’ location, but maybe dangerous now. You probably should change the default setting in <em>nftfw/config.ini</em> to prevent it writing or installing <em>/etc/nftables.conf</em> until you are happy. Change the setting to place the file in perhaps <em>/etc/nftfw/nftables.conf.new</em> for now, and change it back later.</p></li>
 </ul>
+<p>The default entry in <em>config.ini</em> looks like:</p>
+<pre class="text"><code>#  Location of system nftables.conf
+#  Usually /etc/nftables.conf
+;nftables_conf = ${root}/etc/nftables.conf</code></pre>
+<p>the <code>${root}</code> is automatically replaced by the root defined by the installation base. So for a vanilla install, it will be set to <em>/usr/local/etc/nftables.conf</em>. To install the file in <em>/etc</em>, remove the semi-colon and delete <code>${root}</code>.</p>
 <h3 id="logging">Logging</h3>
 <p>All <em>nftfw</em> programs will write logging message to syslog, and also to the terminal. Error messages are output using logging level ERROR, and information messages using INFO. The scripts turn off direct printing output unless they are talking to a terminal. The scripts all have a <em>-q</em> (<em>quiet</em>) flag suppressing terminal output.</p>
 <p>The logging level displayed by the scripts is set by a value in the configuration file <em>config.ini</em>, and this defaults to ERROR, so only error messages are displayed. The scripts have a <em>-v</em> (<em>verbose</em>) flag that raises the output level to INFO, showing the information messages. Alternatively, the <em>loglevel</em> setting can be set in <em>config.ini</em> to always show these messages.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1">;<span class="ex">loglevel</span> = ERROR</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1">;<span class="ex">loglevel</span> = ERROR</a></code></pre></div>
 <p>to</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="ex">loglevel</span> = INFO</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">loglevel</span> = INFO</a></code></pre></div>
 <h2 id="using-symbiosissympl-control-files">Using Symbiosis/Sympl control files</h2>
 <p><em>nftfw</em> uses the same format for the control files found in the Symbiosis/Sympl firewall directory <em>/etc/symbiosis/firewall.d</em> or <em>/etc/sympl/firewall.d</em>. There is a setting in <em>config.ini</em> which tells <em>nftfw</em> where to look for these files, and this may point at the current directory. The five directories, <em>incoming.d</em>, <em>outgoing.d</em>, <em>blacklist.d</em>, <em>whitelist</em>.d and <em>patterns.d</em> are usable by <em>nftfw</em>.</p>
 <p><em>nftfw</em> makes three changes to the file format for patterns that make <em>nftfw</em> pattern files incompatible with those used by Symbiosis.</p>
@@ -196,85 +206,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Let’s look at where you might be now:</p>
 <ul>
 <li>The system runs a Symbiosis or Sympl system using <em>iptables</em>. In this case, the running firewall can be re-installed using the <em>{symbiosis|sympl}-firewall</em> command. You should move <em>/etc/cron.d/symbiosis-firewall</em> and <em>/etc/incron.d/symbiosis-firewall</em> (or equivalent <em>sympl</em> files if present) to a safe place to stop their firewalls from running for now.</li>
-<li><em>Or</em>: The system runs a different system using <em>iptables</em>, you can usually use <em>iptables_save</em> to save the settings somewhere, and <em>iptables_restore</em> to put the old rules back.</li>
+<li><em>Or</em>: The system runs a different firewall system using <em>iptables</em>, you can usually use <em>iptables_save</em> to save the settings somewhere, and <em>iptables_restore</em> to put the old rules back.</li>
 <li><em>Or</em>: Your system already runs an <em>nftables</em> based firewall, and you want to try <em>nftfw</em> out. In this case, do make sure that <em>nftfw</em> won’t overwrite your <em>/etc/nftables.conf</em> file.</li>
 <li><em>Or</em>: There may be other options.</li>
 </ul>
 <p>If you have a live <em>iptables</em> system, check the information about <em>iptables</em> versions and how to set things up at the <a href="#ive_got_a_live_iptables_installation">top of this document</a>.</p>
 <p>Having set up the directories in <em>/usr/local/etc/nftfw</em> and the working directories in <em>/usr/local/var/lib/nftfw</em>, you can run:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1">$ <span class="fu">sudo</span> nftfw -x -v load</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1">$ <span class="fu">sudo</span> nftfw -x -v load</a></code></pre></div>
 <p>The <em>-x</em> flag makes <em>nftfw</em> compile the files used in setting up the firewall, tests their syntax using the <em>nft</em> command, but doesn’t install them. The <em>-v</em> flag prints information messages, and is a good idea if you’ve not altered logging levels in <em>config.ini</em>.</p>
 <p>Assuming the tests show that the installation is OK, then you will have a working firewall to install. At this point, if you want to know what will happen, you can change to <em>/usr/local/var/lib/nftfw/test.d</em> and look at the files. The starting point for the firewall is <em>nftfw_init.nft</em>, which then includes further files. We cannot get a fully compiled set without loading the actual kernel tables, and you could do that if you are feeling confident, but not until you’ve taken the next step.</p>
 <h3 id="installing">Installing</h3>
 <p>If you are on a Symbiosis or Sympl system, I recommend at this point that you move <em>/etc/cron.d/{symbiosis|sympl}-firewall</em> to a safe place. You don’t want this firing when you are doing the next sequence of commands, so remove it from <em>cron</em>. On a Symbiosis system, you also need to move <em>/etc/incron.d/symbiosis-firewall</em> to a safe place, you don’t want this starting Symbiosis if files in <em>/etc/symbiosis/firewall.d</em> change.</p>
 <p>If you have a running <em>nftables</em> or <em>iptables</em> installation, now is the time to run:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1">$ <span class="fu">sudo</span> nftfwadm save</a></code></pre></div>
-<p>this saves your <em>nftables</em> settings into <em>nftfw</em>’s backup system, so if the install does fail, it will revert to what you had there before you started meddling. If you are using an <em>iptables</em> based system, fear not, the <em>nft</em> command doing the work will save the <em>iptables</em> settings in <em>nftables</em> format, assuming you have the <em>nf_tables</em> version of <em>iptables</em> installed and have working tables.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1">$ <span class="fu">sudo</span> nftfwadm save</a></code></pre></div>
+<p>this saves your <em>nftables</em> settings into <em>nftfw</em>’s backup system, so if the install does fail, it will revert to what you had there before you started meddling. If you are using an <em>iptables</em> based system, fear not, the <em>nft</em> command doing the work will save the <em>iptables</em> settings in <em>nftables</em> format, assuming you have the <em>nftables</em> version of <em>iptables</em> installed and have working tables.</p>
 <p>If all is well, you can try loading the rules made by <em>nftfw</em>.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1">$ <span class="fu">sudo</span> nftfw -f -v load</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1">$ <span class="fu">sudo</span> nftfw -f -v load</a></code></pre></div>
 <p>The <em>-f</em> forces a full load and you’ll need it if you’ve run the test. The point of saving the original settings will be apparent if something bad happens on this load, <em>nftfw</em> will reload the kernel state from your saved settings.</p>
 <p>If there was no error, you can now see all the tables using:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
 <p>If you need to revert, then now’s the time.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1">$ <span class="fu">sudo</span> nftfwadm restore</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1">$ <span class="fu">sudo</span> nftfwadm restore</a></code></pre></div>
 <p>replaces the newly installed rules with the tables you saved. The restore command will delete the backup file you stored, so you will need to run <em>save</em> again if you plan to change things and try again.</p>
 <p>If you are happy with <em>nftfw</em>, then you are nearly all set. If you’ve used the <em>save</em> command to <em>nftfwadm</em>, then you need to remove the backup version of your old settings from the system.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1">$ <span class="fu">sudo</span> nftfwadm clean</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1">$ <span class="fu">sudo</span> nftfwadm clean</a></code></pre></div>
 <p>simple deletes the backup file. Don’t leave it installed, <em>nftfw</em> makes a backup file on every run so it can backtrack. However, it doesn’t create a new file if it exists, and you need to remove your original settings from the system. If you don’t remove the file and there’s a problem some time in the future, you may find yourself wondering why the firewall in the system is an ancient version. Just where did <em>that</em> come from?</p>
 <h3 id="final-steps">Final steps</h3>
 <p>To tidy up, check that the setting of <em>nftables_conf</em> in <em>nftfw</em>’s config file <em>/usr/local/etc/nftfw/config.ini</em> reads:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="co">#  Location of system nftables.conf</span></a>
-<a class="sourceLine" id="cb26-2" title="2"><span class="co">#  Usually /etc/nftables.conf</span></a>
-<a class="sourceLine" id="cb26-3" title="3"><span class="ex">nftables_conf</span> = /etc/nftables.conf</a></code></pre></div>
-<p>and run</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1">$ <span class="fu">sudo</span> nftfw -f load</a></code></pre></div>
-<p>again to make sure that the new rules are written into <em>/etc/nftables.conf</em>.</p>
-<p>Tell <em>systemctl</em> to enable and start its <em>nftables</em> service.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1">$ <span class="fu">sudo</span> systemctl enable nftables</a>
-<a class="sourceLine" id="cb28-2" title="2">$ <span class="fu">sudo</span> systemctl start nftables</a>
-<a class="sourceLine" id="cb28-3" title="3">$ <span class="fu">sudo</span> systemctl status nftables</a></code></pre></div>
+<pre class="text"><code>#  Location of system nftables.conf
+#  Usually /etc/nftables.conf
+nftables_conf = /etc/nftables.conf</code></pre>
+<p>and rerun</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb29-1" title="1">$ <span class="fu">sudo</span> nftfw -f load</a></code></pre></div>
+<p>to make sure that the new rules are written into <em>/etc/nftables.conf</em>.</p>
+<p>Tell <em>systemctl</em> to enable and start its <em>nftables</em> service, if that’s needed.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb30-1" title="1">$ <span class="fu">sudo</span> systemctl enable nftables</a>
+<a class="sourceLine" id="cb30-2" title="2">$ <span class="fu">sudo</span> systemctl start nftables</a>
+<a class="sourceLine" id="cb30-3" title="3">$ <span class="fu">sudo</span> systemctl status nftables</a></code></pre></div>
 <p>On a boot of a Symbiosis or Sympl system, the firewall starts at network up time and closes at network down time. Change into <em>/etc/network</em> and delete <em>if-up.d/{symbiosis|sympl}-firewall</em> and <em>if-down.d/{symbiosis|sympl}-firewall}</em>. The file is a symbolic link to the firewall script. This turns out to be an important step, rebooting without having this done results in a bad combination of two firewalls, because the <em>nftables</em> settings are loaded before the Symbiosis/Sympl ones.</p>
 <h3 id="setting-up-cron">Setting up <em>cron</em></h3>
 <p>Like Symbiosis/Sympl, <em>nftfw</em> uses <em>cron</em> to drive regular polls by the firewall loader, and blacklist and whitelist scanners. You’ll find a sample <em>cron</em> control file in the <em>cronfiles</em> directory in the distribution. Hopefully, by now, you’ve moved the Symbiosis or Sympl versions to somewhere where they are not active.</p>
 <p>Check <em>cron-nftfw</em> in the <em>cronfiles</em> directory. The file contains <em>/usr/local/</em> as a pathname, if your system is installed from root, you’ll need to edit the file to point to the correct location.</p>
 <p>Install <em>cron-nftfw</em> in <em>/etc/cron.d/nftfw</em>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb29-1" title="1"><span class="co"># go to the nftfw distribution to find cronfiles</span></a>
-<a class="sourceLine" id="cb29-2" title="2">$ <span class="bu">cd</span> cronfiles</a>
-<a class="sourceLine" id="cb29-3" title="3">$ <span class="fu">sudo</span> cp cron-nftfw /etc/cron.d/nftfw</a>
-<a class="sourceLine" id="cb29-4" title="4">$ <span class="bu">cd</span> ..</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1"><span class="co"># go to the nftfw distribution to find cronfiles</span></a>
+<a class="sourceLine" id="cb31-2" title="2">$ <span class="bu">cd</span> cronfiles</a>
+<a class="sourceLine" id="cb31-3" title="3">$ <span class="fu">sudo</span> cp cron-nftfw /etc/cron.d/nftfw</a>
+<a class="sourceLine" id="cb31-4" title="4"><span class="co"># cron wants the file to be writeable only by owner</span></a>
+<a class="sourceLine" id="cb31-5" title="5">$ <span class="fu">sudo</span> chmod g-w /etc/cron.d/nftfw</a>
+<a class="sourceLine" id="cb31-6" title="6">$ <span class="bu">cd</span> ..</a></code></pre></div>
 <h3 id="making-nftfw-control-directories-active">Making <em>nftfw</em> control directories ‘active’</h3>
 <p>The original Symbiosis system used the <em>incron</em> system to make the <em>nftfw</em> control directories active, ensuring firewall updates when files alter, appear or disappear. Sympl stopped using <em>incron</em> because it’s poorly maintained and buggy. Without automatic updates, the system needs reloading whenever a user changes the contents of one of the directories, and forgetting to run the reload command is a source of errors. <em>nftfw</em> will work happily without active directories, but it makes the life of the system admin easier.</p>
-<p><em>nftfw</em> supplies control files for <em>systemd</em> using its ability to track file changes and starting a firewall reload when a change is detected in one of the control directories. This system replaces the <em>incron</em> support supplied before version 0.6.</p>
+<p><em>nftfw</em> supplies control files for <em>systemd</em> using its ability to track file changes and starting a firewall reload when a change is detected in one of the control directories.</p>
 <p>To install the files and start the system:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb30-1" title="1"><span class="co"># stop incron for nftfw if needed</span></a>
-<a class="sourceLine" id="cb30-2" title="2">$ <span class="fu">sudo</span> rm /etc/incron.d/nftfw</a>
-<a class="sourceLine" id="cb30-3" title="3"></a>
-<a class="sourceLine" id="cb30-4" title="4"><span class="co"># check that _/etc/cron.d/nftfw doesn&#39;t start incron</span></a>
-<a class="sourceLine" id="cb30-5" title="5"><span class="co"># if it does, delete the lines, or see above to install the new cron file</span></a>
-<a class="sourceLine" id="cb30-6" title="6"></a>
-<a class="sourceLine" id="cb30-7" title="7"><span class="co"># go to the nftfw distribution to find systemd files</span></a>
-<a class="sourceLine" id="cb30-8" title="8">$ <span class="bu">cd</span> systemd</a>
-<a class="sourceLine" id="cb30-9" title="9"></a>
-<a class="sourceLine" id="cb30-10" title="10"><span class="co"># check that the nftfw files contain the correct paths, edit if necessary</span></a>
-<a class="sourceLine" id="cb30-11" title="11"><span class="co"># install the files</span></a>
-<a class="sourceLine" id="cb30-12" title="12">$ <span class="fu">sudo</span> cp nftfw.* /etc/systemd/system</a>
-<a class="sourceLine" id="cb30-13" title="13">$ <span class="bu">cd</span> ..</a>
-<a class="sourceLine" id="cb30-14" title="14"></a>
-<a class="sourceLine" id="cb30-15" title="15"><span class="co"># start the units</span></a>
-<a class="sourceLine" id="cb30-16" title="16">$ <span class="fu">sudo</span> systemctl enable nftfw.path</a>
-<a class="sourceLine" id="cb30-17" title="17">$ <span class="fu">sudo</span> systemctl start nftfw.path</a>
-<a class="sourceLine" id="cb30-18" title="18">$ <span class="fu">sudo</span> systemctl status</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb32-1" title="1"><span class="co"># go to the nftfw distribution to find systemd files</span></a>
+<a class="sourceLine" id="cb32-2" title="2">$ <span class="bu">cd</span> systemd</a>
+<a class="sourceLine" id="cb32-3" title="3"></a>
+<a class="sourceLine" id="cb32-4" title="4"><span class="co"># check that the nftfw files contain the correct paths, edit if necessary</span></a>
+<a class="sourceLine" id="cb32-5" title="5"><span class="co"># install the files</span></a>
+<a class="sourceLine" id="cb32-6" title="6">$ <span class="fu">sudo</span> cp nftfw.* /etc/systemd/system</a>
+<a class="sourceLine" id="cb32-7" title="7">$ <span class="bu">cd</span> ..</a>
+<a class="sourceLine" id="cb32-8" title="8"></a>
+<a class="sourceLine" id="cb32-9" title="9"><span class="co"># start the units</span></a>
+<a class="sourceLine" id="cb32-10" title="10">$ <span class="fu">sudo</span> systemctl enable nftfw.path</a>
+<a class="sourceLine" id="cb32-11" title="11">$ <span class="fu">sudo</span> systemctl start nftfw.path</a>
+<a class="sourceLine" id="cb32-12" title="12">$ <span class="fu">sudo</span> systemctl status nftfw.path</a></code></pre></div>
 <p>The last command should show that the unit is active.</p>
 <p>You can test this by going to the <em>whitelist.d</em> directory and adding and removing 8.8.8.8 while monitoring <em>/var/log/syslog</em>. The <em>nftfw</em> command should run and update the firewall.</p>
 <p>Finally, you can turn off <em>incron</em>, if it’s running:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1">$ <span class="fu">sudo</span> systemctl stop incron</a>
-<a class="sourceLine" id="cb31-2" title="2">$ <span class="fu">sudo</span> systemctl disable incron</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb33-1" title="1">$ <span class="fu">sudo</span> systemctl stop incron</a>
+<a class="sourceLine" id="cb33-2" title="2">$ <span class="fu">sudo</span> systemctl disable incron</a></code></pre></div>
 <p>Finally a tip that’s hard to find: reload <em>systemd</em> if you change the <em>nftfw</em> files after installation and starting:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb32-1" title="1">$ <span class="fu">sudo</span> systemctl daemon-reload</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb34-1" title="1">$ <span class="fu">sudo</span> systemctl daemon-reload</a></code></pre></div>
+<h3 id="configuring-the-firewall">Configuring the firewall</h3>
+<p><em>nftfw</em> is distributed with no outbound packet control except for essential IPV6 rules. The set of inbound rules are aimed at permitting access to <em>ssh</em>, <em>http</em> and <em>https</em>, <em>ftp</em> and the various email subsystems. The incoming <em>ftp</em> rules are designed to support <em>Pure FTP</em>. Firewall configuration is a matter of creating or deleting files in the directories in <em>/usr/local/etc/nftfw</em>. You probably need to change settings for your system. Scan through the <a href="How_do_I.md">How do I.. or a User’s Quick Guide</a> document for a quick start on setting up access for your needs.</p>
 <h3 id="geolocation">Geolocation</h3>
 <p>The listing program <em>nftfwls</em> will print out the country that originated packets in the firewall using the <em>geoip2</em> country database available from MaxMind. MaxMind don’t charge but want you to create an account with them to access their files.</p>
 <p>See <a href="Installing-GeoLocation.md">Installing Geolocation</a>.</p>
-<p>If you want to use the <em>blacknets</em> feature of <em>nftfw</em> v0.7.0 and later to block countries, then <em>geoip2</em> can be used to supply lists of IP networks.</p>
+<p>If you want to use the <em>blacknets</em> feature of <em>nftfw</em> to block countries, then <em>geoip2</em> can be used to supply lists of IP networks.</p>
 <p>See <a href="Getting-cidr-lists.md">Getting CIDR lists</a>.</p>
 <h3 id="sympl-users-update-your-mail-system-after-installation">Sympl users: Update your mail system after installation</h3>
 <p>A repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs - see <a href="https://github.com/pcollinson/sympl-email-changes">Sympl mail system update</a>.</p>

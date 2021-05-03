@@ -572,6 +572,14 @@ class BlackList:
         # get a list of candidates for deletion
         days = self.clean_before
         before = int(time.time()) - days*24*60*60
+        # the timestamp stored is seconds from epoch
+        # it's a bit less confusing for people looking at deletions
+        # happening at locally adjusted times if the time delay
+        # is adjusted for local timezone
+        # altzone returns the difference in seconds west of UTC
+        # so will be -ve for times east of GMT
+        if time.daylight:
+            before = before - time.altzone
 
         fwdb = FwDb(cf)
         poss = fwdb.lookup_ips_for_deletion(before)

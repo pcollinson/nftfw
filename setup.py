@@ -9,7 +9,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='nftfw',
-    version='0.7.8',
+    version='0.7.9',
     packages=find_packages(),
 
     license='MIT',
@@ -24,7 +24,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 4 - Beta ',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: System Administrators',
         'Topic :: System :: Networking :: Firewalls',
         'Topic :: System :: Systems Administration',

@@ -317,7 +317,7 @@ See documents in the _docs_ directory:
   - How to update _nftfw_.
 - [How do I.. or Quick User's Guide](How_do_I.md)
   - Answers a bunch of questions about the system.
-- [Manual Page index](docs/man/index.md)
+- [Manual Page index](man/index.md)
   - Manual Page index
 
 ## Acknowledgement

@@ -3,15 +3,15 @@
 
 For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the [Installing nftfw](Installation.md) document. There are links, shown as 'Explanation', to the Installation document.
 
-NB. Versions of _nftfw_ from 0.6 no longer use _incron_ to create active directories, if you installed a previous version make sure you remove _incron_ support.
-
 ## Basic package installations
 
+### _nftables_
 ([Explanation](Installation.md#nftables))
+
 ``` sh
 $ sudo apt install nftables
 ```
-If this installs a version less than 0.9.3, then edit ```/etc/apt/sources.d``` and add
+Optional: If this installs a version less than 0.9.3, then edit ```/etc/apt/sources.d``` and add
 
 ``` sh
 # backports
@@ -25,7 +25,10 @@ $ sudo apt upgrade
 $ sudo apt -t buster-backports install nftables
 ```
 
-Install Python packages ([Explanation](Installation.md#python))
+Raspberry Pi OS doesn't support buster-backports at the time of writing.
+
+### Python
+([Explanation](Installation.md#python))
 
 ``` sh
 $ sudo apt install python3-pip python3-setuptools python3-wheel
@@ -39,7 +42,7 @@ Check on the state of _iptables_, and set things up to use the _nftables_ compat
 $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
-If the output looks like this, then skip to 'Installing _nftfw_. If the word in brackets is 'legacy', do the following
+If the output looks like this, then skip to 'Installing _nftfw_'. This is the most likely scenario. If the word in brackets is 'legacy', do the following
 
 ``` sh
 $ sudo iptables-save > ipsaved
@@ -74,6 +77,7 @@ $ sudo pip3 install .
 ...
 Successfully installed nftfw-<version>
 ```
+_pip3_ may complain about being run as the superuser, it's safe to ignore that warning.
 
 Install _nftfw_ infrastructure:
 
@@ -84,13 +88,14 @@ Answers for default installation:
 - _Install under /usr/local?_ yes
 - _See the files installed?_ your choice
 - _Install?_ yes
-- _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root
+- _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root on other systems
 - _Install Manual pages?_ yes
 
 Alternatively, without any user interaction:
 
 ``` sh
 $ cp Autoinstall.default Autoinstall.conf
+# sudo sh Install.sh
 ```
 edit the _AUTO_USER_ line to the user you want to use own the files in _etc/nftfw_ and run the script as above. The _Autoinstall.conf_ file will be ignored by _git_ so this script can be used to update any future releases.
 
@@ -99,7 +104,7 @@ Edit _/usr/local/etc/nftfw/config.ini_. Change: ([Explanation](Installation.md#p
 
 ``` text
 [Owner]
-;owner=
+;owner=root
 ```
 remove the semi-colon and after the = add the user you selected when installing the files.
 
@@ -114,18 +119,23 @@ Change the logging level for now: Change
 
 remove the semi-colon, and change ERROR to INFO.
 
-If you have a file in _/etc/nftables.conf_ (use _ls_) and you've installed _nftfw_ in the root of the file system, then in the _Locations_ section change
+The file  _/etc/nftables.conf_ is used by the standard _nftables_ service to load tables at start-up and service reset. If you are performing a vanilla install and you don't have a working firewall, then you need to ensure that _nftfw_ will create the file in _/etc_.
+
+In the _Locations_ section change
 
 ``` text
 
 #  Location of system nftables.conf
 #  Usually /etc/nftables.conf
-;nftables_conf = /etc/nftables.conf
+;nftables_conf = ${root}/etc/nftables.conf
 
 ```
-remove the semi-colon, and replace ```/etc/nftables.conf``` by ```/etc/nftables.conf.new```. This avoids writing over the current _/etc/nftables.conf_.
 
-## Disable cron and incron actions
+remove the semi-colon, and ```${root}``` leaving _/etc/nftables.conf_.
+
+If you have a working firewall, with  _/etc/nftables.conf_  in use, it's suggested that you take care not to overwrite the file at this stage. Remove the semi-colon, and ```${root}``` and replace ```/etc/nftables.conf``` by ```/etc/nftables.conf.new```. This avoids writing over the current _/etc/nftables.conf_.
+
+## Disable cron and incron actions for Sympl or Symbiosis
 
 ([Explanation](Installation.md#installation))
 
@@ -183,10 +193,12 @@ If you DO then you've done this bit above.
 ``` sh
 $ sudo nftfw -f -v load
 ```
-to test installation. Output should end with 'Install rules in ...' - wherever the _config.ini_ file tells _nftfw_ to store the _nftables.conf_ file. Now skip to next section.
+to test installation. Output should end with 'Install rules in ...' - wherever the _config.ini_ file tells _nftfw_ to store the _nftables.conf_ file.
+
 ``` sh
 $ sudo nft list ruleset
 ```
+
 will list the ruleset.
 
 ## Final steps
@@ -233,12 +245,14 @@ This turns out to be an important step, rebooting without having this done resul
 ## Installing cron
 ([Explanation](Installation.md#setting-up-cron))
 
-Change into the _cronfiles_ directory in the distribution. If you ran versions of _nftfw_ before 0.6, ensure that you replace the _cron.d_ file with the current version that doesn't run _incron_.
+Change into the _cronfiles_ directory in the distribution.
 
 ``` sh
 $ cd cronfiles
 # check that the paths used in cron-nftfw are correct for you
 $ sudo cp cron-nftfw /etc/cron.d/nftfw
+# cron wants the file to be writeable only by owner
+$ sudo chmod g-w /etc/cron.d/nftfw
 $ cd ..
 ```
 
@@ -252,14 +266,6 @@ $ sudo nftfw -f load
 ```
 when you make a change by hand.
 
-Take these steps if you ran versions of _nftfw_ before 0.6 and used _incron_.
-
-``` sh
-# first, replace /etc/cron.d/nftfw with the current version that doesn't use incron
-# see above
-# then stop nftfw incron actions
-$ sudo rm /etc/incron.d/nftfw
-```
 Install _systemd_ control files from _systemd_ in the _nftfw_ distribution:
 
 ``` sh
@@ -271,7 +277,7 @@ $ cd ..
 # start the path unit only
 $ sudo systemctl enable nftfw.path
 $ sudo systemctl start nftfw.path
-$ sudo systemctl status
+$ sudo systemctl status nftfw.path
 
 # DON'T start or enable nftfw.service
 # it will be started when needed by nftfw.path
@@ -288,12 +294,16 @@ Finally a tip that's hard to find: reload  _systemd_ if you change the _nftfw_ f
 ``` sh
 $ sudo systemctl daemon-reload
 ```
-
 ## Installing Geolocation
 
 This will add country detection to _nftfwls_, which is optional but desirable. See the [document](Installing-GeoLocation.md). If you plan on blocking addresses by country, then the Geolocation system from Maxmind can provide tools to generate lists of IP addresses in the correct format.
 
-### Sympl users: Update your mail system after installation
+## Configuring the firewall
+
+_nftfw_ is distributed with only essential IPV6 rules specified for outbound packets. The set of inbound rules are aimed at permitting access to _ssh_, _http_ and _https_, _ftp_ and various email ports. The incoming _ftp_ rules are designed to support _Pure FTP_. Firewall configuration is a matter of creating or deleting files in the various directories in _/usr/local/etc/nftfw_. You probably need to change settings for your system. Scan through the  [How do I.. or a User's Quick Guide](How_do_I.md) document for a quick start on setting up access for your needs.
+
+
+## Sympl users: Update your mail system after installation
 
  A repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs - see  [Sympl mail system update](https://github.com/pcollinson/sympl-email-changes).
 
