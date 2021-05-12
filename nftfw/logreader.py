@@ -143,9 +143,8 @@ def one_log_reader(cf, filename, patinfo, update_position=True):
     lastseek, linesig = db.getfileinfo(filename)
     db.close()
 
-    # replace UTF8 errors by backslashed values
-    # avoids an error event cancelling file read
-    fhandle = open(filename, 'r', errors='backslashreplace')
+    # Ignore any coding errors
+    fhandle = open(filename, 'r', errors='ignore')
 
     # See if this file is new
     line1 = fhandle.readline(2048)
