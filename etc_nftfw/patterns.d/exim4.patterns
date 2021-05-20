@@ -1,6 +1,7 @@
 # These patterns are specific to exim logs.
 #
 #  The file we scan for patterns
+#  NB Release changed May 2021 - improve regexes
 #
 file = /var/log/exim4/mainlog
 
@@ -15,21 +16,21 @@ ports = 25,465,587
 \[__IP__\] rejected AUTH LOGIN: SSL or TLS encryption required when authenticating.*$
 
 # auth fail
-authenticator failed for .*\) \[__IP__\]: 535 Incorrect authentication data.*$
+authenticator failed for .*\) \[__IP__\]: 535 Incorrect authentication data
 
 # returning bad guys being blocked - here to generate an entry in the database
 # requires change to exim to read information from the nftfw sqlite3 database
-\[__IP__\] rejected.*Blacklisted: Denied access - history of unwanted activity.*$
+\[__IP__\] \(:?rejected|I=\).*Blacklisted: Denied access - history of unwanted activity.*$
 
 # bad guys whose robots keep coming trying to login when it's not allowed
 # this needs +smtp_protocol_error added to log_selector
-\[__IP__\].*AUTH command used when not advertised.*$
+\[__IP__\] I=.*AUTH command used when not advertised.*$
 
 # Sender deferred ratelimiting
-\[__IP__\] temporarily.* Sender deferred.*$
+\[__IP__\] I=.*temporarily rejected.* Sender deferred.*$
 
 # Unrouteable addresses
-# seems to be a source of SPAM
+# This seems to be a source of spam and is worth uncommenting
 #\[__IP__\] I=.* RCPT .*Unrouteable address$
 
 # TLS connection problems

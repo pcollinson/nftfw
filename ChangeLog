@@ -1,3 +1,10 @@
+v0.7.11 Check and update released patterns for detecting exim4
+	problems - original rules were not parsing IP addresses
+	correctly. Look in newly installed
+	.../etc/nftfw/original/patterns/exim4.patterns
+	and update your working copy in
+	.../etc/nftfw/patterns.d/exim4.patterns
+
 v0.7.10 Ignore errors when reading UTF-8 files.
 	Attempted in 0.7.7 but incorrectly implemented. RTFM.
 	Replacing by backslashes only works on write.

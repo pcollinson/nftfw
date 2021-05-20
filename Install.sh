@@ -112,9 +112,18 @@ if [ ! -x ${PIP3} ]; then
     echo 'sudo apt install python3-pip'
     exit 1
 fi
-# This looks hopeful
-DESTROOT=/usr/local
-if [ $DESTROOT = '/' ]; then
+# DESTDIR is a GNU default that might be in the environment
+# as the install root
+# nftfw itself looks in /usr/local/etc and /etc
+# for the nftfw directory
+# code in ntftw/config.py needs changing if any other base locations
+# are needed.
+if [ "$DESTDIR" = '' ]; then
+    DESTROOT=/usr/local
+else
+    DESTROOT=$DESTDIR
+fi
+if [ "$DESTROOT" = '/' ]; then
    DESTROOT=''
 fi
 export DESTROOT
@@ -150,23 +159,27 @@ else
 fi
 echo
 echo '***************************************************'
-echo 'Setting things up'
-if [ "$HAVEAUTO" = 'N' ]; then
-    echo
-    echo "Choose the base of the installation, answering 'y'"
-    echo "will install all files under ${DESTROOT}, answering 'n'"
-    echo "will install under the root of the system (i.e starts with /)"
-    echo
-fi
-if yesno "$AUTO_DESTROOT" "Install files under ${DESTROOT}?" ; then
-    DESTROOT=''
-    echo "Installing files under /"
+# if DESTDIR is set don't mess with DESTROOT
+if [ "$DESTDIR" != '' ]; then
+  echo "Installing files in ${DESTDIR}"
 else
-    echo "Installing files under ${DESTROOT}"
-fi
-if yesno "$AUTO_DESTCONFIRM" "Happy with that?" ; then
-    echo "Exit"
-    exit 0
+  if [ "$HAVEAUTO" = 'N' ]; then
+	echo
+	echo "Choose the base of the installation, answering 'y'"
+	echo "will install all files under ${DESTROOT}, answering 'n'"
+	echo "will install under the root of the system (i.e starts with /)"
+	echo
+    fi
+    if yesno "$AUTO_DESTROOT" "Install files under ${DESTROOT}?" ; then
+	DESTROOT=''
+	echo "Installing files under /"
+    else
+	echo "Installing files under ${DESTROOT}"
+    fi
+    if yesno "$AUTO_DESTCONFIRM" "Happy with that?" ; then
+	echo "Exit"
+	exit 0
+    fi
 fi
 echo
 echo "Do you want see the directories and files that are installed, or "
