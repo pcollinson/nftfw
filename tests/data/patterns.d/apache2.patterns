@@ -4,7 +4,7 @@
 # Sympl/Symbiosis
 # file = /srv/*/public/logs/*access.log
 #
-file  = /var/log/apache2/access.log
+file  = sys/fakelog/apache2_access.log
 ports = 80,443
 
 #

@@ -1,8 +1,37 @@
-These files should live in
+These files and directories live in
 
 /etc/nftfw
 or
 /usr/local/etc/nftfw
 
-depending on your system.
+depending on your system. Once created, they will not be touched by
+any update system. An original copy of what is uploaded can be
+found in the 'original' directory (or symlink). These files will be
+updated and can be used to reference.
 
+Two files control the system:
+config.ini	  Configuration for the nftfw scripts
+		  all sections are commented out to show
+		  the default settings.
+		  See: man 5 nftfw-config
+nftfw_init.nft	  Basic template for setting up nftables
+
+Directories contains controls:
+blacklist.d 	  File names are IP addresses, both IPv4 and
+		  IPv6. CIDR masks can be supplied by adding |nn
+		  the | is changed to / internally in nftfw. Filenames
+		  created by nftfw have the suffix .auto, and may be
+		  deleted when they expire
+blacknets.d	  Files containing lists of network addresses, used
+		  to mass block address ranges.
+incoming.d	  Defines the inbound firewall
+outgoing.d	  Defines the outbound firewall
+patterns.d	  Control files used by the blacklist scanner,
+		  Files all end in .sh Each file contains
+		  a control section and then a set of regular
+		  expressions.
+rule.d		  Rules are a set of shell snippets that inject information into the
+		  nftables rule set, invoked by using a filename in the
+		  incoming.d and outgoing.d files
+whitelist.d	  IP addresses that are automatically whitelisted.
+See: man 5 nftfw-files

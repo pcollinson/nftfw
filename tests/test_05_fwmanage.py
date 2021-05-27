@@ -24,11 +24,11 @@ def test_step1(cf):
     wr = json.dumps(files)
     newpath.write_text(wr)
 
-    path = Path('data/step1_files.json')
+    path = Path('srcdata/step1_files.json')
     contents = path.read_text()
     reference = json.loads(contents)
     for k, val in reference.items():
-        assert k in files.keys(), f'Key {k} missing from data, could be software/or data error'
+        assert k in files.keys(), f'Key {k} missing from srcdata, could be software/or data error'
         assert val == files[k], f'Key {k} - data mismatch'
     for k in files:
         assert k in reference.keys()
@@ -36,7 +36,7 @@ def test_step1(cf):
 def test_step2(cf):
     """ Step 2 - install in build """
 
-    path = Path('data/step1_files.json')
+    path = Path('srcdata/step1_files.json')
     contents = path.read_text()
     files = json.loads(contents)
 
@@ -57,7 +57,7 @@ def test_step2(cf):
     wr = json.dumps(hashdict)
     newpath.write_text(wr)
 
-    path = Path('data/build_files.json')
+    path = Path('srcdata/build_files.json')
     co = path.read_text()
     hashdict = json.loads(co)
     for f in files:
@@ -75,7 +75,7 @@ def test_step4(cf):
     installpath = cf.varpath('install')
     assert str(installpath) == 'sys/install.d'
 
-    path = Path('data/build_files.json')
+    path = Path('srcdata/build_files.json')
     co = path.read_text()
     hashdict = json.loads(co)
     files = hashdict.keys()

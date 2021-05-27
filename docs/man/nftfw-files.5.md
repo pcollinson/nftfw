@@ -1,9 +1,9 @@
-% NFTFW-FILES(1) | Nftfw documentation
+% NFTFW-FILES(5) | Nftfw documentation
 
 NAME
 ====
 
-**nftfw-files** — documentation of file formats used in nftfw
+**nftfw-files** \- documentation of file formats used in nftfw
 
 DESCRIPTION
 =========

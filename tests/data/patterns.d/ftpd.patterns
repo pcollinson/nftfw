@@ -5,7 +5,7 @@
 #
 #  The logfile to look for matches in.
 #
-file = /var/log/syslog
+file = sys/fakelog/syslog
 
 #
 #  We block access to failing machines only to port 21.
@@ -16,4 +16,4 @@ ports = 21
 #  The rule(s) we match
 #
 # We ignore the first four fields.
-^\S+ \S+ \S+ \S+ pure-ftpd: \(\?@__IP__\) \[WARNING\] Authentication failed for 
+^\S+ \S+ \S+ \S+ pure-ftpd: \(\?@__IP__\) \[WARNING\] Authentication failed for

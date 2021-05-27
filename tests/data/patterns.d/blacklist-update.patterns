@@ -4,7 +4,7 @@
 #
 #  The file we scan for patterns
 #
-file  = /var/log/syslog
+file  = sys/fakelog/syslog
 #  Just update the database
 ports = update
 

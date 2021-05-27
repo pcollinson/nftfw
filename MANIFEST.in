@@ -5,6 +5,6 @@ include *.md
 include LICENSE.txt
 
 # Include the data files
-graft system
 graft docs
 graft debug
+graft tests/data

@@ -34,7 +34,7 @@ def test_logreader(cf):
     wr = json.dumps(ret)
     newpath.write_text(wr)
 
-    path = Path('data/logreader.json')
+    path = Path('srcdata/logreader.json')
     re = path.read_text()
     reference = json.loads(re)
 

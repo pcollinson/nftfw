@@ -3,7 +3,7 @@
 NAME
 ====
 
-**nftfwedit** — command line to add, delete and blacklist IPs and IP information print
+**nftfwedit** \- command line to add, delete and blacklist IPs and IP information print
 
 SYNOPSIS
 ======

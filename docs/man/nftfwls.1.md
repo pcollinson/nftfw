@@ -3,7 +3,7 @@
 NAME
 ====
 
-**nftfwls** — list **nftfw** blacklist database
+**nftfwls** \- list **nftfw** blacklist database
 
 SYNOPSIS
 ======

@@ -1,0 +1,10 @@
+May 24 00:00:02 craggy rsyslogd:  [origin software="rsyslogd" swVersion="8.1901.0" x-pid="697" x-info="https://www.rsyslog.com"] rsyslogd was HUPed
+May 24 00:00:02 craggy systemd[1]: logrotate.service: Succeeded.
+May 24 00:00:02 craggy systemd[1]: Started Rotate log files.
+May 24 00:00:03 craggy nftfw[1763]: Determine required installation
+May 24 00:00:03 craggy nftfw[1763]: No install needed
+May 24 00:00:03 craggy systemd[1]: man-db.service: Succeeded.
+May 24 00:00:03 craggy systemd[1]: Started Daily man-db regeneration.
+May 24 00:05:01 craggy CRON[1858]: (root) CMD (/usr/local/bin/nftfw -q blacklist)
+May 24 00:05:01 craggy CRON[1859]: (root) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)
+May 24 00:05:01 craggy nftfw[1861]: Blacklist scan starts

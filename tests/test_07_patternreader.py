@@ -25,7 +25,7 @@ def test_patternreader(cf):
     pickle.dump(patterns, file)
     file.close()
 
-    file = open('data/patternreader.pickle', 'rb')
+    file = open('srcdata/patternreader.pickle', 'rb')
     reference = pickle.load(file)
     file.close()
 

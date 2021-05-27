@@ -1,9 +1,9 @@
-% Nftfwo(1) | Nftfw documentation
+% Nftfw(1) | Nftfw documentation
 
 NAME
 ====
 
-**nftfw** — manage the Nftfw firewall generator
+**nftfw** \- manage the Nftfw firewall generator
 
 SYNOPSIS
 ======

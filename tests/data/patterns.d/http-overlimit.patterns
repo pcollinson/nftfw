@@ -2,7 +2,7 @@
 #
 #  The file we scan for patterns
 #
-file  = /var/log/syslog
+file  = sys/fakelog/syslog
 #  Http/Https
 ports = 80,443
 

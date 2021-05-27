@@ -55,7 +55,7 @@ def test_setup(cf):
         assert path.exists(), f'{dirname} doesn\'t exist'
 
     # see if things have been initialised
-    datadir = Path('data')
+    datadir = Path('srcdata')
     reference = ('build_files.json',
                  'firewallreader.pickle',
                  'listreader-records.json',

@@ -1,9 +1,9 @@
-% NFTFW-CONFIG(1) |  Nftfw documentation
+% NFTFW-CONFIG(5) |  Nftfw documentation
 
 NAME
 ====
 
-**nftfw-config** — configuration file for the nftfw system
+**nftfw-config** \- configuration file for the nftfw system
 
 DESCRIPTION
 =========

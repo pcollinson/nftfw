@@ -3,7 +3,7 @@
 NAME
 ====
 
-**nftfwadm** — support for installation of the Nftfw firewall generator
+**nftfwadm** \- support for installation of the Nftfw firewall generator
 
 SYNOPSIS
 ======
@@ -43,7 +43,7 @@ These are the available options to the program:
 **-v**, **-\-verbose**
 
 :   Change the default logging settings to INFO to show all errors and information messages.
- 
+
 FILES
 =====
 

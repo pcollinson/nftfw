@@ -8,7 +8,7 @@
 #
 #  The logfile we look for matches within.
 #
-file = /var/log/auth.log
+file = sys/fakelog/auth.log
 
 #
 #  Any matches will be denied access to these ports.
@@ -21,4 +21,3 @@ ports = 22
 #  Patterns we'll match upon.
 #
 Failed \S+ for .* from __IP__ port \d+ ssh2$
-

@@ -47,11 +47,11 @@ def test_ix(listrdr):
     newpath.write_text(wr)
 
     # get reference
-    path = Path('data/srcdict.json')
+    path = Path('srcdata/srcdict.json')
     contents = path.read_text()
     reference = json.loads(contents)
     for k, val in reference.items():
-        assert k in srcdict.keys(), f'Key {k} missing from data, could be software/or data error'
+        assert k in srcdict.keys(), f'Key {k} missing from srcdata, could be software/or data error'
         assert val == srcdict[k], f'Key {k} - data mismatch'
 
     for k, val in srcdict.items():
@@ -67,7 +67,7 @@ def test_records(listrdr):
     wr = json.dumps(records)
     newpath.write_text(wr)
 
-    path = Path('data/listreader-records.json')
+    path = Path('srcdata/listreader-records.json')
     contents = path.read_text()
     reference = json.loads(contents)
 

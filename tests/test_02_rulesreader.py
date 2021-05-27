@@ -1,6 +1,6 @@
 """ Pytest rules reader test
 
-Uses standard set of rules in sys/rules.d
+Uses standard set of rules in data/rules.d
 """
 
 from pathlib import Path
@@ -31,7 +31,7 @@ def rulesrdr(cf):
 
 def test_rules(rulesrdr):
     """ Validate rules that are installed
-    against a reference set in data/rulesreader.json
+    against a reference set srcdata/rulesreader.json
     """
 
     rdr = rulesrdr
@@ -46,7 +46,7 @@ def test_rules(rulesrdr):
     newpath.write_text(wr)
 
     # Get reference text
-    path = Path('data/rulesreader.json')
+    path = Path('srcdata/rulesreader.json')
     contents = path.read_text()
     reference = json.loads(contents)
     for k, val in reference.items():

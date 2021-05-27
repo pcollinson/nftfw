@@ -39,7 +39,7 @@ def test_reader(firewallreader):
     pickle.dump(records, file)
     file.close()
 
-    file = open('data/firewallreader.pickle', 'rb')
+    file = open('srcdata/firewallreader.pickle', 'rb')
     reference = pickle.load(file)
     file.close()
 

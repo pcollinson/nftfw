@@ -1,11 +1,13 @@
+
 # ignore any emacs edit files
 *~
 # for now
 bllookup.py
 # Python compiles
-__pycache__/
+*__pycache__*
 *.py[cod]
 *$py.class
+*.pytest_cache*
 
 # Distribution / packaging
 .Python
@@ -14,7 +16,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
+*.eggs*
 lib/
 lib64/
 parts/
@@ -23,6 +25,7 @@ var/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
+*.egg-info
 *.egg-info/
 .installed.cfg
 *.egg

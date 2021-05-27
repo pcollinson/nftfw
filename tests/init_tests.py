@@ -27,6 +27,13 @@ def init_tests():
         print(f'Not set up correctly: {str(e)}')
         sys.exit(1)
 
+    # create srcdata and newdata as directories
+    for name in ['srcdata', 'newdata']:
+        path = Path(name)
+        if not path.exists():
+            path.mkdir()
+        assert path.is_dir()
+
     # Blacklist will expire time elapsed files
     # and this may happen when they are downloaded
     # from github
@@ -117,17 +124,17 @@ def checkbasicfiles(cf):
 
 
 def write_json(file, obj):
-    """ Write the object to newdata and data """
+    """ Write the object to newdata and srcdata """
     wr = json.dumps(obj)
 
-    newpath = Path('data')
+    newpath = Path('srcdata')
     file = newpath / file
     if not file.exists():
         file.write_text(wr)
 
 def write_pickle(file, obj):
     """ Write a pickled object """
-    newpath = Path('data')
+    newpath = Path('srcdata')
     file = newpath / file
     fd = open(str(file), 'wb')
     pickle.dump(obj, fd)

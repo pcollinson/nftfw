@@ -1,3 +1,21 @@
+v0.7.12 Debian packaging wants to run tests from its
+	working directory. Add an __init__.py to ./tests
+	to allow this. Further changes to the test package
+	makes it happier to run when being used by debian packaging.
+	Debian will copy data file fairly easily, so the tests now
+	treat this as read-only and create and destroy working
+	directories.
+	Add fake local logs to pattern files so tests don't look at the
+	system, even when they are just looking for logs.
+	Fix config problems with manual pages
+           Fix titles in section 5
+	   Add \- in front of the title line to keep makewhatis happy
+	Change structure of etc_nftfw to make Debian package generation
+	easier. etc_nftfw is now a clone of what will appear in the
+	just installed /etc/nftfw or /usr/local/etc/nftfw. For current
+	Install.sh this is copied to /usr/local/etc/nftfw/original,
+	for Debian it will be in /usr/share/doc/original.
+
 v0.7.11 Check and update released patterns for detecting exim4
 	problems - original rules were not parsing IP addresses
 	correctly. Look in newly installed

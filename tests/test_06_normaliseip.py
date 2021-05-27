@@ -42,7 +42,7 @@ def test_basic(norm):
 def test_white(cf, normwhite):
     """ Test whitelist option """
 
-    path = Path('sys/whitelist.d/198.51.100.254')
+    path = Path('data/whitelist.d/198.51.100.254')
     assert path.exists()
     res = normwhite.normal('198.51.100.254', cf.is_white_fn)
     assert res is None

@@ -203,12 +203,12 @@ if [ -e ${DESTROOT}/etc/nftfw ]; then
     # See if the distribution has changed config.ini or nftfw_init.nft
     if [ -e ${DESTROOT}/etc/nftfw/original ]; then
 	if [ -f ${DESTROOT}/etc/nftfw/original/config.ini ]; then
-	    if ! cmp -s etc_nftfw/original/config.ini ${DESTROOT}/etc/nftfw/original/config.ini; then
+	    if ! cmp -s etc_nftfw/config.ini ${DESTROOT}/etc/nftfw/original/config.ini; then
 		DISTRIBUTION="config.ini"
 	    fi
 	fi
 	if [ -f ${DESTROOT}/etc/nftfw/original/nftfw_init.nft ]; then
-	    if ! cmp -s etc_nftfw/original/nftfw_init.nft ${DESTROOT}/etc/nftfw/original/nftfw_init.nft; then
+	    if ! cmp -s etc_nftfw/nftfw_init.nft ${DESTROOT}/etc/nftfw/original/nftfw_init.nft; then
 		DISTRIBUTION="$(echo ${DISTRIBUTION} "nftfw_init.nft")"
 	    fi
 	fi
@@ -275,9 +275,21 @@ if [ ${DOINSTALL} = 'Y' ]; then
 	done
 
 	# setup the original directory
+        # First: delete any installed files/directories that no longer exist in
+        # the distribution
+	if [ -e $DEST/original ]; then
+	    CURRENT=$(cd $DEST/original; ls)
+	    if [ "$CURRENT" != "" ]; then
+		for name in ${CURRENT}; do
+		    if [ ! -e $name ]; then
+			rm -rf $DEST/original/$name 2> /dev/null
+		    fi
+		done
+	    fi
+	fi
+	# install original from distribution
 	${INSTALL} ${SETUSER} -d $DEST/original
-	( cd original
-	  FILES=$(find . -maxdepth 1 -type f -print)
+	( FILES=$(find . -maxdepth 1 -type f -print)
 	  ${INSTALL} ${SETUSER} ${FILEMODE} -t ${DEST}/original ${FILES}
 	  DIRS=$(find . -maxdepth 1 -type d -print)
 	  for name in ${DIRS}; do

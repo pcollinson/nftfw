@@ -12,15 +12,20 @@ Running
 $ make
 
 will run the init_tests.py to create the necessary reference files
-and will then run all the tests.
+and will then run all the tests. It copies files from the data
+directory into a new directory called sys - which mimics the
+system files. Two working directories are also created for
+the tests to use - srcdata and newdata. All of these new files
+are deleted in the last test or can be deleted by
 
-If you are using git to get updates, then you must run
+$ make clean
+
+If you are using git to get updates, then it may be wise to
 
 $ make clean
 
 afterwards so that you don't have any changed files, otherwise git will
 complain when you run 'git pull' to update things.
-
 
 You can use
 $ make lint
@@ -40,7 +45,7 @@ Tests are designed to be re-entrant, so should leave the 'sys'
 directory as they found it.
 
 Several tests compare program output with static data files living in
-'data', if the contents of 'sys' are changed, this can make tests
+'srcdata', if the contents of 'sys' are changed, this can make tests
 break.
 
 Tests that use stored data will also create a new file in 'newdata'
