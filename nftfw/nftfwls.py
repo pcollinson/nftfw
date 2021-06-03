@@ -299,21 +299,34 @@ time of last incident (in descending order)
     # Sort out config
     # but don't init anything as yet
     #
-    cf = Config(dosetup=False)
+    try:
+        cf = Config(dosetup=False)
+    except AssertionError as e:
+        cf.set_logger(logprint=False)
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     # allow change of config file
     if args.config:
         file = Path(args.config)
         if file.is_file():
-            cf.set_ini_value_with_section('Locations', 'ini_file', file)
+            cf.set_ini_value_with_section('Locations', 'ini_file', str(file))
         else:
-            print(f'Cannot find config file: {args.config}')
+            cf.set_logger(logprint=False)
+            log.critical(f'Aborted: Cannot find config file: {args.config}')
             sys.exit(1)
 
     # Load the ini file if there is one
     # options can set new values into the ini setup
     # to override
-    cf.readini()
+    try:
+        cf.readini()
+    except AssertionError as e:
+        cf.set_logger(logprint=False)
+        emsg = 'Aborted: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     if args.quiet:
         cf.set_logger(logprint=False)
@@ -321,7 +334,12 @@ time of last incident (in descending order)
     if args.verbose:
         cf.set_logger(loglevel='DEBUG')
 
-    cf.setup()
+    try:
+        cf.setup()
+    except AssertionError as e:
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     orderby = 'last DESC'
     if args.reverse:

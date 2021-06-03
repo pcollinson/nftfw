@@ -87,13 +87,24 @@ config.ini.
     ap.add_argument('ipaddress', help='IP address list', nargs='*')
     args = ap.parse_args()
 
-    # make sure terminal error output is happening
-    cf = Config(dosetup=False)
+    try:
+        cf = Config(dosetup=False)
+    except AssertionError as e:
+        cf.set_logger(logprint=False)
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     # Load the ini file if there is one
     # options can set new values into the ini setup
     # to override
-    cf.readini()
+    try:
+        cf.readini()
+    except AssertionError as e:
+        cf.set_logger(logprint=False)
+        emsg = 'Aborted: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     if args.quiet:
         cf.set_logger(logprint=False)
@@ -102,7 +113,13 @@ config.ini.
         cf.set_logger(loglevel='DEBUG')
 
     # Now set things up
-    cf.setup()
+    try:
+        cf.setup()
+    except AssertionError as e:
+        cf.set_logger(logprint=False)
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     if args.delete:
         run_delete(cf, ap, args)

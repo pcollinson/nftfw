@@ -17,7 +17,7 @@ init:
 lint: $(OUT)
 
 %.lint: %.py
-	PYTHONPATH=./nftfw pylint3 --exit-zero -s n --disable=redefined-outer-name $<
+	PYTHONPATH=../nftfw pylint3 --exit-zero -s n --disable=redefined-outer-name $<
 
 clean:
 	rm -rf srcdata newdata sys

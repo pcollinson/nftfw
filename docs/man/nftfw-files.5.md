@@ -13,7 +13,7 @@ various control files in _/etc/nftfw_ or _/usr/local/etc/nftfw_ depending on the
 
 The _etc/nftfw_ directory contains:
 
-- _config.ini_ - configuration file supplying most 'constants' for the code, see nftfw_config(5).
+-  _config.ini_ - configuration file supplying most 'constants' for the code, see nftfw_config(5).
 -  _nftfw_init.nft_ - template file holding the basic nftables framework for **nftfw**.
 -  _incoming.d_ -   contains rules controlling  access to services on the system;
 -  _outbound.d_ - sets any rules controlling packets leaving the system;
@@ -23,7 +23,7 @@ The _etc/nftfw_ directory contains:
 -  _patterns.d_ - contain pattern files for matching lines in log files for blacklist; and
 -  _rule.d_  - hold  files for generating **nft** commands from rule names.
 
-Distributed files can be found in _etc/nftfw/original_.
+Distributed files can be found in _etc/nftfw/etc_nftfw_.
 
 incoming and outbound
 ----------------------
@@ -159,12 +159,12 @@ _nftfw_init.nft_
 
 The file _nftfw_init.nft_ contains the template rule set for nftables, it's used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. **nftfw** copies the file into the build directory at the start of the build process.
 
-The file is user-editable, allowing the framework to be changed. The basic setup assumes that it's running on a system with a single network connection attached to the internet. See the example supplied in _etc/nftfw/original/nftfw_router_example_ which provides a router setup with WAN and LAN connections using _nat_ and _forward_ tables.
+The file is user-editable, allowing the framework to be changed. The basic setup assumes that it's running on a system with a single network connection attached to the internet. See the example supplied in _etc/nftfw/etc_nftfw/nftfw_router_example_ which provides a router setup with WAN and LAN connections using _nat_ and _forward_ tables.
 
-_original_ directory
+_etc_nftfw_ directory or symlink
 -----------------
 
-Finally, the _original_ directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system.
+Finally, the _etc_nftfw_ directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system. _etc_nftfw_ may be a symlink on some installations pointing to the distribution files stored elsewhere.
 
 Files in _var/lib/nftfw_
 ---------------------

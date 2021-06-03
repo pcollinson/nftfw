@@ -1,13 +1,12 @@
 These files and directories live in
 
-/etc/nftfw
-or
-/usr/local/etc/nftfw
+/etc/nftfw or /usr/local/etc/nftfw
 
 depending on your system. Once created, they will not be touched by
 any update system. An original copy of what is uploaded can be
-found in the 'original' directory (or symlink). These files will be
-updated and can be used to reference.
+found in the 'etc_nftfw' directory (or symlink). These files will
+be changed when the distribution changes, and can be used as
+reference.
 
 Two files control the system:
 config.ini	  Configuration for the nftfw scripts

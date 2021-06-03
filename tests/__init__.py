@@ -4,6 +4,7 @@
 #
 import os
 import sys
+import init_tests
 # get the path of this file
 install = os.path.dirname(__file__) # pylint: disable=invalid-name
 # add it at the start of path
@@ -15,5 +16,4 @@ os.chdir(install)
 # aimed at running on 3.7
 assert sys.version_info >= (3, 6)
 
-import init_tests
 init_tests.init_tests()

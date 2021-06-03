@@ -58,7 +58,13 @@ def main():
     # Sort out config
     # but don't init anything as yet
     #
-    cf = Config(dosetup=False)
+
+    try:
+        cf = Config(dosetup=False)
+    except AssertionError as e:
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        print(emsg)
+        exit(1)
 
     # allow change of config file
     if args.config:
@@ -71,7 +77,12 @@ def main():
 
     # Load the ini file if there is one options can set new values
     # into the ini setup to override
-    cf.readini()
+    try:
+        cf.readini()
+    except AssertionError as e:
+        emsg = 'Aborted: {0}'.format(str(e))
+        print(emsg)
+        exit(1)
 
     # decode and action standard args
     nftfw_stdargs(cf, args)
@@ -87,7 +98,12 @@ def main():
         sys.exit(1)
 
     # Now set things up
-    cf.setup()
+    try:
+        cf.setup()
+    except AssertionError as e:
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        print(emsg)
+        exit(1)
 
     # no return if not true
     cf.am_i_root()

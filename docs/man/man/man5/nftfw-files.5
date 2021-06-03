@@ -41,7 +41,7 @@ files for blacklist; and
 \f[I]rule.d\f[] \- hold files for generating \f[B]nft\f[] commands from
 rule names.
 .PP
-Distributed files can be found in \f[I]etc/nftfw/original\f[].
+Distributed files can be found in \f[I]etc/nftfw/etc_nftfw\f[].
 .SS incoming and outbound
 .PP
 Files in these directories specify rules for the firewall.
@@ -308,15 +308,17 @@ The file is user\-editable, allowing the framework to be changed.
 The basic setup assumes that it's running on a system with a single
 network connection attached to the internet.
 See the example supplied in
-\f[I]etc/nftfw/original/nftfw_router_example\f[] which provides a router
-setup with WAN and LAN connections using \f[I]nat\f[] and
+\f[I]etc/nftfw/etc_nftfw/nftfw_router_example\f[] which provides a
+router setup with WAN and LAN connections using \f[I]nat\f[] and
 \f[I]forward\f[] tables.
-.SS \f[I]original\f[] directory
+.SS \f[I]etc_nftfw\f[] directory or symlink
 .PP
-Finally, the \f[I]original\f[] directory contains the starting point for
-all control files, and some examples.
+Finally, the \f[I]etc_nftfw\f[] directory contains the starting point
+for all control files, and some examples.
 The directory allows distributions to update the standard control files
 while not changing those in use on a running system.
+\f[I]etc_nftfw\f[] may be a symlink on some installations pointing to
+the distribution files stored elsewhere.
 .SS Files in \f[I]var/lib/nftfw\f[]
 .PP
 The \f[I]lib/nftfw\f[] directory provides working space for the system.

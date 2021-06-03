@@ -199,16 +199,22 @@ DOINSTALL=Y
 # Set to not empty if the distribution has changed the
 # config.ini or nftfw_init.nft files
 DISTRIBUTION=""
+LAST_DIST="etc_nftfw"
 if [ -e ${DESTROOT}/etc/nftfw ]; then
+    # See if the original directory has migrated to etc_nftfw
+    # if not we'll delete it later
+    if [ -d ${DESTROOT}/etc/nftfw/original ]; then
+	LAST_DIST=original
+    fi
     # See if the distribution has changed config.ini or nftfw_init.nft
-    if [ -e ${DESTROOT}/etc/nftfw/original ]; then
-	if [ -f ${DESTROOT}/etc/nftfw/original/config.ini ]; then
-	    if ! cmp -s etc_nftfw/config.ini ${DESTROOT}/etc/nftfw/original/config.ini; then
+    if [ -e ${DESTROOT}/etc/nftfw/${LAST_DIST} ]; then
+	if [ -f ${DESTROOT}/etc/nftfw/${LAST_DIST}/config.ini ]; then
+	    if ! cmp -s etc_nftfw/config.ini ${DESTROOT}/etc/nftfw/${LAST_DIST}/config.ini; then
 		DISTRIBUTION="config.ini"
 	    fi
 	fi
-	if [ -f ${DESTROOT}/etc/nftfw/original/nftfw_init.nft ]; then
-	    if ! cmp -s etc_nftfw/nftfw_init.nft ${DESTROOT}/etc/nftfw/original/nftfw_init.nft; then
+	if [ -f ${DESTROOT}/etc/nftfw/${LAST_DIST}/nftfw_init.nft ]; then
+	    if ! cmp -s etc_nftfw/nftfw_init.nft ${DESTROOT}/etc/nftfw/${LAST_DIST}/nftfw_init.nft; then
 		DISTRIBUTION="$(echo ${DISTRIBUTION} "nftfw_init.nft")"
 	    fi
 	fi
@@ -274,29 +280,29 @@ if [ ${DOINSTALL} = 'Y' ]; then
 	    fi
 	done
 
-	# setup the original directory
+	# setup the etc_nftfw directory
         # First: delete any installed files/directories that no longer exist in
         # the distribution
-	if [ -e $DEST/original ]; then
-	    CURRENT=$(cd $DEST/original; ls)
+	if [ -e $DEST/${LAST_DIST} ]; then
+	    CURRENT=$(cd $DEST/${LAST_DIST}; ls)
 	    if [ "$CURRENT" != "" ]; then
 		for name in ${CURRENT}; do
 		    if [ ! -e $name ]; then
-			rm -rf $DEST/original/$name 2> /dev/null
+			rm -rf $DEST/${LAST_DIST}/$name 2> /dev/null
 		    fi
 		done
 	    fi
 	fi
-	# install original from distribution
-	${INSTALL} ${SETUSER} -d $DEST/original
+	# install etc_nftfw from distribution
+	${INSTALL} ${SETUSER} -d $DEST/etc_nftfw
 	( FILES=$(find . -maxdepth 1 -type f -print)
-	  ${INSTALL} ${SETUSER} ${FILEMODE} -t ${DEST}/original ${FILES}
+	  ${INSTALL} ${SETUSER} ${FILEMODE} -t ${DEST}/etc_nftfw ${FILES}
 	  DIRS=$(find . -maxdepth 1 -type d -print)
 	  for name in ${DIRS}; do
-	      ${INSTALL} ${SETUSER} -d ${DEST}/original/$name
+	      ${INSTALL} ${SETUSER} -d ${DEST}/etc_nftfw/$name
 	      FILES=$(find $name -maxdepth 1 -type f -a \! -name '.empty' -print)
 	      if [ "$FILES" != "" ]; then
-		  ${INSTALL} -C ${SETUSER} ${FILEMODE} -t ${DEST}/original/$name ${FILES}
+		  ${INSTALL} -C ${SETUSER} ${FILEMODE} -t ${DEST}/etc_nftfw/$name ${FILES}
 	      fi
 	  done
 	)
@@ -375,13 +381,13 @@ if [ "${DISTRIBUTION}" != "" ]; then
 	echo '***************************************************'
 	echo
 	echo "The update has modified this file or files: ${DISTRIBUTION}"
-	echo "in ${DESTROOT}/etc/nftfw/original"
+	echo "in ${DESTROOT}/etc/nftfw/etc_nftfw"
 	echo
 	echo "You need to replace your active version(s) in ${DESTROOT}/etc/nftfw"
 	echo "with updated copies."
 	echo
 	echo "If you have not changed the active versions you can copy files"
-	echo "from ${DESTROOT}/etc/nftfw/original to ${DESTROOT}/etc/nftfw."
+	echo "from ${DESTROOT}/etc/nftfw/etc_nftfw to ${DESTROOT}/etc/nftfw."
 	echo
 	echo "If you have changed the active versions, then a manual compare"
 	echo "and edit is needed."

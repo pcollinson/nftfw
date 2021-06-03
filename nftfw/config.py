@@ -5,8 +5,7 @@ Passed into every class used in the system to convey system settings.
 Uses ConfigParser to
     read compiled in default ini file settings
     read external ini file settings
-    settings can also be changed by program
-    arguments
+    settings can also be changed by program arguments
 
 Establishes logging used in all modules, allows logging setting
 changes from config files and command line - managed by loggermanager
@@ -19,8 +18,6 @@ import os
 import sys
 from functools import wraps
 from pathlib import Path
-from pwd import getpwnam
-from grp import getgrnam
 from configparser import ConfigParser, ExtendedInterpolation
 from configparser import Error as ConfigParserError
 import logging
@@ -59,19 +56,12 @@ class Config:
                         and other information
     sysvar : str        Path to var/lib/nftfw storing working files
                         and rules
-    ini_file : str      where to find the default config.py file
+    ini_file : str      where to find the default config.ini file
                         Only in global file, can be changed
                         using -c argument
     nftables_conf : str location of the systems nfttables.conf file
     nftfw_base : str    Location of the symbiosis style firewall
                         settings. Can be set to /etc/symbiosis.
-
-    [Owner]             Owner used to set ownership of
-                        files created in children of etc/nftfw
-                        Set to root.root in the default setup
-                        Files in var/lib always owned by root
-    owner : str
-    group : str         Only needed if differs from group of owner
 
     [Rules]             map default fw settings to commands in rules
                         Possible to use 'drop' for reject here
@@ -220,6 +210,9 @@ class Config:
 #  are installed
 root
 # system locations used by nftfw
+# NB sysetc location cannot be changed unless
+# the ini file is used as the -c option
+# to nftfw main scripts
 sysetc = ${root}/etc/nftfw
 sysvar = ${root}/var/lib/nftfw
 
@@ -243,16 +236,6 @@ nftfw_init = ${sysetc}/nftfw_init.nft
 #  by this system. To provide local changes, edit
 #  etc/nftfw_init.nft
 nftfw_base = ${sysetc}
-
-[Owner]
-# Owner used to set ownership of files created
-# in children of etc/nftfw
-# Set to root.root in the default setup -
-# Files in var/lib always owned by root
-owner = root
-# group only needed if differs from that
-# of owner
-group
 
 [Rules]
 #   Default rules for incoming and outgoing
@@ -408,7 +391,7 @@ pattern_split = No
     rootlist = ('', '/usr/local')
 
     # Directories we expect to find in the
-    # nftfw_base directory which can be different from sysexec
+    # nftfw_base directory which can be different from sysetc
     # where most things live
     nftfw_dir = {'incoming':  'incoming.d',
                  'outgoing':  'outgoing.d',
@@ -467,9 +450,8 @@ pattern_split = No
     #   Used to check on names for the -o option
     #   and also for deciding on type of ini variables
     ini_string_change = (
-        'sysetc', 'sysvar',
+        'sysvar',
         'nftables_conf', 'nftfw_init', 'nftfw_base',
-        'owner', 'group',
         'incoming', 'outgoing', 'whitelist',
         'blacklist', 'blacknets',
         'logfmt', 'loglevel',
@@ -503,7 +485,8 @@ pattern_split = No
         setup()   establishes final settings
 
         The main scripts provide extra processing between
-        these steps.
+        these steps. Callers need to trap AssertionError
+        to bail out cleanly.
 
         Parameters
         ----------
@@ -544,12 +527,11 @@ pattern_split = No
         self.logprint = logvars['logprint']
         self.logsyslog = logvars['logsyslog']
 
-        # these are set in chownpath
+        # these are used in chownpath
         # see chownpath
-        self.owner = None
-        self.group = None
-        self.fileuid = None
-        self.filegid = None
+        # default to root:root
+        self.fileuid = 0
+        self.filegid = 0
 
         # now setup loggermanager
         self.logger_mgr = LoggerManager(self, log)
@@ -574,8 +556,13 @@ pattern_split = No
             for r in rootsearch:
                 self.parser.set('Locations', 'root', r)
                 sysetc = self.parser.get('Locations', 'sysetc')
-                if Path(sysetc).exists():
+                psysetc = Path(sysetc)
+                if psysetc.exists():
+                    assert psysetc.is_dir(), f'{psysetc} is not a directory'
                     return
+            assert False, 'Cannot find etc/nftfw directory'
+
+        # safety code - shouldn't be called
         self.parser.set('Locations', 'root', '')
 
     def readini(self):
@@ -587,15 +574,14 @@ pattern_split = No
         errors = []
         try:
             ini_file = self.parser.get('Locations', 'ini_file')
+            # it's OK not to have an ini_file
             if not os.path.isfile(ini_file):
                 return
             self.parser.read(ini_file)
         except ConfigParserError as e:
-            errors.append(str(e))
-        if any(errors):
-            for line in errors:
-                print(line)
-                sys.exit(1)
+            errors.append(str(e).replace("\n", '; '))
+
+        assert not errors, 'config.ini syntax errors: {0}'.format(' '.join(errors))
 
         # turn off printing by default unless talking to a terminal
         # but can be overridden from config files and arguments
@@ -613,9 +599,61 @@ pattern_split = No
         logvars = self.get_ini_values_by_section('Logging')
         for k, v in logvars.items():
             setattr(self, k, v)
-
         self.logger_mgr.setup()
 
+        # Get owner of the nftfw_base directory
+        # we don't know it exists as yet, it may not
+        # be the same as sysetc
+        dirname = self.parser.get('Locations', 'nftfw_base')
+        dirpath = Path(dirname)
+        assert dirpath.is_dir(), \
+            f'Missing configuration directory (nftfw_base): {dirname}'
+        dirstat = dirpath.stat()
+        self.fileuid = dirstat.st_uid
+        self.filegid = dirstat.st_gid
+
+        # Finally check on the installation
+        self._check_installation()
+
+    def _check_installation(self):
+        """ Check control directories
+
+        Check that all the needed control directories
+        exist. Raise assert exception if not there.
+        """
+
+        missing = []
+        # sysetc is known to exist
+        # but we are not sure of nftfw_base
+        # however this error will include full pathname
+        # and will indicate misconfiguration
+        for name in ('incoming', 'outgoing', 'patterns'):
+            path = self.nftfwpath(name)
+            if not path.is_dir():
+                missing.append(str(path))
+
+        # check on rule.d
+        path = self.etcpath('rule')
+        if not path.is_dir():
+            missing.append(str(path))
+
+        # check on the nftfw_init.nft file
+        if not self.nftfw_init.exists():
+            missing.append(str(self.nftfw_init))
+
+        # Now worry about the var directories
+        p = self.get_ini_value_from_section('Locations', 'sysvar')
+        sysvar = Path(p)
+        if not sysvar.is_dir():
+            missing.append(str(sysvar))
+        else:
+            for name in self.var_dir:
+                dir_path = sysvar / self.var_dir[name]
+                if not dir_path.is_dir():
+                    missing.append(str(dir_path))
+
+        # log list is not empty
+        assert not missing, 'Missing configuration directories/files: {0}'.format(" ".join(missing))
 
     def set_logger(self, logprint=None,
                    logsyslog=None, loglevel=None):
@@ -764,8 +802,8 @@ pattern_split = No
         # Return what's left as a repr
 
         base = ConfigParser(allow_no_value=True,
-                                   strict=False,
-                                   interpolation=ExtendedInterpolation())
+                            strict=False,
+                            interpolation=ExtendedInterpolation())
         base.read_string(self.default_parser_settings)
 
         # remove root
@@ -805,7 +843,7 @@ pattern_split = No
 
             # remove empty sections
             if not any(base.items(sect, raw=True)):
-                 base.remove_section(sect)
+                base.remove_section(sect)
 
         # prepare output
         out = self.config_settings(base)
@@ -831,21 +869,6 @@ pattern_split = No
         path : str
             File to change
         """
-        if self.fileuid is None:
-            if self.owner is None:
-                # Same for owner and group
-                logvars = self.get_ini_values_by_section('Owner')
-                self.owner = logvars['owner']
-                self.group = logvars['group']
-            # set up ownership of files that are created
-            pw = getpwnam(self.owner)
-            self.fileuid = pw.pw_uid
-            self.filegid = pw.pw_gid
-            if self.group is not None \
-               and self.group != '':
-                gp = getgrnam(self.group)
-                self.filegid = gp.gr_gid
-
         if self.fileuid == 0 \
            and self.filegid == 0:
             return

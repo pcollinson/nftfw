@@ -195,7 +195,7 @@ See the manual page [_nftfw-config_](man/nftfw-config.5.md) for a description.
 
 ## How to I: Add my own tables and rules to _nftfw_?
 
-The file _/usr/local/etc/nftfw/nftfw_init.nft_ contains the template _nftables_ framework for _nftfw_. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with  WAN and LAN interfaces  in _/usr/local/etc/nftfw/original/nftfw_router_example_. Rules for a router  adds a _nat_ table and uses the _forward_ table.
+The file _/usr/local/etc/nftfw/nftfw_init.nft_ contains the template _nftables_ framework for _nftfw_. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with  WAN and LAN interfaces  in _/usr/local/etc/nftfw/etc_nftfw/nftfw_router_example_. Rules for a router  adds a _nat_ table and uses the _forward_ table.
 
 _nftfw_init.nft_ uses _nft_'s readable file format. When deciding what to add or change, the best strategy is to add your new rules to the system using the _nft_ command line interface to check that they work and use:
 ``` sh

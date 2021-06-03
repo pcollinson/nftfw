@@ -130,10 +130,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>It the file doesn’t contain the string <em>blacknets</em>, then you need to update it.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="bu">cd</span> /usr/local/etc/nftfw</a>
 <a class="sourceLine" id="cb10-2" title="2">$ <span class="fu">grep</span> blacknets nftfw_init.nft</a></code></pre></div>
-<p>If the command gives no output, check the copy of the file in the <em>originals</em> directory using <em>grep</em>.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">grep</span> blacknets originals/nftfw_init.nft</a></code></pre></div>
+<p>If the command gives no output, check the copy of the file in the <em>etc_nftfw</em> directory using <em>grep</em>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">grep</span> blacknets etc_nftfw/nftfw_init.nft</a></code></pre></div>
 <p>If this gives output, then copy the <em>originals</em> file over your running version, carefully re-applying any changes you’ve made.</p>
-<p>If there is no output from <em>grep</em> on the copy in <em>originals</em>, you need to update your <em>nftfw</em> installation to a version after v0.7.0. See <a href="Updating-nftfw.md">Updating <em>nftfw</em></a>.</p>
+<p>If there is no output from <em>grep</em> on the copy in <em>etc_nftfw</em>, you need to update your <em>nftfw</em> installation to a version after v0.7.0. See <a href="Updating-nftfw.md">Updating <em>nftfw</em></a>.</p>
 <h2 id="general-notes">General notes</h2>
 <p>You can create as many files as you like in <em>blacknets.d</em> as long as they are in the correct format. To remove a set from the firewall, simply remove the file.</p>
 <p>The files can contain a lot of IP addresses, and processing them can take some time. The reader will cope with automatic detection of IPv4 and IPv6, the conversion of IPv4 addresses when expressed in IPv6 format (which <em>ip2location.com</em> uses), and the removal of some addresses that look like networks but are not. It will also remove duplicates and compresses the IP list down to a set of unique networks. It’s possible to run CIDR files from both of the sources shown in this document, and reduce them to a minimal set.</p>

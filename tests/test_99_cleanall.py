@@ -7,8 +7,8 @@ def test_clean():
     """ Clean the src data and newdata directories
     to make things re-entrant """
 
-    for dir in ["srcdata", "newdata"]:
-        path = Path(dir)
+    for cleandir in ["srcdata", "newdata"]:
+        path = Path(cleandir)
         for name in path.glob("*.json"):
             name.unlink()
         for name in path.glob("*.pickle"):

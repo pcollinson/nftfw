@@ -1,3 +1,23 @@
+v0.7.13	Want to be able to write files in etc/nftfw owned by someone other
+	than root making it easier for a mortal to control. Originally
+	this was done by putting the owner/group into the config.ini. It's
+	going to be easier to distribute if the owner of new files
+	is taken from the owner of etc/nftfw. Most of the changes for this
+	are in config.py, with some changes in Install.sh.
+
+	Insert checks at program startup to verify that the
+	directories and config files exist in the right places.
+	In the event of non-configuration or mis-configuration
+	the scripts will now complain meaningfully.
+
+	Decided that the use of 'etc/nftfw/original' to retain the distributed
+	config files was perhaps obvious what the files were. Renaming
+	this to etc_nftfw as it is in the source. For the Debian package, this
+	will be a symlink to /usr/share/doc/nftfw/etc_nftfw. Changes to do
+	this are in Install.sh, and will also need to put some code into
+	the Debian install to recognise that 'original' might have an old
+	installation set and will need deleting.
+
 v0.7.12 Debian packaging wants to run tests from its
 	working directory. Add an __init__.py to ./tests
 	to allow this. Further changes to the test package

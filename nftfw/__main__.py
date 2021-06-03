@@ -2,12 +2,14 @@
 
 import sys
 import argparse
+import logging
 import re
 from pathlib import Path
 import pkg_resources
 from config import Config
 from scheduler import Scheduler
 from stdargs import nftfw_stdargs
+log = logging.getLogger('nftfw')
 
 def main():
     """ Main action """
@@ -69,7 +71,12 @@ def main():
     args = ap.parse_args()
 
     # Sort out config but don't init anything as yet
-    cf = Config(dosetup=False)
+    try:
+        cf = Config(dosetup=False)
+    except AssertionError as e:
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     # allow change of config file
     if args.config:
@@ -77,13 +84,17 @@ def main():
         if file.is_file():
             cf.set_ini_value_with_section('Locations', 'ini_file', str(file))
         else:
-            print(f'Cannot find config file: {args.config}')
+            log.critical(f'Aborted: Cannot find config file: {args.config}')
             sys.exit(1)
 
     # Load the ini file if there is one options can set new values
     # into the ini setup to override
-
-    cf.readini()
+    try:
+        cf.readini()
+    except AssertionError as e:
+        emsg = 'Aborted: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     # decode and action standard args
     nftfw_stdargs(cf, args)
@@ -104,7 +115,12 @@ def main():
         sys.exit(1)
 
     # Now set things up
-    cf.setup()
+    try:
+        cf.setup()
+    except AssertionError as e:
+        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
+        log.critical(emsg)
+        exit(1)
 
     # install arguments into cf values
     if args.full:

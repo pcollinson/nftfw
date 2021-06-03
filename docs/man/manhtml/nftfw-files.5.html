@@ -34,7 +34,7 @@
 <li><em>patterns.d</em> - contain pattern files for matching lines in log files for blacklist; and</li>
 <li><em>rule.d</em> - hold files for generating <strong>nft</strong> commands from rule names.</li>
 </ul>
-<p>Distributed files can be found in <em>etc/nftfw/original</em>.</p>
+<p>Distributed files can be found in <em>etc/nftfw/etc_nftfw</em>.</p>
 <h2 id="incoming-and-outbound">incoming and outbound</h2>
 <p>Files in these directories specify rules for the firewall. File names have the format:</p>
 <blockquote>
@@ -114,9 +114,9 @@
 <p>The <em>etc</em> directory contains the <em>config.ini</em> file for <strong>nftfw</strong>. nftfw_config(5) contains a description of the lines in this file.</p>
 <h2 id="nftfw_init.nft"><em>nftfw_init.nft</em></h2>
 <p>The file <em>nftfw_init.nft</em> contains the template rule set for nftables, it’s used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. <strong>nftfw</strong> copies the file into the build directory at the start of the build process.</p>
-<p>The file is user-editable, allowing the framework to be changed. The basic setup assumes that it’s running on a system with a single network connection attached to the internet. See the example supplied in <em>etc/nftfw/original/nftfw_router_example</em> which provides a router setup with WAN and LAN connections using <em>nat</em> and <em>forward</em> tables.</p>
-<h2 id="original-directory"><em>original</em> directory</h2>
-<p>Finally, the <em>original</em> directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system.</p>
+<p>The file is user-editable, allowing the framework to be changed. The basic setup assumes that it’s running on a system with a single network connection attached to the internet. See the example supplied in <em>etc/nftfw/etc_nftfw/nftfw_router_example</em> which provides a router setup with WAN and LAN connections using <em>nat</em> and <em>forward</em> tables.</p>
+<h2 id="etc_nftfw-directory-or-symlink"><em>etc_nftfw</em> directory or symlink</h2>
+<p>Finally, the <em>etc_nftfw</em> directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system. <em>etc_nftfw</em> may be a symlink on some installations pointing to the distribution files stored elsewhere.</p>
 <h2 id="files-in-varlibnftfw">Files in <em>var/lib/nftfw</em></h2>
 <p>The <em>lib/nftfw</em> directory provides working space for the system. It contains three directories and several working files.</p>
 <ul>

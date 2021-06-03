@@ -15,6 +15,8 @@ from logreader import log_reader
 def init_tests():
     """ Initialise data used to compare test values """
 
+    # pylint: disable=too-many-locals
+
     cf = config_init()
     cf.TESTING = True
 

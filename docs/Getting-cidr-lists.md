@@ -90,13 +90,13 @@ It the file doesn't contain the string _blacknets_, then you need to update it.
 $ cd /usr/local/etc/nftfw
 $ grep blacknets nftfw_init.nft
 ```
-If the command gives no output, check the copy of the file in the _originals_ directory using _grep_.
+If the command gives no output, check the copy of the file in the _etc_nftfw_ directory using _grep_.
 ``` sh
-$ grep blacknets originals/nftfw_init.nft
+$ grep blacknets etc_nftfw/nftfw_init.nft
 ```
 If this gives output, then copy the _originals_ file over your running version, carefully re-applying any changes you've made.
 
-If there is no output from _grep_ on the copy in _originals_, you need to update your _nftfw_ installation to a version after v0.7.0. See [Updating _nftfw_](Updating-nftfw.md).
+If there is no output from _grep_ on the copy in _etc_nftfw_, you need to update your _nftfw_ installation to a version after v0.7.0. See [Updating _nftfw_](Updating-nftfw.md).
 
 
 ## General notes
