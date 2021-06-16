@@ -60,7 +60,7 @@ def pattern_reader(cf):
 
     """
 
-    path = cf.nftfwpath('patterns')
+    path = cf.etcpath('patterns')
     files = (f for f in path.glob('*.patterns') if f.is_file())
     patterns = ((f.stem, f.read_text()) for f in files)
     recordlist = (parsefile(cf, f, c) for f, c in patterns)

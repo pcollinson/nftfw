@@ -1,0 +1,22 @@
+This directory is the place to put locally modified or created rules.
+Files should be called <FILE>.sh.
+Files should be compatible with 'dash' and not 'bash'
+
+Note that the rule.d directory might be altered by future distributions
+so don't make any changes there.
+
+Each rule is called twice, once for ip and once of ip6
+
+The environment is set up as follows:
+DIRECTION incoming | outgoing
+PROTO - values ip|ip6
+TABLE - usually filter
+CHAIN - chain to add the rule to
+PORTS - ports to use (can be empty)
+COUNTER - set to counter or empty
+IPS - ip addresses (can be empty, single, ranges, named sets, unnamed sets)
+LOGGER - logger statement
+       To replace this in a script use
+       LOGGER='log prefix "STRING "'
+       the space at the end of the string is needed
+       to add a space in the log file

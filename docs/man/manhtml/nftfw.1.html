@@ -26,11 +26,11 @@
 <p><strong>nftfw</strong> is the front-end for the firewall system that generates rules for nftables. It uses files in five directories in <em>/usr/local/etc/nftfw</em> to create firewall rules. The directories create incoming and outgoing firewalls, and also tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system’s root or below <em>/usr/local</em>.</p>
 <p>The <strong>nftfw</strong> command has several options, and most of these don’t change that often when the system is in operation. Editing the ini format file <em>/etc/nftfw/config.ini</em> changes the values of options - see nftfw-config(5). You may make temporary variable changes to configuration values from the command line using the <strong>-o</strong> option to <strong>nftfw</strong> (see below).</p>
 <p>The optional command argument to <strong>nftfw</strong> runs main modules of the program. All actions need users to have root access permission. A lock file ensures the running of only one instance of the program, <strong>nftfw</strong> queues actions if it’s busy, and runs queued actions at the finish of the task in hand.</p>
-<p><strong>nftfw</strong> uses an initial setup file <em>/usr/local/etc/nftfw/nftfw_init.nft</em> to form the framework for the completed ruleset. When <strong>nftfw</strong> builds the firewall rules, the <em>nftfw_init.nft</em> file is copied into the build system, and uses include statements to pull in rules from the separate files created from the four directories.</p>
+<p><strong>nftfw</strong> uses an initial setup file <em>/etc/nftfw/nftfw_init.nft</em> to form the framework for the completed ruleset. When <strong>nftfw</strong> builds the firewall rules, the <em>nftfw_init.nft</em> file is copied into the build system, and uses include statements to pull in rules from the separate files created from the four directories.</p>
 <p>The system, as distributed, provides a firewall for a hosted server with one external internet connection. Administrators can change the <em>nftfw_init.nft</em> file to support more complex network needs.</p>
 <p>Actions are:</p>
 <p><strong>load</strong></p>
-<p>The <strong>load</strong> command builds the firewall files by taking input from files in directories in <em>/usr/local/etc/nftfw</em>:</p>
+<p>The <strong>load</strong> command builds the firewall files by taking input from files in directories in <em>/etc/nftfw</em>:</p>
 <ul>
 <li><em>incoming.d</em> contains rules controlling access to services on the system;</li>
 <li><em>outbound.d</em> sets any rules controlling packets leaving the system;</li>
@@ -39,7 +39,7 @@
 <li><em>blacklist.d</em> contains files named for IP addresses in the inbound packets that should not have access</li>
 </ul>
 <p>nftfw-files(5) describes the contents and formats of files in these directories.</p>
-<p><strong>nftfw load</strong> performs these steps, creating files in directories in <em>/usr/local/var/lib/nftfw</em>:</p>
+<p><strong>nftfw load</strong> performs these steps, creating files in directories in <em>/var/lib/nftfw</em>:</p>
 <ol type="1">
 <li><p>The command builds a firewall ruleset in several files in <em>build.d</em>, and copies <em>nftfw_init.nft</em> into the directory creating the initial framework. Rules generated from <em>incoming.d</em> and <em>outgoing.d</em> support the basic system services. Rules formed from the <em>whitelist.d</em>. <em>blacklist.d</em> and <em>blacknets.d</em> directories make use of nftables sets. These sources change more often than the other directories, and the use of sets allows <strong>nftfw</strong> to change parts of the installed ruleset without completely reloading the firewall.</p></li>
 <li><p><strong>nftfw</strong> now runs the <strong>nft -c</strong> command validating the rules. Errors cause <strong>nftfw</strong> to abandon any further processing.</p></li>
@@ -47,14 +47,14 @@
 <li><p><strong>nftfw</strong> copies all the files into the <em>install.d</em> directory and loads these rules into the system’s kernel depending on the decision above.</p></li>
 <li><p>Finally <strong>nftfw</strong> captures the kernel settings and stores them in <em>/etc/nftables.conf</em>, which is where the Debian system expects to find the rules on system start-up.</p></li>
 </ol>
-<p>The steps from (4) above could result in a broken system if parts of the installation fails. <strong>nftfw</strong> avoids the possible disaster by storing a backup Ocopy of the kernel’s rules before attempting any update. On failure, <strong>nftfw</strong> reverts to the backup rules.</p>
+<p>The steps from (4) above could result in a broken system if parts of the installation fails. <strong>nftfw</strong> avoids the possible disaster by storing a backup copy of the kernel’s rules before attempting any update. On failure, <strong>nftfw</strong> reverts to the backup rules.</p>
 <p><strong>whitelist</strong></p>
-<p>The <strong>whitelist</strong> action is a scanner for the system’s wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. <strong>nftfw</strong> creates a file named for the IP address in <em>/usr/local/etc/nftfw/whitelist.d</em> as long as the IP address is global.</p>
+<p>The <strong>whitelist</strong> action is a scanner for the system’s wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. <strong>nftfw</strong> creates a file named for the IP address in <em>/etc/nftfw/whitelist.d</em> as long as the IP address is global.</p>
 <p>The <strong>whitelist</strong> command expires addresses that were automatically created (identified by the suffix <em>.auto</em>) after a set number of days given in <strong>nftfw</strong>’s config file.</p>
 <p>If the scanner makes any changes, <strong>whitelist</strong> invokes the <strong>load</strong> command automatically installing the changes in the firewall.</p>
 <p>See nftfw-files(5) for information on the file formats used for whitelist control files.</p>
 <p><strong>blacklist</strong></p>
-<p>The <strong>blacklist</strong> command is a file scanner creating IP address files in <em>/usr/local/etc/nftfw/blacklist.d</em>. The scanner reads pattern files from <em>/usr/local/etc/nftfw/patterns.d</em>. Pattern files contain a file name (or a range of files given by shell <em>glob</em> rules), the relevant ports for blocking and a set of regular expressions matching offending lines in the nominated log files.</p>
+<p>The <strong>blacklist</strong> command is a file scanner creating IP address files in <em>/etc/nftfw/blacklist.d</em>. The scanner reads pattern files from <em>/etc/nftfw/patterns.d</em>. Pattern files contain a file name (or a range of files given by shell <em>glob</em> rules), the relevant ports for blocking and a set of regular expressions matching offending lines in the nominated log files.</p>
 <p>When <strong>nftfw</strong> finds a match, it updates a sqlite3(1) database with the information and uses the frequency of matches (given in the config file) to decide whether to blacklist the IP.</p>
 <p>When scanning log files, the blacklist engine remembers the position in the file at the end of the last scan, so only examines new entries on every pass. The <strong>blacklist</strong> command also expires blacklisted IPs after a set number of days. See nftfw-files(5) for information on the file formats used for blacklist control files.</p>
 <p>If the scanner makes any changes, <strong>blacklist</strong> invokes the <strong>load</strong> command automatically installing the changes in the firewall.</p>
@@ -69,7 +69,7 @@
 <dd><p>Does a full install, ignores the file compare installation step.</p>
 </dd>
 <dt><strong>-x</strong>, <strong>--no-exec</strong></dt>
-<dd><p>Create rules in _/var/lib/nftfw/test.d and test them. When used with the <strong>blacklist</strong> command, prints the result of scanning for matches without saving any information and without updating stored log file positions.</p>
+<dd><p>Create rules in _/var/lib/nftfw/test.d and tests them. When used with the <strong>blacklist</strong> command, prints the result of scanning for matches without saving any information and without updating stored log file positions.</p>
 </dd>
 <dt><strong>-C</strong>, <strong>--config</strong> CONFIG</dt>
 <dd><p>Supply a alternate configuration file, overriding any values from the default system settings.</p>
@@ -94,18 +94,18 @@
 </dd>
 </dl>
 <h1 id="files">FILES</h1>
-<p>Files can be located in <em>/</em> or <em>/usr/local</em>.</p>
+<p>Files can be located under <em>/</em> or <em>/usr/local</em>.</p>
 <dl>
-<dt><em>/usr/local/etc/nftfw</em></dt>
+<dt><em>/etc/nftfw</em></dt>
 <dd><p>Location of control files and directories</p>
 </dd>
-<dt><em>/usr/local/etc/nftfw/nftfw_init.nft</em></dt>
+<dt><em>/etc/nftfw/nftfw_init.nft</em></dt>
 <dd><p><strong>nftables</strong> basic framework</p>
 </dd>
-<dt><em>/usr/local/etc/nftfw/config.ini</em></dt>
+<dt><em>/etc/nftfw/config.ini</em></dt>
 <dd><p>ini file with basic settings for <em>nftfw</em>, overriding built-in values</p>
 </dd>
-<dt><em>/usr/local/var/lib/nftfw/</em></dt>
+<dt><em>/var/lib/nftfw/</em></dt>
 <dd><p>Location of <em>build.d</em>, <em>test.d</em>, <em>install.d</em>, lock files and the sqlite3 databases storing file positions and blacklist information</p>
 </dd>
 </dl>

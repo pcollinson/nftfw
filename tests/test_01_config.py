@@ -39,14 +39,9 @@ def test_setup(cf):
 
     assert str(cf.nftfw_init) == 'sys/nftfw_init.nft'
     assert str(cf.nftables_conf) == 'sys/nftables.conf'
-    nftfw_base = cf.get_ini_value_from_section('Locations', 'nftfw_base')
-    assert nftfw_base == 'sys'
     sysvar = cf.get_ini_value_from_section('Locations', 'sysvar')
     assert sysvar == 'sys'
 
-    for name, dirname in cf.nftfw_dir.items():
-        path = cf.nftfwpath(name)
-        assert path.exists(), f'{dirname} doesn\'t exist'
     for name, dirname in cf.etc_dir.items():
         path = cf.etcpath(name)
         assert path.exists(), f'{dirname} doesn\'t exist'

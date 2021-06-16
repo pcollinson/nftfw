@@ -181,7 +181,7 @@ class DbFns:
         if iplist is None:
             return 0
 
-        blacklistpath = self.cf.nftfwpath('blacklist')
+        blacklistpath = self.cf.etcpath('blacklist')
 
         fwdb = FwDb(self.cf)
 

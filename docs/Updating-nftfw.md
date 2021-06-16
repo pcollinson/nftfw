@@ -1,5 +1,5 @@
-% Updating nftfw
-# Updating nftfw
+% Updating nftfw manual installations
+# Updating nftfw manual installations
 
 ## Get current version
 
@@ -44,6 +44,24 @@ Successfully installed nftfw-<version>
 Will update files in your _etc/nftfw_ directory, but will not touch any working files. The _original_ directory may contain changes that are useful to you. You can use _diff_ to compare your working versions with files in the _original_ directory.
 
 The [Incron] section in the _config.ini_ file can be deleted as it's no longer used.
+
+## Changes for _nftfw_ version 0.8 and onwards
+
+Summary of changes from 0.7 requiring some reconfiguration:
+
+ - Edit config.ini to remove:
+    [Owner] section - ownership of files created in etc/nftfw now taken from owner of that directory
+    nftfw_base - nftfw now uses it's own control files
+ - _etc/nftfw/original_ renamed _etc/nftfw/etc_nftfw_
+ - Change to nftfw_init.nft to include essential ipv6 icmp coding. Change to _rule.d/essential-icmpv6.sh_. Can remove reference to this rule in incoming.d and outgoing.d.
+ - Updated regular expressions in exim4.patterns - now find IP addresses correctly
+ - Local action rules should be placed in _/etc/nftfw/local.d_, so that _/rule.d can be updated by distributions.
+
+Other changes:
+
+ - New import_tool to import Symbiosis/Sympl configs
+ - New Uninstall.sh to remove manual installation
+ - Many documentation changes - example files now shown relative to filesystem root - e.g _/etc/nftfw_ rather than _/usr/local/etc/nftfw_.
 
 ## Changes for _nftfw_ version 0.7 and onwards
 

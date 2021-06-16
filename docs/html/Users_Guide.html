@@ -84,7 +84,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 id="users-guide-to-nftfw">User’s Guide to nftfw</h1>
 <h2 id="what-does-nftfw-do">What does nftfw do?</h2>
 <p><em>nftfw</em> provides a simple-to-use framework generating rules for the latest flavour of packet filtering for Linux, known as <em>nftables</em>. It generates a set of incoming rules, outgoing rules, supports a whitelist for ‘friends’ and a blacklist for miscreants. <em>nftfw</em> glues these rules together and loads them into the system’s kernel to act as your firewall.</p>
-<p>There are five control directories in <em>/usr/local/etc/nftfw</em> (or it may be <em>/etc/nftfw</em> on your machine). You tell <em>nftfw</em> to make a rule by adding a file, that’s often empty, to one of these directories. <em>nftfw</em> uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.</p>
+<p>There are five control directories in <em>/etc/nftfw</em> (or it may be <em>/usr/local/etc/nftfw</em> on your machine). You tell <em>nftfw</em> to make a rule by adding a file, that’s often empty, to one of these directories. <em>nftfw</em> uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.</p>
 <p>Here are the directories:</p>
 <ul>
 <li><p><em>incoming.d</em> The incoming directory provides information to permit selected inbound connections through the firewall. It contains files that add rules giving the ports that should be available to external users. When a file has no content, its rule applies to all comers. Adding IP addresses into the file constrains the rule to apply only to those addresses.</p></li>
@@ -107,10 +107,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 id="incoming.d">incoming.d</h3>
 <p>Here’s what is present in the <em>incoming.d</em> directory for a standard installation:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">ls</span> incoming.d</a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="ex">05-essential-icmpv6</span>  10-http   30-imaps  50-smtps</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="ex">05-ping</span>              10-https  40-pop3   50-submission</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="ex">06-ftp-helper</span>        20-ftp    40-pop3s  60-sieve</a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="ex">07-ssh</span>               30-imap   50-smtp   99-reject</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" title="2"><span class="ex">05-ping</span>        10-https        30-imaps  50-smtps</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="ex">06-ftp-helper</span>  20-ftp          40-pop3   50-submission</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="ex">07-ssh</span>         21-ftp-passive  40-pop3s  60-sieve</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">10-http</span>        30-imap         50-smtp   99-drop</a></code></pre></div>
 <p>None of these files have any content, they are just a filename. Each filename is a two digit number, a minus sign and a name. The number provides sorting value for the files and firewall entries made from this setup will appear in the order that you see. As we’ve seen, order is important.</p>
 <p>There are three possible types for ‘name’ section of the filename:</p>
 <ul>
@@ -121,70 +121,66 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>If the name part is a port number or a service name, then <em>nftfw</em> uses the default <em>accept</em> action from <em>rule.d</em> to make the necessary rules. The action is given the port number from the name or from the matching entry in <em>/etc/services</em>. For example, the file <em>10-http</em> will create an accept rule for port 80, <em>10-https</em> will create an accept rule for port 443.</p>
 <p>It could be that you are not using the POP protocol for inbound mail delivery and you can remove <em>40-pop3</em> and <em>40-pop3s</em>. These services will still be available, but perhaps you don’t want to offer them to the world.</p>
 <p>If you want a service only to work for a limited number of specific IP addresses, just add the addresses one per line to the file in <em>incoming.d</em>. You may add a domain name instead of an IP address, and <em>nftfw</em> will lookup the name, translating it to actual IP addresses (both types of address: IPv4 and IPv6 if available). It’s a good idea to run a caching nameserver on your machine if using names, to prevent slower offsite lookups.</p>
-<p>The <em>05-essential-icmpv6</em> is not a service name. It’s an action file in <em>rule.d</em> named <em>essential_icmpv6.sh</em>. Like all the files in <em>rule.d</em>, it’s a shell script, and in this case give some firewall rules that IPv6 uses to make things work.</p>
-<p>The <em>07-ftp-helper</em> file adds in essential glue that makes the <em>ftp</em> server work. It’s not needed it you don’t support <em>ftp</em>.</p>
+<p>The <em>07-ftp-helper</em> is not a service name. It’s an action file in <em>rule.d</em> named <em>ftp-helper.sh</em>. It adds in the essential glue that makes the <em>ftp</em> server work. It’s not needed it you don’t support <em>ftp</em>.</p>
 <p>If you need to create a special script for a standard service, then you can do so. <em>nftfw</em> gives precedence to action files in <em>rule.d</em> with the same name as a service.</p>
 <p>There are several unused rules in the <em>rule.d</em> directory, a text file called <em>README</em> lists them.</p>
 <h3 id="outgoing.d">outgoing.d</h3>
-<p>Here’s what is present in the <em>outgoing.d</em> directory for a standard installation:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="fu">ls</span> outgoing.d</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="ex">05-essential-icmpv6</span>  50-reject-www-data</a></code></pre></div>
+<p>There are no files <em>outgoing.d</em> directory for a standard installation. There are some essential rules built into <em>nftables</em> template for IPv6.</p>
 <p>Files in the directory behave the same as those in <em>incoming.d</em>, except that when they contain IP addresses, then those addresses will match the destination IP address of the packet that’s tested.</p>
 <p>The default setting <em>outgoing.d</em> is: if no rule matches the filtered packet then it’s accepted and passed on. Adding a file that uses a service name or a port number will load a ‘reject’ rule, for example (you may not want to do this):</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">40-ssh</span></a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="ex">42-80</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">40-ssh</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">42-80</span></a></code></pre></div>
 <p>will block your machine from sending to an external <em>sshd</em> server, and also to any external websites. If you want to block access to a specific site offering these services, then you can add IP addresses to the file.</p>
-<p>The <em>reject-www-data</em> rules is taken from Symbiosis and restricts all outgoing packets owned by the user running the web server to the world, unless the server is looking up a name in a remote DNS server. This is a special rule, and adding IP addresses to the file will whitelist them for the web server. The idea is to prevent any possible malicious actor who has taken over your webserver from talking to the outside world.</p>
 <h3 id="blacklist.d">blacklist.d</h3>
 <p>To blacklist an address, create a file in <em>blacklist.d</em> named by the IP address to add the address into the firewall. The <em>touch</em> command is a simple way to make an empty file.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="fu">touch</span> 198.51.100.40 <span class="st">&#39;2001:db8::6|64&#39;</span></a>
-<a class="sourceLine" id="cb4-2" title="2">$ <span class="fu">ls</span> blacklist.d</a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="ex">198.51.100.40</span>   2001:db8::6<span class="kw">|</span><span class="ex">64</span>  203.0.113.204.auto</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="fu">touch</span> 198.51.100.40 <span class="st">&#39;2001:db8::6|64&#39;</span></a>
+<a class="sourceLine" id="cb3-2" title="2">$ <span class="fu">ls</span> blacklist.d</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="ex">198.51.100.40</span>   2001:db8::6<span class="kw">|</span><span class="ex">64</span>  203.0.113.204.auto</a></code></pre></div>
 <p>The first IP address is a version 4 address, and the second a version 6 address. It’s usual to match only the top half of an IPv6 address, this is normally written <code>2001:db8::6/64</code> but we can’t use ‘/’ in a Linux file system, and the convention is to replace this by the vertical bar ‘|’ symbol. Note we have to quote the address when used on the command line. The blacklist scanner (see below) creates files ending in <em>.auto</em>, you should leave these alone, the scanner will take care of them.</p>
 <p>An empty blacklist file will block access to all ports to the IP address given by the name. Adding port numbers into the file, one per line, will restrict access to only those port numbers. The word ‘all’ can also be added, blocking all incoming ports. If a file contains ‘all’, other port numbers are ignored.</p>
-<p>If your system doesn’t have <em>systemd</em> active directory installed, you will need to run</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
+<p>?If your system doesn’t have <em>systemd</em> active directory installed, you will need to run</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
 <p>after you’ve changed the directory contents, or wait for the next automatic update.</p>
 <h3 id="whitelist.d">whitelist.d</h3>
 <p>The whitelist directory follows the same basic pattern used to manage the blacklist directory. To whitelist an address, create a file named by the IP address. The file content can hold ports if you only want to allow access to specific services.</p>
 <p>The whitelist scanner will create files ending in <em>.auto</em>. See below.</p>
 <p>If your system doesn’t have <em>systemd</em> active directory installed, you will need to run</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
 <p>after you’ve changed the directory contents, or wait for the next automatic update.</p>
 <h3 id="blacknets.d">blacknets.d</h3>
 <p>The only rule about filenames in the <em>blacknets.d</em> directory is that they should end with <em>.nets</em>. Each file should contain a list of network address ranges, one per line, in CIDR format. See <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Wikipedia</a> if you need more information on the notation. The files support comments starting with ‘#’.</p>
 <p>Mostly, you can find suitable lists on the web, see <a href="Getting-cidr-lists.md">Getting CIDR Lists</a> for how to install them. However, there’s nothing to stop you creating your own lists.</p>
 <h2 id="starting-with-nftfw">Starting with <em>nftfw</em></h2>
 <p>The root user runs_nftfw_ from the command line to create the firewall:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
 <p>It can be run from the <em>systemd</em> daemon whose <em>nftfw.path</em> service (when installed) triggers a call to <em>nftfw</em> when files change in one of the action directories. As a catch-all, <em>cron</em> will run the command once an hour.</p>
 <p>The <em>load</em> command tries not to make changes to the kernel’s tables unless it has to. It creates a set of files that are needed for the complete ruleset and then compares those files with the set that was made on the last run. If the files are identical, no change is needed. The blacklist and whitelist rule sets can be replaced without changing the whole ruleset. The blacklist rules change most frequently, and an update to the blacklist is done without disturbing the remainder of the firewall. In general, all the rules maintain counts of matches, and these counts are reloaded when the complete firewall is replaced. By updating only parts of the firewall, these counts become a good indicator of activity on your system.</p>
 <p>The <em>-f</em> or <em>–full</em> flag to the <em>load</em> command forces the new files to be loaded without reference to the last run. Consider using the <em>-f</em> flag to force a full reload if you think that the firewall isn’t working.</p>
-<p><em>nftfw</em> uses a configuration file in <em>/usr/local/etc/nftfw/config.ini</em> to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The <em>-i</em> flag to <em>nftfw</em> lists all the values that are in force.</p>
+<p><em>nftfw</em> uses a configuration file in <em>/etc/nftfw/config.ini</em> to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The <em>-i</em> flag to <em>nftfw</em> lists all the values that are in force.</p>
 <p><em>nftfw</em> will write error messages into <em>/var/log/syslog</em> using the standard <em>syslog</em> mechanism. To get an listing of what <em>ntfw</em> is doing, set <em>loglevel</em> in the config file to <em>INFO</em>.</p>
 <p>There are various manual pages - see <a href="man/index.md">Manual page index</a>.</p>
 <p>If you are migrating from another firewall system to <em>nftfw</em>, now’s the time to look at the <a href="Installation.md#migrating-to-nftfw">Migrating to nftfw</a> section of the Installation document.</p>
 <h2 id="blacklist">Blacklist</h2>
 <p><em>nftfw</em> contains a scanner whose job is to watch log files and add offending IP addresses into <em>blacklist.d</em>. The scanner is started by:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="fu">sudo</span> nftfw blacklist</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">sudo</span> nftfw blacklist</a></code></pre></div>
 <p>and that’s usually run from <em>cron</em> every 15 minutes. If it makes any changes, it will reload the firewall, usually only changing the parts of the firewall that it uses.</p>
-<p>The rules for scanning are supplied by a set of files in <em>/usr/local/etc/nftfw/patterns.d</em>. Files here are named by <em>‘pattern-name’.pattern</em>. Here’s part of my <em>apache2.pattern</em> file:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="co">#</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="co">#  The file we scan for patterns</span></a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="fu">file</span>  = /var/log/apache2/access.log</a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="co"># the ports we block, can be the word all</span></a>
-<a class="sourceLine" id="cb9-5" title="5"><span class="ex">ports</span> = 80,443</a>
-<a class="sourceLine" id="cb9-6" title="6"></a>
-<a class="sourceLine" id="cb9-7" title="7"><span class="co">#</span></a>
-<a class="sourceLine" id="cb9-8" title="8"><span class="co">#  The patterns we use</span></a>
-<a class="sourceLine" id="cb9-9" title="9"><span class="ex">__IP__.*wget%20http</span></a>
-<a class="sourceLine" id="cb9-10" title="10"><span class="ex">__IP__.*XDEBUG_SESSION_START</span>=phpstorm.*$</a>
-<a class="sourceLine" id="cb9-11" title="11"><span class="ex">__IP__.*</span> CONNECT .*$</a>
-<a class="sourceLine" id="cb9-12" title="12"><span class="ex">__IP__.*%20UNION.*</span>$</a></code></pre></div>
+<p>The rules for scanning are supplied by a set of files in <em>/etc/nftfw/patterns.d</em>. Files here are named by <em>‘pattern-name’.pattern</em>. Here’s part of my <em>apache2.pattern</em> file:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="co">#</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="co">#  The file we scan for patterns</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="fu">file</span>  = /var/log/apache2/access.log</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co"># the ports we block, can be the word all</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="ex">ports</span> = 80,443</a>
+<a class="sourceLine" id="cb8-6" title="6"></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="co">#</span></a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="co">#  The patterns we use</span></a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="ex">__IP__.*wget%20http</span></a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="ex">__IP__.*XDEBUG_SESSION_START</span>=phpstorm.*$</a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="ex">__IP__.*</span> CONNECT .*$</a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="ex">__IP__.*%20UNION.*</span>$</a></code></pre></div>
 <p>Comments are useful, and comment lines are shown by putting a # at the start of the line.</p>
 <p>The file is split into two sections. The first couple of statements set the file to be scanned and the ports to be blocked if this pattern is matched. The rest of the file contains several regular expressions that match lines in the logfile.</p>
 <p>The file statement can contain shell ‘glob’ patterns, for example on a Symbiosis/Sympl system, you can scan all the website log files by using:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="va">file=</span>/srv/*/public/logs/access.log</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="va">file=</span>/srv/*/public/logs/access.log</a></code></pre></div>
 <p>When scanning files, <em>nftfw</em> remembers the last position it reached in the a file and restarts from that position. When adding a new expression to capture some bad line you’ve spotted in a log, it can sometimes be confusing that the bad guy doesn’t suddenly appear in the blacklist. <em>nftfw</em> supplies a way round this using the ‘ports’ statement, see below.</p>
 <p>The regular expressions contain the ‘magic’ string <code>__IP__</code> (two underscores at each end) matching an IPv4 or IPv6 address in the line. If you are a <em>regex</em> novice, then <code>.*</code> matches ‘anything’ and the <code>$</code> matches the end of the line. Most matches can be specified using these simple constructs. Character case is ignored when the expression is matched against lines from the file.</p>
 <p>Regular expressions use several characters to mean something special, and if you want to match these characters in a line from a log then they must be preceded by a back-slash (). The characters are:</p>
@@ -195,41 +191,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>When <em>nftfw</em> finds a match, it stores the IP address, the ports, the time of first encounter, the time of last encounter and the matching pattern name in a database. It also stores a running count of matches found and the number of ‘incidents’, the latter is the number of runs of the scanner it has taken to make the match count.</p>
 <p>If the match count is over a threshold number, defaulting to 10, and settable in the <em>config.ini</em> file, the scanner will add a file to the <em>blacklist.d</em> directory, triggering a run of <em>nftfw load</em> to put the ip address into the blacklist blocking against the nominated ports. When the match count gets over a second threshold, default 100, and also settable in <em>config.ini</em>, the blacklist entry is promoted to blocking all ports.</p>
 <p>The current state of the blacklist can be seen by using</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1">$ <span class="ex">nftfwls</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="ex">nftfwls</span></a></code></pre></div>
 <p>and the <em>-a</em> option to this command lists all the entries in the database. <em>nftfwls</em> has a manual page, see the <a href="man/index.md">Manual page index</a>.</p>
 <h3 id="the-portsupdate-option">The ports=update option</h3>
 <p>Once in the firewall, miscreant sites will continue to knock at the door. They are generally robots, and it’s good to know if they are still knocking so we can keep them in the firewall. A firewall rule with logging will write a record into <em>/var/log/syslog</em> and the database is updated using the special port value of <em>update</em>. Here’s <em>blacklist-update.pattern</em>:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="co">#  Blacklist feedback pattern</span></a>
-<a class="sourceLine" id="cb13-2" title="2"><span class="co">#</span></a>
-<a class="sourceLine" id="cb13-3" title="3"><span class="co">#  The file we scan for patterns</span></a>
-<a class="sourceLine" id="cb13-4" title="4"><span class="co">#</span></a>
-<a class="sourceLine" id="cb13-5" title="5"><span class="fu">file</span>  = /var/log/syslog</a>
-<a class="sourceLine" id="cb13-6" title="6"><span class="co">#  Just update the database</span></a>
-<a class="sourceLine" id="cb13-7" title="7"><span class="ex">ports</span> = update</a>
-<a class="sourceLine" id="cb13-8" title="8"></a>
-<a class="sourceLine" id="cb13-9" title="9"><span class="co">#</span></a>
-<a class="sourceLine" id="cb13-10" title="10"><span class="co">#  The patterns we use</span></a>
-<a class="sourceLine" id="cb13-11" title="11"><span class="co">#  depends on Blacklist Logging in place</span></a>
-<a class="sourceLine" id="cb13-12" title="12"><span class="ex">.*kernel.*Blacklist.*SRC</span>=__IP__.*$</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="co">#  Blacklist feedback pattern</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="co">#</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="co">#  The file we scan for patterns</span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="co">#</span></a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="fu">file</span>  = /var/log/syslog</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="co">#  Just update the database</span></a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="ex">ports</span> = update</a>
+<a class="sourceLine" id="cb12-8" title="8"></a>
+<a class="sourceLine" id="cb12-9" title="9"><span class="co">#</span></a>
+<a class="sourceLine" id="cb12-10" title="10"><span class="co">#  The patterns we use</span></a>
+<a class="sourceLine" id="cb12-11" title="11"><span class="co">#  depends on Blacklist Logging in place</span></a>
+<a class="sourceLine" id="cb12-12" title="12"><span class="ex">.*kernel.*Blacklist.*SRC</span>=__IP__.*$</a></code></pre></div>
 <p>when detected, the port action just updates the database counts and time, so you can track if the bad sites have really gone away.</p>
 <h3 id="testing-regular-expressions">Testing regular expressions</h3>
 <p>It’s often the case that you see a line in a logfile and think ‘I ought to have a rule for that’. Testing the new line you’ve just added can be difficult because the logfile reader remembers file positions and won’t see the line again unless the action re-occurs.</p>
 <p><em>nftfw</em> can use a special pattern file, setting <em>ports=test</em>, that allows you to test the regular expression against some known content to see if it matches. Copy the pattern file that you want check out to a new file, here’s a copy of <em>apache2.pattern</em> in <em>apache2-test.pattern</em>.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="co">#</span></a>
-<a class="sourceLine" id="cb14-2" title="2"><span class="co">#  The file we scan for patterns</span></a>
-<a class="sourceLine" id="cb14-3" title="3"><span class="fu">file</span>  = /var/log/apache2/access.log</a>
-<a class="sourceLine" id="cb14-4" title="4"><span class="co"># the ports we block, can be the word all</span></a>
-<a class="sourceLine" id="cb14-5" title="5"><span class="ex">ports</span> = test</a>
-<a class="sourceLine" id="cb14-6" title="6"></a>
-<a class="sourceLine" id="cb14-7" title="7"><span class="co">#</span></a>
-<a class="sourceLine" id="cb14-8" title="8"><span class="co">#  The patterns we use</span></a>
-<a class="sourceLine" id="cb14-9" title="9"><span class="ex">__IP__.*TESTING</span> EXPRESSION</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="co">#</span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="co">#  The file we scan for patterns</span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="fu">file</span>  = /var/log/apache2/access.log</a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="co"># the ports we block, can be the word all</span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="ex">ports</span> = test</a>
+<a class="sourceLine" id="cb13-6" title="6"></a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="co">#</span></a>
+<a class="sourceLine" id="cb13-8" title="8"><span class="co">#  The patterns we use</span></a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="ex">__IP__.*TESTING</span> EXPRESSION</a></code></pre></div>
 <p>The blacklist scanner will ignore any pattern file with <em>ports=test</em>, but it can be used with the single package selection option to <em>nftfw</em>. Here’s the testing command:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> nftfw -x -p apache2-test blacklist</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1">$ <span class="fu">sudo</span> nftfw -x -p apache2-test blacklist</a></code></pre></div>
 <p>will use data from <em>apache2-test.pattern</em> and will scan the named log file. The <em>-x</em> flag scans the log file from the beginning and will not update the stored file position. The command will print a table with any matching IP addresses, along with a match count. The command can be re-run if matches fail after adjusting the regular expression in the pattern file.</p>
 <h2 id="whitelist">Whitelist</h2>
 <p>The whitelist scanner is started by</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> nftfw whitelist</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> nftfw whitelist</a></code></pre></div>
 <p>and is usually run from <em>cron</em> every 15 minutes, usually 5 minutes after the blacklist run. If it makes any changes, it will reload the firewall, usually only changing the parts of the firewall that it uses.</p>
 <p>It’s job is a little simpler than the task faced by the blacklist, it adds the IP addresses used by users of the machine that have logged in from a global IP address into the <em>whitelist.d</em> directory.</p>
 <p>The whitelist command looks in the system’s <em>wtmp</em> file that records all user logins and system reboots. It can be set to look in the <em>wtmp</em> file that just contains today’s activity by changing the <em>wtmp</em> value in _config.</p>
@@ -246,7 +242,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>COUNTER - adds the ‘counter’ statement to the rule. The value is usually empty, or the word ‘counter’</li>
 <li>LOGGER - Finally the LOGGER value is either empty or contains ‘log prefix “String”’, adding a space after any supplied string from <em>nftfw</em>.</li>
 </ul>
-<p>There are several examples of these scripts in the <em>/usr/local/etc/nftfw/rule.d</em> and the README file in that directory explains what they do.</p>
+<p>There are several examples of these scripts in the <em>/etc/nftfw/rule.d</em> and the README file in that directory explains what they do.</p>
+<h2 id="rules---local.d">Rules - local.d</h2>
+<p>If you want to supply your own rules, or override standard rules in <em>rule.d</em>, new and alternative rules can be placed in <em>local.d</em>.</p>
 <h2 id="other-documents">Other documents</h2>
 <p>All documents can be found on the web from the <a href="https://nftfw.uk"><em>nftfw</em> website</a>.</p>
 <p>See documents in the <em>docs</em> directory:</p>

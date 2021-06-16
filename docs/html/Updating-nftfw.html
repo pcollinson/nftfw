@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Updating nftfw</title>
+  <title>Updating nftfw manual installations</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -79,9 +79,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </head>
 <body>
 <header>
-<h1 class="title">Updating nftfw</h1>
+<h1 class="title">Updating nftfw manual installations</h1>
 </header>
-<h1 id="updating-nftfw">Updating nftfw</h1>
+<h1 id="updating-nftfw-manual-installations">Updating nftfw manual installations</h1>
 <h2 id="get-current-version">Get current version</h2>
 <p>If you’ve installed <em>nftfw</em> from a zip or tar file, then revisit the github pages and pull the current version. Unpack and install the files.</p>
 <p>If you used <em>git</em>, then change to the your <em>nftfw</em> source directory and</p>
@@ -105,6 +105,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="re-run-the-install.sh-script">Re-run the Install.sh script</h2>
 <p>Will update files in your <em>etc/nftfw</em> directory, but will not touch any working files. The <em>original</em> directory may contain changes that are useful to you. You can use <em>diff</em> to compare your working versions with files in the <em>original</em> directory.</p>
 <p>The [Incron] section in the <em>config.ini</em> file can be deleted as it’s no longer used.</p>
+<h2 id="changes-for-nftfw-version-0.8-and-onwards">Changes for <em>nftfw</em> version 0.8 and onwards</h2>
+<p>Summary of changes from 0.7 requiring some reconfiguration:</p>
+<ul>
+<li>Edit config.ini to remove: [Owner] section - ownership of files created in etc/nftfw now taken from owner of that directory nftfw_base - nftfw now uses it’s own control files</li>
+<li><em>etc/nftfw/original</em> renamed <em>etc/nftfw/etc_nftfw</em></li>
+<li>Change to nftfw_init.nft to include essential ipv6 icmp coding. Change to <em>rule.d/essential-icmpv6.sh</em>. Can remove reference to this rule in incoming.d and outgoing.d.</li>
+<li>Updated regular expressions in exim4.patterns - now find IP addresses correctly</li>
+<li>Local action rules should be placed in <em>/etc/nftfw/local.d</em>, so that _/rule.d can be updated by distributions.</li>
+</ul>
+<p>Other changes:</p>
+<ul>
+<li>New import_tool to import Symbiosis/Sympl configs</li>
+<li>New Uninstall.sh to remove manual installation</li>
+<li>Many documentation changes - example files now shown relative to filesystem root - e.g <em>/etc/nftfw</em> rather than <em>/usr/local/etc/nftfw</em>.</li>
+</ul>
 <h2 id="changes-for-nftfw-version-0.7-and-onwards">Changes for <em>nftfw</em> version 0.7 and onwards</h2>
 <p><em>nftfw</em> has gained a new control directory <em>etc/nftfw/blacknets.d</em> which allows you to install files of IP address ranges coded as using CIDR notation. The <em>blacknets</em> system provides blocking of a large number of IP networks based on lists of addresses. It can be used to keep whole countries out, or stop access from large organisations with complex address ranges. There’s a document <a href="Getting-cidr-lists.md">Getting CIDR lists</a> explaining how to get the country lists onto your system. There are other sources of bulk blacklists.</p>
 <p>To support the new category of blocking there are some changes to <em>etc/nftfw/nftfw_init.nft</em> that need to be installed, when updating - remember to run the <em>Install.sh</em> script and then copy <em>etc/nftfw/originals/nftfw_init.nft</em> to <em>etc/nftfw/nftfw_init.nft</em>. If you’ve made changes to the installed file, you’ll need to edit them in again. It’s wise then run</p>

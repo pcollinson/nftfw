@@ -67,7 +67,7 @@ class ListReader:
 
         self.cf = cf
         self.listname = listname
-        self.path = cf.nftfwpath(listname)
+        self.path = cf.etcpath(listname)
         self.srcdict = self.loadfile()
         if need_compiled_ix:
             self.records = self.compileix(self.srcdict)
@@ -100,7 +100,7 @@ class ListReader:
         # followed optionally by .auto
         strict = re.compile(r'([0-9a-f.:]*?)(\|[0-9]{1,2})?(?:\.auto)?$', re.I)
         srcdict = {}
-        for p in self.path.glob('[0-9a-z]*'):
+        for p in sorted(self.path.glob('[0-9a-z]*')):
             ma = strict.match(p.name)
             if ma is not None and p.is_file():
                 key = ma.group(1)

@@ -79,61 +79,26 @@ Successfully installed nftfw-<version>
 ```
 _pip3_ may complain about being run as the superuser, it's safe to ignore that warning.
 
+Install _nftfw_ infrastructure,  without any user interaction:
+
+``` sh
+$ cp Autoinstall.default Autoinstall.conf
+```
+edit the _AUTO_USER_ line to the user you want to use own the files in _etc/nftfw_. The _Autoinstall.conf_ file will be ignored by _git_ so this script can be used to update any future releases.
+
 Install _nftfw_ infrastructure:
 
 ``` sh
 $ sudo sh Install.sh
 ```
-Answers for default installation:
+
+If you've not created _Autoinstall.conf_, the Install.sh will ask some
+questions. Answers for default installation:
 - _Install under /usr/local?_ yes
 - _See the files installed?_ your choice
 - _Install?_ yes
 - _User to replace root?_ 'admin' for Symbiosis, 'sympl' for Symbl, 'return' for root on other systems
 - _Install Manual pages?_ yes
-
-Alternatively, without any user interaction:
-
-``` sh
-$ cp Autoinstall.default Autoinstall.conf
-# sudo sh Install.sh
-```
-edit the _AUTO_USER_ line to the user you want to use own the files in _etc/nftfw_ and run the script as above. The _Autoinstall.conf_ file will be ignored by _git_ so this script can be used to update any future releases.
-
-## Setting up _config.ini_
-Edit _/usr/local/etc/nftfw/config.ini_. Change: ([Explanation](Installation.md#paying_attention_to_configini))
-
-``` text
-[Owner]
-;owner=root
-```
-remove the semi-colon and after the = add the user you selected when installing the files.
-
-Change the logging level for now: Change
-
-``` text
-#  what level are we logging at
-#  needs to be a level name not a value
-#  CRITICAL, ERROR, WARNING, INFO, DEBUG
-;loglevel = ERROR
-```
-
-remove the semi-colon, and change ERROR to INFO.
-
-The file  _/etc/nftables.conf_ is used by the standard _nftables_ service to load tables at start-up and service reset. If you are performing a vanilla install and you don't have a working firewall, then you need to ensure that _nftfw_ will create the file in _/etc_.
-
-In the _Locations_ section change
-
-``` text
-
-#  Location of system nftables.conf
-#  Usually /etc/nftables.conf
-;nftables_conf = ${root}/etc/nftables.conf
-
-```
-
-remove the semi-colon, and ```${root}``` leaving _/etc/nftables.conf_.
-
-If you have a working firewall, with  _/etc/nftables.conf_  in use, it's suggested that you take care not to overwrite the file at this stage. Remove the semi-colon, and ```${root}``` and replace ```/etc/nftables.conf``` by ```/etc/nftables.conf.new```. This avoids writing over the current _/etc/nftables.conf_.
 
 ## Disable cron and incron actions for Sympl or Symbiosis
 
@@ -300,7 +265,7 @@ This will add country detection to _nftfwls_, which is optional but desirable. S
 
 ## Configuring the firewall
 
-_nftfw_ is distributed with only essential IPV6 rules specified for outbound packets. The set of inbound rules are aimed at permitting access to _ssh_, _http_ and _https_, _ftp_ and various email ports. The incoming _ftp_ rules are designed to support _Pure FTP_. Firewall configuration is a matter of creating or deleting files in the various directories in _/usr/local/etc/nftfw_. You probably need to change settings for your system. Scan through the  [How do I.. or a User's Quick Guide](How_do_I.md) document for a quick start on setting up access for your needs.
+_nftfw_ is distributed with no rules specified for outbound packets (the _nftfw_init.nft_ file has some builtin default rules. The set of inbound rules are aimed at permitting access to _ssh_, _http_ and _https_, _ftp_ and various email ports. The incoming _ftp_ rules are designed to support _Pure FTP_. Firewall configuration is a matter of creating or deleting files in the various directories in _/usr/local/etc/nftfw_. You probably need to change settings for your system. Scan through the  [How do I.. or a User's Quick Guide](How_do_I.md) document for a quick start on setting up access for your needs.
 
 
 ## Sympl users: Update your mail system after installation

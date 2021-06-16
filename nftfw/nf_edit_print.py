@@ -40,7 +40,7 @@ class PrintInfo:
               or None
         """
 
-        blacklistpath = self.cf.nftfwpath('blacklist')
+        blacklistpath = self.cf.etcpath('blacklist')
         if '/' in ipstr:
             ipstr = ipstr.replace('/', '|')
         filepath = blacklistpath / ipstr

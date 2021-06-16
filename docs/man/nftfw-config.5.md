@@ -27,28 +27,14 @@ These two variables contain the control and working files for the system:
       sysvar = ${root}/var/lib/nftfw
 
 _nftables_conf_
-**nftfw** needs to know where the system stores the main _nftables.conf_ file. If installing a  new system into root (/) you may wish to change this value to prevent **nftfw** from overwriting an extant file. Conversely, if installing a new system into _/usr/local/etc_,  you will need to change this value when things are working to make sure that **nftfw** writes its settings in the correct place.
+**nftfw** needs to know where the system writes _nftables.conf_ file that provides input to _nftables_ on system reboot. On installation, the file is written into _/etc/nftfw_ for safety. The variable needs changing to _/etc/nftables.conf_ when the system is live.
 
-      nftables_conf = $(root}/etc/nftables.conf
+      nftables_conf = ${sysetc}/etc/nftables.conf
 
 _nftfw_init_
 The location for the initial nft setup file containing the framework used by the firewall.
 
       nftfw_init = ${sysetc}/nftfw_init.nft
-
-_nftfw_base_
-*nftfw* expects to find the five working directories, _incoming.d_, _outgoing.d_, _blacklist.d_, _whitelist.d_ and _patterns.d_ under this directory. It you want to run the system from the  Symbiosis control directory, then the _nftfw_base_ option needs to be changed from the default to _/etc/symbiosis/firewall_. You'll need to create a _blacknets.d_ directory. *Nftfw* expects to find its _rule.d_ directory in its own _sysetc_ directory. Symbiosis files in _firewall/local.d_ are not supported by this system. To provide local changes, edit _/etc/nftfw_init.nft_.
-
-      nftfw_base = ${sysetc}
-
-**\[Owner]**
-
-_owner_, _group_
-The _owner_ variable needs to be set to the username of the owner of the files in _${sysetc}/nftfw_. The intention is to allow a user to have easy non-root access to control the firewall. If the _group_ variable is empty, the group will be set to the main group of the owner, but can be set to another group if this assists. The blacklist and whitelist scanners will make files owned by the user in their control directories. The default is to use the root user.
-
-       owner=root
-       group
-
 
 **\[Rules]**
 
@@ -70,9 +56,9 @@ Set the format of log statements (see the Python _logging_ documentation for pos
       logfmt = nftfw[%(process)d]: %(message)s
 
 _loglevel_
-Sets the level are we logging at, this value needs to be a level name not a value. Choose  one of CRITICAL, ERROR, WARNING, INFO, DEBUG.  **nftfw** uses the **-v** flag to the set this value to INFO.
+Sets the level are we logging at, this value needs to be a level name not a value. Choose  one of CRITICAL, ERROR, WARNING, INFO, DEBUG.  **nftfw** uses the **-v** flag to the set this value to INFO. On installation, the log level is set to INFO and can be changed to ERROR to reduce information written into the logs.
 
-      loglevel = ERROR
+      loglevel = INFO
 
 _logfacility_
 The logging facility are we using, it needs to be a facility name not a value.
@@ -166,9 +152,9 @@ _sync_check_
 **\[Nftfwls]**
 
 _date_fmt_
-Allows change of date format for _nftfwls_. The default is  DD-MM-YYYY HH:MM:SS. I'm using a two digit year number.
+Allows change of date format for _nftfwls_. The default is  DD-MM-YYYY HH:MM.
 
-      date_fmt = %d-%m-%Y %H:%M:%S
+      date_fmt = %d-%m-%Y %H:%M
 
 _pattern_split_
 Replaces any commas in the pattern listing column by a newline and a space, reducing output width on the terminal output. Can be overridden by _-p_ option to _nftfwls_.
@@ -185,16 +171,16 @@ Sample entries are supplied in the distributed file, and require un-commenting b
       ;Barracuda=b.barracudacentral.org
       ;SpamCop=bl.spamcop.net
 
-FILES
+Files
 =====
 
-Files can be located in _/_ rather than _/usr/local_.
+Files can be located in _/usr/local_ rather than under_/_.
 
-_/usr/local/etc/nftfw_
+_/etc/nftfw_
 
 :   Location of  control files
 
- _/usr/local/var/lib/nftfw/_
+ _/var/lib/nftfw/_
 
 :   Location of *build*, *install*, lock file and sqlite3 databases storing file positions and blacklist information
 

@@ -1,11 +1,11 @@
 % Getting CIDR lists
 #  Getting CIDR lists
 
-You will want to get hold of lists of IP addresses if you want to use the _blacknets_ feature of _nftfw_ (v0.7.0 or later) to block access from certain countries or IP address ranges. If you want to use this system, check the version of _nftfw_ you have installed, see [How to check on your _nftfw_ version](#how-to-check-your-nftfw-version) at bottom of this page.
+You will want to get hold of lists of IP addresses if you want to use the _blacknets_ feature of _nftfw_ (v0.7.0 or later) to block access from certain countries or IP address ranges. If you want to use this system, check that the version of _nftfw_ you have installed is configured to support it, see [How to check _nftfw_ supports_blacknets](#how-to-check-nftfw-supports-blacknets) at bottom of this page.
 
 To use _blacknets_, you need a file or files containing IP networks, one per line, using 'CIDR' notation. See [Wikipedia](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation) if you need more information on CIDR.
 
-There are several sources for this information, I've used two. There are undoubtedly others.
+There are several sources for lists of networks by country, I've used two.
 
 ## ip2location.com
 
@@ -54,12 +54,12 @@ I run mine an hour after the weekly run of _geoipupdate_, so please do choose th
 
 Return to the _nftfw_ distribution and find the _cidrlist_ directory again. The ```getcountrynet``` script uses the database installed in Step 1 to create a country CIDR file. Install the script:
 ``` sh
-$ sudo cp getcountrynet /usr/local/etc/nftfw
-$ cd /usr/local/etc/nftfw
+$ sudo cp getcountrynet /etc/nftfw
+$ cd /etc/nftfw
 $ sudo chown USER.USER getcountrynet
 $ sudo chmod +x getcountrynet
 ```
-The USER.USER here should be whoever owns the _/usr/local/etc/nftfw_ directory. I've installed my command file in this directory on the grounds of 'keeping everything together', but you can put it anywhere that's convenient.
+The USER.USER here should be whoever owns the _/etc/nftfw_ directory (may be _/usr/local/etc/nftfw_ on your machine). I've installed my command file in this directory on the grounds of 'keeping everything together', but you can put it anywhere that's convenient.
 
 Now run the script as the owner of the directory or use sudo and change ownership afterwards. To run, you can give it any number of two letter ISO country codes and it will create a matching file in _blacknets.d_.
 ``` sh
@@ -77,22 +77,22 @@ $ sudo nftfw -f load
 ```
 Finally tell _cron_ to run the ```getcountrynet``` script. Again, I've added a new line to the _/etc/cron.d/geoipupdate_ adding:
 ``` sh
-55 7 	* * 3	USER /usr/local/etc/getcountrynet COUNTRIES
+55 7 	* * 3	USER /etc/nftfw/getcountrynet COUNTRIES
 ```
 the USER should be whoever owns the files, and the arguments should match the ones you typed in earlier.
 
-## How to check  your _nftfw_ version
+## How to check _nftfw_ supports blacknets
 
-The _blacknets_ feature from v0.7.0 of _nftfw_ requires a change in the firewall template file _/usr/local/etc/nftfw/nftfw_init.nft_. You may need to check you've updated the _nftfw_init.nft_ file before running _nftfw_ with the CIDR files. This file requires updating by hand, and you may have not installed it.
+The _blacknets_ feature from v0.7.0 of _nftfw_ requires a change in the firewall template file _/etc/nftfw/nftfw_init.nft_. You may need to check you've updated the _nftfw_init.nft_ file before running _nftfw_ with the CIDR files. This file requires updating by hand, and you may have not installed it.
 
 It the file doesn't contain the string _blacknets_, then you need to update it.
 ``` sh
-$ cd /usr/local/etc/nftfw
+$ cd /etc/nftfw
 $ grep blacknets nftfw_init.nft
 ```
 If the command gives no output, check the copy of the file in the _etc_nftfw_ directory using _grep_.
 ``` sh
-$ grep blacknets etc_nftfw/nftfw_init.nft
+$ grep blacknets /etc/nftfw/etc_nftfw/nftfw_init.nft
 ```
 If this gives output, then copy the _originals_ file over your running version, carefully re-applying any changes you've made.
 

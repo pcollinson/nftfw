@@ -92,7 +92,7 @@ class NetReader:
         else:
             self.cachepath = Path(cachefile)
 
-        blacknets_d = cf.nftfwpath(listname)
+        blacknets_d = cf.etcpath(listname)
 
         # safety - check that the blacknets.d directory exists
         if not blacknets_d.exists():
@@ -223,7 +223,7 @@ class NetReaderFromFiles:
         """
 
         self.cf = cf
-        blacknets_d = cf.nftfwpath(listname)
+        blacknets_d = cf.etcpath(listname)
         # re used to remove comments
         self.commentre = re.compile(r'^(.*?)#.*$')
 

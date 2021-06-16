@@ -40,8 +40,11 @@ files for blacklist; and
 .IP \[bu] 2
 \f[I]rule.d\f[] \- hold files for generating \f[B]nft\f[] commands from
 rule names.
+.IP \[bu] 2
+\f[I]local.d\f[] \- locally installed or modified rules should be placed
+here to allow for distributions to update rules
 .PP
-Distributed files can be found in \f[I]etc/nftfw/etc_nftfw\f[].
+The distributed files can be found in \f[I]etc/nftfw/etc_nftfw\f[].
 .SS incoming and outbound
 .PP
 Files in these directories specify rules for the firewall.
@@ -70,8 +73,8 @@ The \f[I]config.ini\f[] file contains variables that select the default
 rule based on the directory name (see nftfw\-config(1)).
 .PP
 To allow rules to have the same name as services and replace the default
-action, \f[B]nftfw\f[] searches the rule directory for name matches
-before querying the service file.
+action, \f[B]nftfw\f[] searches the local.d and then the rule.d
+directories for name matches before querying the service file.
 .PP
 Files are usually empty, but can contain a list of IP addresses (one per
 line) that \f[B]nftfw\f[] uses to specify the source IP or IPs for an
@@ -123,12 +126,11 @@ of IP addresses without reloading the whole firewall.
 .PP
 Files in this directory make nftables rules in a single set that block
 ranges of IP addresses.
-To be included, a file must end in \f[I].nets\f[].
+Files not ending in \f[I].nets\f[] are ignored.
 .PP
 Each file contains a list of IP network addresses, expressed in CIDR
 notation, one to a line.
-The file can also contain comments with the usual use of # to indicate
-them.
+The file can also contain comments with the usual use of # to show them.
 Lines can contain the following formats:
 .RS
 .PP
@@ -248,8 +250,8 @@ The command can be re\-run if matches fail after adjusting the regular
 expression in the pattern file.
 .SS rule.d
 .PP
-The \f[I]rule\f[] directory contains small shell scripts that translate
-firewall actions named in the \f[I]incoming.d\f[] and
+The \f[I]rule.d\f[] directory contains small shell scripts that
+translate firewall actions named in the \f[I]incoming.d\f[] and
 \f[I]outgoing.d\f[] directories into nftables command lines.
 Default rules are also used for the whitelist and blacklist generation.
 Note the coding and management of these files are different from
@@ -291,6 +293,13 @@ address.
 .PP
 A rule script will usually create a simpler version of the command when
 called with no ports.
+.SS \f[I]local.d\f[]
+.PP
+The \f[I]local.d\f[] is the place to add locally modified and created
+rules.
+The directory allows distributions to update \f[I]rule.d\f[].
+\f[I]local.d\f[] is searched before \f[I]rule.d\f[] when looking for
+rules.
 .SS \f[I]config.ini\f[]
 .PP
 The \f[I]etc\f[] directory contains the \f[I]config.ini\f[] file for
@@ -307,9 +316,8 @@ the build process.
 The file is user\-editable, allowing the framework to be changed.
 The basic setup assumes that it's running on a system with a single
 network connection attached to the internet.
-See the example supplied in
-\f[I]etc/nftfw/etc_nftfw/nftfw_router_example\f[] which provides a
-router setup with WAN and LAN connections using \f[I]nat\f[] and
+See the example supplied in \f[I]nftfw_router_example\f[] which provides
+a router setup with WAN and LAN connections using \f[I]nat\f[] and
 \f[I]forward\f[] tables.
 .SS \f[I]etc_nftfw\f[] directory or symlink
 .PP
@@ -351,7 +359,7 @@ The nftfwls(1) command prints its contents.
 command to store the last known position in the log files that it scans.
 .IP \[bu] 2
 \f[I]whitelist_scan\f[] \- is an empty file, the whitelist command sets
-its modification date registering the last run time that the system was
+its modification date registering the last run time that the command was
 run.
 The command uses the time to skip over processed entries in the
 \f[I]wmtp\f[] file
@@ -370,11 +378,9 @@ On the last action, lock owner deletes the queue file.
 .IP \[bu] 2
 \f[I]queue.lock\f[] \- is a lock file controlling access to the queue
 file.
-.PP
-Contents of build etc
 .SH FILES
 .PP
-Files can be located in \f[I]/usr/local\f[].
+Files can be located under \f[I]/usr/local\f[].
 .TP
 .B \f[I]/etc/nftfw\f[]
 Location of control files
@@ -382,7 +388,7 @@ Location of control files
 .RE
 .SH BUGS
 .PP
-See GitHub Issues: <https://github.com/pcollinson/nftfw/issues>
+See GitHub Issues: ``<https://github.com/pcollinson/nftfw/issues>
 .SH AUTHOR
 .PP
 Peter Collinson (huge credit to the ideas from Patrick Cherry's work for

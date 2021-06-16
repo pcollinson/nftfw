@@ -8,8 +8,7 @@ NAME
 DESCRIPTION
 =========
 
-This page documents the file formats used in the **nftfw** firewall system.  The system stores
-various control files in _/etc/nftfw_ or _/usr/local/etc/nftfw_ depending on the installation.
+This page documents the file formats used in the **nftfw** firewall system.  The system stores various control files in _/etc/nftfw_ or _/usr/local/etc/nftfw_ depending on the installation.
 
 The _etc/nftfw_ directory contains:
 
@@ -22,8 +21,9 @@ The _etc/nftfw_ directory contains:
 -  _blacknets.d_ - contains lists of network address ranges allowing bulk blocking;
 -  _patterns.d_ - contain pattern files for matching lines in log files for blacklist; and
 -  _rule.d_  - hold  files for generating **nft** commands from rule names.
+-  _local.d_ - locally installed or modified rules should be placed here to allow for distributions to update rules
 
-Distributed files can be found in _etc/nftfw/etc_nftfw_.
+The distributed files can be found in _etc/nftfw/etc_nftfw_.
 
 incoming and outbound
 ----------------------
@@ -41,7 +41,7 @@ Descriptions can be:
 
 When port numbers appear in the filename, the directory name dictates the action file applied for the rule. The _config.ini_ file contains variables that select the default rule based on the directory name (see nftfw-config(1)).
 
-To allow rules to have the same name as services and replace the default action, **nftfw** searches the rule directory for name matches  before querying the service file.
+To allow rules to have the same name as services and replace the default action, **nftfw** searches the local.d and then the rule.d directories for name matches before querying the service file.
 
 Files are usually empty, but can contain a list of IP addresses (one per line) that **nftfw** uses to specify the source IP or IPs for an incoming rule, or the destination IP or IPs for the outbound rule. For example,  supplying a list of known IP addresses  for the standard ssh(1) service will prevent tiresome exhaustive attempts to get passwords.  Local users can access ssh(1) from unknown addresses using the knowledge of a random port number given by another rule.
 
@@ -68,9 +68,9 @@ When building the firewall from these two directories, **nftfw** writes the IP a
 
 blacknets.d
 ----------
-Files in this directory make nftables rules in a single set that block ranges of IP addresses. To be included, a file must end in _.nets_.
+Files in this directory make nftables rules in a single set that block ranges of IP addresses. Files not ending in _.nets_ are ignored.
 
-Each file contains a list of IP network addresses, expressed in CIDR notation, one to a line. The file can also contain comments with the usual use of # to indicate them. Lines can contain the following formats:
+Each file contains a list of IP network addresses, expressed in CIDR notation, one to a line. The file can also contain comments with the usual use of # to show them. Lines can contain the following formats:
 
 > \# IPv4 CIDR
 > 203.0.113.0/24
@@ -128,7 +128,7 @@ will use data from _pattern-test.pattern_  and will scan the named log file (or 
 
 rule.d
 -----
-The _rule_ directory contains small shell scripts that translate firewall actions named in the _incoming.d_ and _outgoing.d_ directories into nftables command lines. Default rules are also used for the whitelist and blacklist generation. Note the coding and management of these files are different from Symbiosis, but the same idea is there, a shell file allows easy additions by users. The files do not run any commands, they output _nftables_ statements to _nftfw_ which stores them and passes the file into the _nft_ command.
+The _rule.d_ directory contains small shell scripts that translate firewall actions named in the _incoming.d_ and _outgoing.d_ directories into nftables command lines. Default rules are also used for the whitelist and blacklist generation. Note the coding and management of these files are different from Symbiosis, but the same idea is there, a shell file allows easy additions by users. The files do not run any commands, they output _nftables_ statements to _nftfw_ which stores them and passes the file into the _nft_ command.
 
 Filenames have the format:
 
@@ -149,6 +149,11 @@ The pattern script uses the DIRECTION parameter in both incoming and outgoing co
 
 A rule script will usually create a simpler version of the command when called with no ports.
 
+_local.d_
+--------
+
+The _local.d_ is the place to add locally modified and created rules. The directory allows distributions to update _rule.d_. _local.d_ is searched before _rule.d_ when looking for rules.
+
 _config.ini_
 ----------
 
@@ -159,7 +164,7 @@ _nftfw_init.nft_
 
 The file _nftfw_init.nft_ contains the template rule set for nftables, it's used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. **nftfw** copies the file into the build directory at the start of the build process.
 
-The file is user-editable, allowing the framework to be changed. The basic setup assumes that it's running on a system with a single network connection attached to the internet. See the example supplied in _etc/nftfw/etc_nftfw/nftfw_router_example_ which provides a router setup with WAN and LAN connections using _nat_ and _forward_ tables.
+The file is user-editable, allowing the framework to be changed. The basic setup assumes that it's running on a system with a single network connection attached to the internet. See the example supplied in _nftfw_router_example_ which provides a router setup with WAN and LAN connections using _nat_ and _forward_ tables.
 
 _etc_nftfw_ directory or symlink
 -----------------
@@ -176,17 +181,16 @@ The _lib/nftfw_ directory provides working space for the system. It contains thr
 -   _test.d_ - **nftfw -x** runs the build process up to the point of validating the files and will use this directory as a target for the build.
 -  _firewall.db_  - is an sqlite3(1) database used by the blacklist command to store state on the IP's it detects, when and why. The nftfwls(1) command prints  its contents.
 -  _filepos.db_  - is an sqlite3(1) database used by the blacklist command to store the last known position in the log files that it scans.
--  _whitelist_scan_ - is an empty file, the whitelist command sets its modification date registering the last run time that the system was run. The command uses the time to skip over processed entries in the _wmtp_ file
+-  _whitelist_scan_ - is an empty file, the whitelist command sets its modification date registering the last run time that the command was run. The command uses the time to skip over processed entries in the _wmtp_ file
 -  _sched.lock_ - is a lock file used as master lock. **nftfw** locks the file to prevent other instances from running. If another instance of the command starts, it will fail to get the lock, and the queues the intended action before exiting.
 -  _sched.queue_ -  stores queued actions. The queuing system permits the storage of only one action of any one type (load, blacklist, whitelist or tidy). When the master lock owner finishes its task, it inspects the queue file and performs the job without relinquishing the master lock. On the last action, lock owner deletes the queue file.
 - _queue.lock_ - is a lock file controlling access to the queue file.
 
-Contents of build etc
 
 FILES
 =====
 
-Files can be located in _/usr/local_.
+Files can be located under _/usr/local_.
 
 _/etc/nftfw_
 
@@ -196,7 +200,7 @@ _/etc/nftfw_
 BUGS
 ====
 
-See GitHub Issues: <https://github.com/pcollinson/nftfw/issues>
+See GitHub Issues: ``<https://github.com/pcollinson/nftfw/issues>
 
 AUTHOR
 ======

@@ -65,19 +65,19 @@ FILES
 Files can be located in _/_ or _/usr/local_.
 
 
-_/usr/local/etc/nftfw_
+_/etc/nftfw_
 
 :   Location of control files and directories
 
-_/usr/local/etc/nftfw/nftfw_init.nft_
+_/etc/nftfw/nftfw_init.nft_
 
 :  **nftables** basic framework
 
-_/usr/local/etc/nftfw/config.ini_
+_/etc/nftfw/config.ini_
 
 : ini file with basic settings for *nftfw*, overriding built-in values
 
-_/usr/local/var/lib/nftfw/_
+_/var/lib/nftfw/_
 
 :   Location of *build.d*, *test.d*, *install.d*, lock files and the sqlite3 databases storing file positions and blacklist information
 

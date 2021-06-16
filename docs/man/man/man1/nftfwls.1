@@ -15,7 +15,7 @@
 \f[B]nftfwls\f[] displays the status of the database storing the state
 of the \f[B]nftfw\f[] firewall.
 The default output only displays the IP addresses found in
-\f[I]/usr/local/etc/nftfw/blacklist.d\f[].
+\f[I]/etc/nftfw/blacklist.d\f[].
 The \f[B]\-a\f[] option shows all entries in the database, and ignores
 the contents of the \f[I]blacklist.d\f[] directory.
 HTML output is also possible.
@@ -136,12 +136,12 @@ information messages.
 .PP
 Files can be located in \f[I]/\f[] or \f[I]/usr/local\f[].
 .TP
-.B \f[I]/usr/local/etc/nftfw\f[]
+.B \f[I]/etc/nftfw\f[]
 Location of control files
 .RS
 .RE
 .TP
-.B \f[I]/usr/local/var/lib/nftfw/\f[]
+.B \f[I]/var/lib/nftfw/\f[]
 Location of \f[I]build\f[], \f[I]install\f[], lock file and sqlite3
 databases storing file positions and blacklist information
 .RS

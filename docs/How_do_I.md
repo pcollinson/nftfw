@@ -28,18 +28,19 @@
 
 ## How do I: Allow access to a service on my machine?
 
-Change directory into _/usr/local/etc/nftfw/incoming.d_
+Change directory into _/etc/nftfw/incoming.d_ (maybe _/usr/local/etc/nftfw/incoming,d_)
 
 You'll see something like
 
 ``` sh
 $ ls
-05-essential-icmpv6  10-http   30-imaps  50-smtps
-05-ping              10-https  40-pop3   50-submission
-06-ftp-helper        20-ftp    40-pop3s  60-sieve
-07-ssh               30-imap   50-smtp   99-reject
-
+05-ping        10-https        30-imaps  50-smtps
+06-ftp-helper  20-ftp          40-pop3   50-submission
+07-ssh         21-ftp-passive  40-pop3s  60-sieve
+10-http        30-imap         50-smtp   99-drop
 ```
+
+Some of the filenames in the directory access 'rules' in the _rule.d_ directory. There's more information on the manual page in [_nftfw_files_](man/nftfw-files.5.md) in man section 5.
 
 Each file makes a rule for the firewall, and starts with a two digit number that supplies the ordering of the rules. A new entry needs to be adding before the _99-reject_ rule. So let's pick '70' for that.
 
@@ -51,7 +52,13 @@ $ touch 70-domain
 
 because the file is empty, connections from any IP address may access this service.
 
-Some of the filenames in the directory access 'rules' in the _rule.d_ directory. There's more information on the manual page in [_nftfw_files_](man/nftfw-files.5.md) in man section 5.
+The command:
+``` sh
+$ sudo netstat -pat
+...
+```
+lists the services currently being used on your machine, along with the process that is using them. Some of these will be used internally, and you may not wish to make them globally available.
+
 
 ## How do I: Deny access to a service?
 
@@ -189,13 +196,13 @@ The blacklist scanner normally ignores pattern files with _ports=test_, so it's 
 
 ## How do I: Change the settings for _nftfw_?
 
-The file _/usr/local/etc/nftfw/config.ini_ is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.
+The file _/etc/nftfw/config.ini_ is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.
 
 See the manual page [_nftfw-config_](man/nftfw-config.5.md) for a description.
 
 ## How to I: Add my own tables and rules to _nftfw_?
 
-The file _/usr/local/etc/nftfw/nftfw_init.nft_ contains the template _nftables_ framework for _nftfw_. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with  WAN and LAN interfaces  in _/usr/local/etc/nftfw/etc_nftfw/nftfw_router_example_. Rules for a router  adds a _nat_ table and uses the _forward_ table.
+The file _/etc/nftfw/nftfw_init.nft_ contains the template _nftables_ framework for _nftfw_. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with  WAN and LAN interfaces  in _/etc/nftfw/etc_nftfw/nftfw_router_example_. Rules for a router  adds a _nat_ table and uses the _forward_ table.
 
 _nftfw_init.nft_ uses _nft_'s readable file format. When deciding what to add or change, the best strategy is to add your new rules to the system using the _nft_ command line interface to check that they work and use:
 ``` sh

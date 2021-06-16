@@ -82,9 +82,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 class="title">Getting CIDR lists</h1>
 </header>
 <h1 id="getting-cidr-lists">Getting CIDR lists</h1>
-<p>You will want to get hold of lists of IP addresses if you want to use the <em>blacknets</em> feature of <em>nftfw</em> (v0.7.0 or later) to block access from certain countries or IP address ranges. If you want to use this system, check the version of <em>nftfw</em> you have installed, see <a href="#how-to-check-your-nftfw-version">How to check on your <em>nftfw</em> version</a> at bottom of this page.</p>
+<p>You will want to get hold of lists of IP addresses if you want to use the <em>blacknets</em> feature of <em>nftfw</em> (v0.7.0 or later) to block access from certain countries or IP address ranges. If you want to use this system, check that the version of <em>nftfw</em> you have installed is configured to support it, see <a href="#how-to-check-nftfw-supports-blacknets">How to check <em>nftfw</em> supports_blacknets</a> at bottom of this page.</p>
 <p>To use <em>blacknets</em>, you need a file or files containing IP networks, one per line, using ‘CIDR’ notation. See <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Wikipedia</a> if you need more information on CIDR.</p>
-<p>There are several sources for this information, I’ve used two. There are undoubtedly others.</p>
+<p>There are several sources for lists of networks by country, I’ve used two.</p>
 <h2 id="ip2location.com">ip2location.com</h2>
 <p>This company, based in the Isle of Man, has been collating IP addresses for many years. They offer a free download of IP addresses per country in several formats aimed at different applications. Visit their page <a href="https://www.ip2location.com/free/visitor-blocker">Block Visitors by Country Using Firewall</a> and scroll to the bottom of the page for the form.</p>
 <p>There are three drop-down menus: choose the country, select IPv6, and CIDR and click DOWNLOAD. The file will be downloaded to your machine.</p>
@@ -110,11 +110,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>I run mine an hour after the weekly run of <em>geoipupdate</em>, so please do choose the hour and minute to be different from the world.</p>
 <h3 id="step-2---creating-the-country-cidr-file">Step 2 - Creating the country CIDR file</h3>
 <p>Return to the <em>nftfw</em> distribution and find the <em>cidrlist</em> directory again. The <code>getcountrynet</code> script uses the database installed in Step 1 to create a country CIDR file. Install the script:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> cp getcountrynet /usr/local/etc/nftfw</a>
-<a class="sourceLine" id="cb5-2" title="2">$ <span class="bu">cd</span> /usr/local/etc/nftfw</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">sudo</span> cp getcountrynet /etc/nftfw</a>
+<a class="sourceLine" id="cb5-2" title="2">$ <span class="bu">cd</span> /etc/nftfw</a>
 <a class="sourceLine" id="cb5-3" title="3">$ <span class="fu">sudo</span> chown USER.USER getcountrynet</a>
 <a class="sourceLine" id="cb5-4" title="4">$ <span class="fu">sudo</span> chmod +x getcountrynet</a></code></pre></div>
-<p>The USER.USER here should be whoever owns the <em>/usr/local/etc/nftfw</em> directory. I’ve installed my command file in this directory on the grounds of ‘keeping everything together’, but you can put it anywhere that’s convenient.</p>
+<p>The USER.USER here should be whoever owns the <em>/etc/nftfw</em> directory (may be <em>/usr/local/etc/nftfw</em> on your machine). I’ve installed my command file in this directory on the grounds of ‘keeping everything together’, but you can put it anywhere that’s convenient.</p>
 <p>Now run the script as the owner of the directory or use sudo and change ownership afterwards. To run, you can give it any number of two letter ISO country codes and it will create a matching file in <em>blacknets.d</em>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="ex">getcountrynet</span> GB fr</a></code></pre></div>
 <p>will create files called <em>GB.nets</em> and <em>fr.nets</em> in <em>blacknets.d</em>. Remember that file systems are case-dependent, so choose your capitalisation and stick with it. I’m assuming you replace the arguments with a country or countries that you want to block.</p>
@@ -123,15 +123,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>All being well, you can then install the new tables:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="fu">sudo</span> nftfw -f load</a></code></pre></div>
 <p>Finally tell <em>cron</em> to run the <code>getcountrynet</code> script. Again, I’ve added a new line to the <em>/etc/cron.d/geoipupdate</em> adding:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">55</span> 7    * * 3   USER /usr/local/etc/getcountrynet COUNTRIES</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"><span class="ex">55</span> 7    * * 3   USER /etc/nftfw/getcountrynet COUNTRIES</a></code></pre></div>
 <p>the USER should be whoever owns the files, and the arguments should match the ones you typed in earlier.</p>
-<h2 id="how-to-check-your-nftfw-version">How to check your <em>nftfw</em> version</h2>
-<p>The <em>blacknets</em> feature from v0.7.0 of <em>nftfw</em> requires a change in the firewall template file <em>/usr/local/etc/nftfw/nftfw_init.nft</em>. You may need to check you’ve updated the <em>nftfw_init.nft</em> file before running <em>nftfw</em> with the CIDR files. This file requires updating by hand, and you may have not installed it.</p>
+<h2 id="how-to-check-nftfw-supports-blacknets">How to check <em>nftfw</em> supports blacknets</h2>
+<p>The <em>blacknets</em> feature from v0.7.0 of <em>nftfw</em> requires a change in the firewall template file <em>/etc/nftfw/nftfw_init.nft</em>. You may need to check you’ve updated the <em>nftfw_init.nft</em> file before running <em>nftfw</em> with the CIDR files. This file requires updating by hand, and you may have not installed it.</p>
 <p>It the file doesn’t contain the string <em>blacknets</em>, then you need to update it.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="bu">cd</span> /usr/local/etc/nftfw</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="bu">cd</span> /etc/nftfw</a>
 <a class="sourceLine" id="cb10-2" title="2">$ <span class="fu">grep</span> blacknets nftfw_init.nft</a></code></pre></div>
 <p>If the command gives no output, check the copy of the file in the <em>etc_nftfw</em> directory using <em>grep</em>.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">grep</span> blacknets etc_nftfw/nftfw_init.nft</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">grep</span> blacknets /etc/nftfw/etc_nftfw/nftfw_init.nft</a></code></pre></div>
 <p>If this gives output, then copy the <em>originals</em> file over your running version, carefully re-applying any changes you’ve made.</p>
 <p>If there is no output from <em>grep</em> on the copy in <em>etc_nftfw</em>, you need to update your <em>nftfw</em> installation to a version after v0.7.0. See <a href="Updating-nftfw.md">Updating <em>nftfw</em></a>.</p>
 <h2 id="general-notes">General notes</h2>

@@ -132,7 +132,7 @@ def step1(cf):
              is the nft commands to be output
     """
 
-    log.info('Loading data from %s', str(cf.nftfw_base))
+    log.info('Loading data from %s', str(cf.etc_base))
     return loadinfo(cf)
 
 def step2(cf, files, buildpath):

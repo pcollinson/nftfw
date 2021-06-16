@@ -1,0 +1,241 @@
+#!/usr/sbin/nft -f
+#
+# Local multiinterface version for
+# craggy, my gateway machine
+
+# First remove all rulesets
+flush ruleset
+
+#
+# Variables
+# interface for gateway
+define gateif = "enp4s0"
+# interface for local network
+define localif = "enp1s0"
+# ip of our gateway interface
+define gateip = xx.xx.xx.xx
+# ip for gateway
+define gatesrcip = xx.xx.xx.xx
+# ip for admin access
+# allow these addresses to be routed to the gateway
+define gateadminnet = 192.168.1.0/24
+
+table ip filter {
+	chain input {
+		type filter hook input priority 0; policy drop;
+		iif "lo" counter accept
+
+		# not sure I need this
+		pkttype multicast counter accept
+		pkttype broadcast counter accept
+
+		# allow all from local interface
+		iif $localif counter accept
+
+ 		# allow direct from gateway
+		ip saddr $gatesrcip counter accept
+
+		# allow direct from admin on the gateway
+		ip saddr $gateadminnet counter accept
+
+		# better to put these related checks before looking
+		# at any thing else, so the firewall is only
+		# processing new connections
+		ct state {established,related} counter accept
+		ct state invalid counter drop
+
+		counter jump whitelist
+		counter jump blacknets
+		counter jump blacklist
+		counter jump incoming
+	}
+
+	chain forward {
+		type filter hook forward priority 0; policy drop;
+
+		# allow all from local
+		iif $localif counter accept
+
+		# better to put these related checks before looking
+		# at any thing else, so the firewall is only
+		# processing new connections
+		ct state {established,related} counter accept
+		ct state invalid counter drop
+
+		counter jump whitelist
+		counter jump blacknets
+		counter jump blacklist
+		counter jump incoming
+	}
+
+	chain output {
+		type filter hook output priority 0; policy accept;
+		oif "lo" counter accept
+		ct state {established,related} counter accept
+		ct state invalid counter drop
+		counter jump outgoing
+	}
+
+	# basic target when rejecting packets
+	chain rejectcounter {
+		meta l4proto tcp counter reject with tcp reset
+		meta l4proto udp counter reject
+		counter drop
+	}
+
+
+	# basic target when dropping packets
+	chain dropcounter {
+		counter drop
+	}
+
+	# empty chains
+	chain whitelist {
+	}
+
+	chain blacklist {
+	}
+
+	chain blacknets {
+	}
+
+	chain incoming {
+	}
+
+	chain outgoing {
+	}
+}
+
+table ip nat {
+	chain prerouting {
+		type nat hook prerouting priority 0; policy accept;
+	}
+	chain postrouting {
+		type nat hook postrouting priority 100; policy accept;
+		oif $gateif counter snat to $gateip
+	}
+}
+
+table ip myhelpers {
+	chain prerouting {
+		type filter hook prerouting priority 0;
+	}
+      }
+
+#
+# Don't have ipv6 from outside
+# but some internal systems use it
+table ip6 filter {
+	chain input {
+		type filter hook input priority 0; policy drop;
+		iif "lo" counter accept
+
+                # These are better here, to allow selective blocking of neighbours
+                icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem } counter accept
+                icmpv6 type { nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, nd-redirect } ip6 hoplimit 255 counter accept
+
+		ct state {established,related} counter accept
+		ct state invalid counter drop
+
+		# allow all from local interface
+		iif $localif counter accept
+
+		counter jump whitelist
+		counter jump blacknets
+		counter jump blacklist
+		counter jump incoming
+	}
+
+	# won't be using forward in the standard firewall
+	chain forward {
+		type filter hook forward priority 0; policy drop;
+
+		ct state {established,related} counter accept
+		ct state invalid counter drop
+
+		# allow all from local
+		iif $localif counter accept
+
+		counter jump whitelist
+		counter jump blacknets
+		counter jump blacklist
+		counter jump incoming
+	}
+
+	chain output {
+		type filter hook output priority 0; policy accept;
+		oif "lo" counter accept
+
+		# These are better here, to allow selective blocking of neighbours
+                icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem } counter accept
+                icmpv6 type { nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, nd-redirect } ip6 hoplimit 255 counter accept
+
+		ct state {established,related} counter accept
+		ct state invalid counter drop
+		counter jump outgoing
+	}
+
+	chain rejectcounter {
+		meta l4proto tcp counter reject with tcp reset
+ 		meta l4proto udp counter reject
+		counter drop
+	}
+
+	# basic target when dropping packets
+	chain dropcounter {
+		counter drop
+	}
+
+	chain whitelist {
+	}
+
+	chain blacklist {
+	}
+
+	chain blacknets {
+	}
+
+	chain incoming {
+	}
+
+	chain outgoing {
+	}
+}
+
+table ip6 myhelpers {
+	chain prerouting {
+		type filter hook prerouting priority 0;
+	}
+      }
+
+#
+# The plan is put firewall, blacklist, blacknets and whitelist
+# into separate files. These files will use the 'incremental' syntax
+# The intention is to optimise changes to the firewall by making only the changes
+# that are needed. When active, changes are mostly to the blacklist
+# and that will be only to some sets. blacklist and whitelist
+# will be split into a set file and a rules file to allow
+# for separate updates
+#
+# Here we include the files generated by the system
+# this file is copied into the build.d and install.d directories
+# so all include files need to be relative to it.
+#
+# This file will always be used with the -I argument
+# to nft, filenames cannot start with ./
+#
+include "incoming.nft"
+include "outgoing.nft"
+include "whitelist_sets_init.nft"
+include "whitelist_sets.nft"
+include "whitelist.nft"
+include "blacknets_sets_init.nft"
+include "blacknets_sets.nft"
+include "blacknets.nft"
+include "blacklist_sets_init.nft"
+include "blacklist_sets.nft"
+include "blacklist.nft"
+#
+#
+# end
+#

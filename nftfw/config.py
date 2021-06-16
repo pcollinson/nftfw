@@ -59,9 +59,16 @@ class Config:
     ini_file : str      where to find the default config.ini file
                         Only in global file, can be changed
                         using -c argument
-    nftables_conf : str location of the systems nfttables.conf file
-    nftfw_base : str    Location of the symbiosis style firewall
-                        settings. Can be set to /etc/symbiosis.
+    nftables_conf : str location of the systems nftables.conf file
+                        set in this file to /etc/nftables.conf
+                        overridden in the initial config.ini file
+
+    nftables_conf : str Location of system nftables.conf
+                        Should be /etc/nftables.conf for production.
+                        But because we don't want to kill people's
+                        systems when they first install nftfw
+                        This will default to {sysexec}/nftables.conf
+                        and installers will be asked to change it.
 
     [Rules]             map default fw settings to commands in rules
                         Possible to use 'drop' for reject here
@@ -183,7 +190,7 @@ class Config:
 
     """
 
-    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes, too-many-lines
     # This is a config class and needs loads
 
     # Default settings
@@ -209,10 +216,10 @@ class Config:
 #  and /usr/local/etc/nftfw to find where things
 #  are installed
 root
-# system locations used by nftfw
-# NB sysetc location cannot be changed unless
-# the ini file is used as the -c option
-# to nftfw main scripts
+#  system locations used by nftfw
+#  NB sysetc location cannot be changed unless
+#  the ini file is used as the -c option
+#  to nftfw main scripts
 sysetc = ${root}/etc/nftfw
 sysvar = ${root}/var/lib/nftfw
 
@@ -221,21 +228,16 @@ sysvar = ${root}/var/lib/nftfw
 ini_file = ${sysetc}/config.ini
 
 #  Location of system nftables.conf
-#  Usually /etc/nftables.conf
-nftables_conf = ${root}/etc/nftables.conf
+#  Should be /etc/nftables.conf for production.
+#  But because we don't want to kill people's
+#  systems when they first install nftfw
+#  This will default to {sysexec}/nftables.conf
+#  and installers will be asked to change it.
+#  nftables_conf = ${sysetc}/nftables.conf
+nftables_conf = ${sysetc}/nftables.conf
 
 #  Where the initial nft setup for the firewall is found
 nftfw_init = ${sysetc}/nftfw_init.nft
-
-#
-#  This is where to look for the various directories
-#  that manage the system.
-#  On a system with symbiosis installed can be set to
-#  /etc/symbiosis
-#  NB Symbiosis files in local.d are not supported
-#  by this system. To provide local changes, edit
-#  etc/nftfw_init.nft
-nftfw_base = ${sysetc}
 
 [Rules]
 #   Default rules for incoming and outgoing
@@ -255,7 +257,7 @@ logfmt = nftfw[%(process)d]: %(message)s
 #  needs to be a level name not a value
 #  CRITICAL, ERROR, WARNING, INFO, DEBUG
 #  Use ERROR for production
-loglevel = ERROR
+loglevel = INFO
 #  what facility are we using
 #  needs to be a facility name not a value
 logfacility = daemon
@@ -390,18 +392,15 @@ pattern_split = No
     # '' is basically /
     rootlist = ('', '/usr/local')
 
-    # Directories we expect to find in the
-    # nftfw_base directory which can be different from sysetc
-    # where most things live
-    nftfw_dir = {'incoming':  'incoming.d',
-                 'outgoing':  'outgoing.d',
-                 'whitelist': 'whitelist.d',
-                 'blacklist': 'blacklist.d',
-                 'blacknets': 'blacknets.d',
-                 'patterns':  'patterns.d'}
-
-    # Directories we expect to find in the etc/nftfw directory
-    etc_dir = {'rule': 'rule.d'}
+    # Directories we expect to find in sysetc
+    etc_dir = {'incoming':  'incoming.d',
+                'outgoing':  'outgoing.d',
+                'whitelist': 'whitelist.d',
+                'blacklist': 'blacklist.d',
+                'blacknets': 'blacknets.d',
+                'patterns':  'patterns.d',
+                'rule':      'rule.d',
+                'local':     'local.d'}
 
     # Directories we expect to find in the sysvar
     var_dir = {'build': 'build.d',
@@ -451,7 +450,7 @@ pattern_split = No
     #   and also for deciding on type of ini variables
     ini_string_change = (
         'sysvar',
-        'nftables_conf', 'nftfw_init', 'nftfw_base',
+        'nftables_conf', 'nftfw_init',
         'incoming', 'outgoing', 'whitelist',
         'blacklist', 'blacknets',
         'logfmt', 'loglevel',
@@ -472,8 +471,7 @@ pattern_split = No
         'blacknets_set_auto_merge',
         'pattern_split')
 
-
-    def __init__(self, dosetup=True):
+    def __init__(self, dosetup=True, localroot=None):
         """Set up constants and logging
 
         Use config.ini to override variables
@@ -493,6 +491,11 @@ pattern_split = No
         dosetup : bool
                   If false, expects the caller to directly
                   call readini() and setup()
+        localroot: string
+                  The code that looks for root needs disabling
+                  when running tests.
+                  This argument will set the root and skip
+                  establish root tests
         """
 
         # establish parser and load default values
@@ -512,7 +515,12 @@ pattern_split = No
 
         # work out if we are based in / or /usr/local
         # set root in ini to affect paths
-        self._establishroot()
+        if localroot is None:
+            self._establishroot()
+        else:
+            # we are testing and need not to look
+            # on the system, testing will pass in '.'
+            self.parser.set('Locations', 'root', localroot)
 
         # used for ini lookup reverse mapping
         self.inireverse = {}
@@ -601,13 +609,12 @@ pattern_split = No
             setattr(self, k, v)
         self.logger_mgr.setup()
 
-        # Get owner of the nftfw_base directory
-        # we don't know it exists as yet, it may not
-        # be the same as sysetc
-        dirname = self.parser.get('Locations', 'nftfw_base')
+        # Get owner of the sysetc directory
+        # we know it exists
+        dirname = self.parser.get('Locations', 'sysetc')
         dirpath = Path(dirname)
         assert dirpath.is_dir(), \
-            f'Missing configuration directory (nftfw_base): {dirname}'
+            f'Missing configuration directory (sysetc): {dirname}'
         dirstat = dirpath.stat()
         self.fileuid = dirstat.st_uid
         self.filegid = dirstat.st_gid
@@ -624,18 +631,11 @@ pattern_split = No
 
         missing = []
         # sysetc is known to exist
-        # but we are not sure of nftfw_base
-        # however this error will include full pathname
-        # and will indicate misconfiguration
-        for name in ('incoming', 'outgoing', 'patterns'):
-            path = self.nftfwpath(name)
+        # but we are not sure of it's contents
+        for name in ('incoming', 'outgoing', 'patterns', 'rule'):
+            path = self.etcpath(name)
             if not path.is_dir():
                 missing.append(str(path))
-
-        # check on rule.d
-        path = self.etcpath('rule')
-        if not path.is_dir():
-            missing.append(str(path))
 
         # check on the nftfw_init.nft file
         if not self.nftfw_init.exists():
@@ -953,30 +953,6 @@ pattern_split = No
         return dir_path
 
     @cache
-    def nftfwpath(self, name):
-        """Create a full path to a dir in nftfw's nftfw_dir dir
-
-        Finding path to control directories
-
-        Parameters
-        ----------
-        name : str
-            String name of directory
-            Must be in self.nftfw_dir
-
-        Returns
-        -------
-        Path
-            Path to directory in the control directory
-        """
-
-        s = self.get_ini_value_from_section('Locations', 'nftfw_base')
-        base = Path(s)
-        assert name in self.nftfw_dir, f'{name} not in nftfw_dir'
-        dir_path = base / self.nftfw_dir[name]
-        return dir_path
-
-    @cache
     def etcpath(self, name):
         """Create a full path to a dir in nftfw's etc dir
 
@@ -994,8 +970,7 @@ pattern_split = No
             Path to directory in the etc directory
         """
 
-        s = self.get_ini_value_from_section('Locations', 'sysetc')
-        base = Path(s)
+        base = self.etc_base
         assert name in self.etc_dir, f'{name} not in etc_dir'
         dir_path = base / self.etc_dir[name]
         return dir_path
@@ -1004,10 +979,10 @@ pattern_split = No
     # Values as properties
     #
     @property
-    def nftfw_base(self):
-        """Returns nftfw_base address as a Path"""
+    def etc_base(self):
+        """Returns sysetc address as a Path"""
 
-        s = self.get_ini_value_from_section('Locations', 'nftfw_base')
+        s = self.get_ini_value_from_section('Locations', 'sysetc')
         base = Path(s)
         return base
 

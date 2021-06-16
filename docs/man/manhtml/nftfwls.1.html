@@ -23,7 +23,7 @@
 <h1 id="synopsis">SYNOPSIS</h1>
 <div class="line-block"><strong>nftfwls</strong> [<strong>-h</strong>] [<strong>-c</strong> <em>config</em>] [<strong>-p</strong> yes|no ] [<strong>-a |-r | -m | -i | -n | -w | -q | -v </strong>]</div>
 <h1 id="description">DESCRIPTION</h1>
-<p><strong>nftfwls</strong> displays the status of the database storing the state of the <strong>nftfw</strong> firewall. The default output only displays the IP addresses found in <em>/usr/local/etc/nftfw/blacklist.d</em>. The <strong>-a</strong> option shows all entries in the database, and ignores the contents of the <em>blacklist.d</em> directory. HTML output is also possible.</p>
+<p><strong>nftfwls</strong> displays the status of the database storing the state of the <strong>nftfw</strong> firewall. The default output only displays the IP addresses found in <em>/etc/nftfw/blacklist.d</em>. The <strong>-a</strong> option shows all entries in the database, and ignores the contents of the <em>blacklist.d</em> directory. HTML output is also possible.</p>
 <p><strong>nftfwls</strong> ‘pretty prints’ a table with these headings:</p>
 <ul>
 <li>IPs: The blocked IP address</li>
@@ -85,10 +85,10 @@
 <h1 id="files">FILES</h1>
 <p>Files can be located in <em>/</em> or <em>/usr/local</em>.</p>
 <dl>
-<dt><em>/usr/local/etc/nftfw</em></dt>
+<dt><em>/etc/nftfw</em></dt>
 <dd><p>Location of control files</p>
 </dd>
-<dt><em>/usr/local/var/lib/nftfw/</em></dt>
+<dt><em>/var/lib/nftfw/</em></dt>
 <dd><p>Location of <em>build</em>, <em>install</em>, lock file and sqlite3 databases storing file positions and blacklist information</p>
 </dd>
 </dl>

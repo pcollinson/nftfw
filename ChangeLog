@@ -1,3 +1,49 @@
+v0.8.0	Summary of changes from 0.7 requiring some reconfiguration
+	It's highly likely that you will need to update your config.ini
+	and nftfw_init.nft files from the distributed versions.
+
+	a) Edit config.ini to remove:
+	   [Owner] section - ownership of files created in etc/nftfw
+	   now taken from owner of that directory
+	   nftfw_base - nftfw now uses its own control files
+	b) etc/nftfw/original renamed etc/nftfw/etc_nftfw
+	c) Change to nftfw_init.nft to include essential ipv6 icmp
+	   coding. Change to rule.d/essential-icmpv6.sh. Can remove
+	   reference to this rule in incoming.d and outgoing.d.
+	d) Updated regular expressions in exim4.patterns - now
+	   finds IP addresses correctly
+
+	Other changes:
+	New import_tool to import Symbiosis/Sympl configs
+	New Uninstall.sh to remove manual installation
+	Many documentation changes
+
+v0.7.14	Repair the tests directory that hadn't been updated correctly.
+	Tests now create reference data if the srcdata file
+	doesn't exist in the data directory.
+
+	Change default for nftables_conf in config.ini. It now defaults to
+	/etc/nftables.conf and is overriden by the distributed config.ini
+	file that places it in etc/nftfw. This is safe for installing on
+	a new system, while being considerably easier to explain.
+
+	Add etc/nftfw/local.d directory to allow for locally modified rules
+	matching Sympl's usage. Names in local.d will supersede files in
+	rule.d. This means that rule.d can be updated when new
+	installations happen. Add some missing rules to match Sympl.
+	Change Install.sh to match this change.
+
+	Remove support for using a Symbiosis/Sympl firewall configuration
+	as part of the nftfw setup. nftfw can now only use its own
+	files. Provide import_tool to import Symbiosis/Sympl setup into nftfw.
+
+	Add essential ipv6 icmp rules to nftfw_init.nft before any
+	blacklist whitelist checking. Otherwise if an ipv6 neighbour is
+	blacklisted, everything for that address is blocked.
+
+	Add Uninstall.sh which will remove the manually installed nftfw
+	installation from the system.
+
 v0.7.13	Want to be able to write files in etc/nftfw owned by someone other
 	than root making it easier for a mortal to control. Originally
 	this was done by putting the owner/group into the config.ini. It's

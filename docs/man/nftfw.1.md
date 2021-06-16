@@ -20,7 +20,7 @@ The **nftfw** command has several options, and most of these don't change that o
 
 The optional command argument to **nftfw** runs main modules of the program. All actions need users to have root access permission. A  lock file ensures the running of only one instance of the program, **nftfw** queues actions if it's busy, and runs queued actions at the finish of the task in hand.
 
-**nftfw** uses an initial setup file _/usr/local/etc/nftfw/nftfw_init.nft_ to form the framework for the completed ruleset. When **nftfw** builds the firewall rules, the _nftfw_init.nft_ file is copied into the build system, and uses include statements to pull in rules from the separate files created from the four directories.
+**nftfw** uses an initial setup file _/etc/nftfw/nftfw_init.nft_ to form the framework for the completed ruleset. When **nftfw** builds the firewall rules, the _nftfw_init.nft_ file is copied into the build system, and uses include statements to pull in rules from the separate files created from the four directories.
 
 The system, as distributed, provides a firewall for a hosted server with one external internet connection. Administrators can change the _nftfw_init.nft_ file to support more complex network needs.
 
@@ -28,7 +28,7 @@ Actions are:
 
 **load**
 
-The **load** command builds the firewall files by taking input from files in directories in _/usr/local/etc/nftfw_:
+The **load** command builds the firewall files by taking input from files in directories in _/etc/nftfw_:
 
 -  _incoming.d_  contains rules controlling  access to services on the system;
 -  _outbound.d_ sets any rules controlling packets leaving the system;
@@ -38,7 +38,7 @@ The **load** command builds the firewall files by taking input from files in dir
 
 nftfw-files(5) describes the contents and formats of files in these directories.
 
-**nftfw load** performs these steps, creating files in directories in _/usr/local/var/lib/nftfw_:
+**nftfw load** performs these steps, creating files in directories in _/var/lib/nftfw_:
 
 1. The command builds a  firewall ruleset in several files in _build.d_, and copies _nftfw_init.nft_  into the directory creating the initial framework. Rules generated from _incoming.d_ and _outgoing.d_  support the basic system services. Rules formed from the _whitelist.d_.  _blacklist.d_ and _blacknets.d_ directories make use of nftables sets. These sources change more often than the other directories, and the use of sets allows **nftfw** to change parts of the installed ruleset without completely reloading the firewall.
 
@@ -50,11 +50,11 @@ nftfw-files(5) describes the contents and formats of files in these directories.
 
 5. Finally **nftfw** captures the kernel settings and stores them in _/etc/nftables.conf_, which is where the Debian system expects to find the rules on system start-up.
 
-The steps from (4) above could result in a broken system if parts of the installation fails. **nftfw** avoids the possible disaster by storing a backup Ocopy of the kernel's rules before attempting any update. On failure, **nftfw** reverts to the backup rules.
+The steps from (4) above could result in a broken system if parts of the installation fails. **nftfw** avoids the possible disaster by storing a backup copy of the kernel's rules before attempting any update. On failure, **nftfw** reverts to the backup rules.
 
 **whitelist**
 
-The **whitelist** action is a scanner for the system's wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. **nftfw** creates a file named for the IP address in _/usr/local/etc/nftfw/whitelist.d_  as long as the IP address is global.
+The **whitelist** action is a scanner for the system's wtmp(5) or utmp(5) file. The system records user logins in this file along with the IP address used to access the system. **nftfw** creates a file named for the IP address in _/etc/nftfw/whitelist.d_  as long as the IP address is global.
 
 The **whitelist** command expires addresses that were automatically created (identified by the suffix _.auto_) after a set number of days given in **nftfw**'s config file.
 
@@ -64,7 +64,7 @@ If the scanner makes any changes, **whitelist** invokes the **load** command aut
 
 **blacklist**
 
-The **blacklist** command is a file scanner creating IP address files in _/usr/local/etc/nftfw/blacklist.d_.  The scanner reads pattern files from _/usr/local/etc/nftfw/patterns.d_.  Pattern files contain a file name (or a range of files given by shell  *glob* rules), the relevant ports for blocking  and a set of regular expressions matching offending lines in the nominated log files.
+The **blacklist** command is a file scanner creating IP address files in _/etc/nftfw/blacklist.d_.  The scanner reads pattern files from _/etc/nftfw/patterns.d_.  Pattern files contain a file name (or a range of files given by shell  *glob* rules), the relevant ports for blocking  and a set of regular expressions matching offending lines in the nominated log files.
 
 When **nftfw** finds a match, it updates a sqlite3(1) database with the information and uses the frequency of matches (given in the config file) to decide whether to blacklist the IP.
 
@@ -88,7 +88,7 @@ These are the available options to the program:
 
 **-x**, **-\-no-exec**
 
-:   Create rules in _/var/lib/nftfw/test.d and test them. When used with the **blacklist** command, prints the result of scanning for matches without saving any information and without updating stored log file positions.
+:   Create rules in _/var/lib/nftfw/test.d and tests them. When used with the **blacklist** command, prints the result of scanning for matches without saving any information and without updating stored log file positions.
 
 **-C**, **-\-config** CONFIG
 
@@ -122,22 +122,22 @@ These are the available options to the program:
 FILES
 =====
 
-Files can be located in _/_ or _/usr/local_.
+Files can be located under _/_ or _/usr/local_.
 
 
-_/usr/local/etc/nftfw_
+_/etc/nftfw_
 
 :   Location of control files and directories
 
-_/usr/local/etc/nftfw/nftfw_init.nft_
+_/etc/nftfw/nftfw_init.nft_
 
 :  **nftables** basic framework
 
-_/usr/local/etc/nftfw/config.ini_
+_/etc/nftfw/config.ini_
 
 : ini file with basic settings for *nftfw*, overriding built-in values
 
-_/usr/local/var/lib/nftfw/_
+_/var/lib/nftfw/_
 
 :   Location of *build.d*, *test.d*, *install.d*, lock files and the sqlite3 databases storing file positions and blacklist information
 

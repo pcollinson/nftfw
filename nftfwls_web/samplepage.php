@@ -1,13 +1,13 @@
 <!doctype html>
 <html>
-  <head>
+<head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blacklist output</title>
 <link rel="stylesheet" href="samplepage.css">
 </head>
 <html>
-<div class="main">	 
-<h1>Blacklist</h1>	 
+<div class="main">
+<h1>Blacklist</h1>
 <?php
 #
 # PHP insert to display nftfwls on a web page
@@ -16,12 +16,20 @@
 #
 function display_nftfwls()
 {
-	$op = array();
-	$cmd = '/usr/local/bin/nftfwls -w -p no';
-	exec($cmd, $op);
-	foreach ($op as $l) {
-		echo($l."\n");
-	}
+ $nftfwls = "/usr/bin/nftfwls";
+ if (!file_exists($nftfwls)) {
+    $nftfwls = "/usr/local/bin/nftfwls";
+ }
+ if (file_exists($nftfwls)) {
+    $op = array();
+    $cmd = $nftfwls.' -w -p no';
+    exec($cmd, $op);
+    foreach ($op as $l) {
+       echo($l."\n");
+    }
+ } else {
+    echo("<p>Sorry, cannot find nftfwls script</p>\n");
+ }
 }
 #
 #
@@ -30,7 +38,5 @@ function display_nftfwls()
 #
 display_nftfwls();
 ?>
-</div>  
+</div>
 </html>
-  
-  

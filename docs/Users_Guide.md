@@ -5,7 +5,7 @@
 
 _nftfw_ provides a simple-to-use framework generating rules for the latest flavour of packet filtering for Linux, known as _nftables_. It generates a set of incoming rules, outgoing rules, supports a whitelist for 'friends' and a blacklist for miscreants. _nftfw_  glues these rules together and loads them into the system's kernel to act as your firewall.
 
-There are five control directories in _/usr/local/etc/nftfw_ (or it may be _/etc/nftfw_ on your machine). You tell _nftfw_ to make a rule by adding a file, that's often empty, to one of these directories. _nftfw_ uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.
+There are five control directories in _/etc/nftfw_ (or it may be _/usr/local/etc/nftfw_ on your machine). You tell _nftfw_ to make a rule by adding a file, that's often empty, to one of these directories. _nftfw_ uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.
 
 Here are the directories:
 
@@ -23,7 +23,6 @@ The blacklist directory has similar contents to the whitelist but will block any
 
 - _blacknets.d_
 The blacknets directory contains files ending in _.nets_, each file can contain a list of IP network address ranges in CIDR format. Ranges enable the firewall to use fast logical operations on numbers to see if an IP address should be be blocked rather than needing a single rule for each IP. Using blacknets, it's possible to cheaply stop access to your server from one or more countries, or from other large organisations with a diverse address range.
-
 
 All of these directories create a list of rules. The order of the list is important. The firewall passes each packet  from one rule to the next trying to match the data in the packet with the tests in the rule. Some rules will be looking for matching IP addresses, some for ports and some for both addresses and ports. When the firewall finds a match, the rule tells it to make one of two decisions: accept the packet or reject it.
 
@@ -45,10 +44,10 @@ Here's what is present in the _incoming.d_ directory for a standard installation
 
 ``` sh
 $ ls incoming.d
-05-essential-icmpv6  10-http   30-imaps  50-smtps
-05-ping              10-https  40-pop3   50-submission
-06-ftp-helper        20-ftp    40-pop3s  60-sieve
-07-ssh               30-imap   50-smtp   99-reject
+05-ping        10-https        30-imaps  50-smtps
+06-ftp-helper  20-ftp          40-pop3   50-submission
+07-ssh         21-ftp-passive  40-pop3s  60-sieve
+10-http        30-imap         50-smtp   99-drop
 ```
 
 None of these files have any content, they are just a filename. Each filename is a two digit number, a minus sign and a name. The number provides sorting value for the files and firewall entries made from this setup will appear in the order that you see. As we've seen, order is important.
@@ -65,9 +64,7 @@ It could be that you are not using the POP protocol for inbound mail delivery an
 
 If you want a service only to work for a limited number of specific IP addresses, just add the addresses one per line to the file in _incoming.d_. You may add a domain name instead of an IP address, and _nftfw_ will lookup the name, translating it to actual IP addresses (both types of address: IPv4 and IPv6 if available). It's a good idea to run a caching nameserver on your machine if using names, to prevent slower offsite lookups.
 
-The _05-essential-icmpv6_ is not a service name. It's an action file in _rule.d_  named _essential_icmpv6.sh_. Like all the files in _rule.d_, it's a shell script, and in this case give some firewall rules that IPv6 uses to make things work.
-
-The _07-ftp-helper_ file adds in essential glue that makes the _ftp_ server work. It's not needed it you don't support _ftp_.
+The _07-ftp-helper_ is not a service name.  It's an action file in _rule.d_ named _ftp-helper.sh_. It adds in the  essential glue that makes the _ftp_ server work. It's not needed it you don't support _ftp_.
 
 If you need to create a special script for a standard service, then you can do so. _nftfw_ gives precedence to action files in _rule.d_ with the same name as a service.
 
@@ -75,12 +72,7 @@ There are several unused rules in the _rule.d_ directory, a text file called _RE
 
 ### outgoing.d
 
-Here's what is present in the _outgoing.d_ directory for a standard installation:
-
-``` sh
-$ ls outgoing.d
-05-essential-icmpv6  50-reject-www-data
-```
+There are no files  _outgoing.d_ directory for a standard installation. There are some essential rules built into _nftables_ template for IPv6.
 
 Files in the directory behave the same as those in _incoming.d_, except that when they contain IP addresses, then those addresses will match the  destination IP address of the packet that's tested.
 
@@ -92,8 +84,6 @@ The default setting _outgoing.d_ is:  if no rule matches the filtered packet the
 ```
 
 will block your machine from sending to an external _sshd_ server, and also to any external websites. If you want to block access to a specific site offering these services, then you can add IP addresses to the file.
-
-The _reject-www-data_ rules is taken from Symbiosis and restricts all outgoing packets owned by the user running the web server to the world, unless the server is looking up a name in a remote DNS server. This is a special rule, and adding IP addresses to the file will whitelist them for the web server. The idea is to prevent any possible malicious actor who has taken over your webserver from talking to the outside world.
 
 ### blacklist.d
 
@@ -110,7 +100,7 @@ The first IP address is a version 4 address, and the second a version 6 address.
 
 An empty blacklist file will block access to all ports to the IP address given by the name. Adding port numbers into the file, one per line, will restrict access to only those port numbers. The word 'all' can also be added, blocking all incoming ports. If a file contains 'all', other port numbers are ignored.
 
-If your system doesn't have _systemd_ active directory installed, you will need to run
+?If your system doesn't have _systemd_ active directory installed, you will need to run
 
 ``` sh
 $ sudo nftfw load
@@ -150,7 +140,7 @@ The _load_ command tries not to make changes to the kernel's tables unless it ha
 
 The _-f_ or _--full_ flag to the _load_ command forces the new files to be loaded without reference to the last run. Consider  using the _-f_ flag to force a full reload if you think that the firewall isn't working.
 
-_nftfw_ uses a configuration file in _/usr/local/etc/nftfw/config.ini_ to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The _-i_ flag to _nftfw_ lists all the values that are in force.
+_nftfw_ uses a configuration file in _/etc/nftfw/config.ini_ to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The _-i_ flag to _nftfw_ lists all the values that are in force.
 
 _nftfw_ will write error messages into _/var/log/syslog_ using the standard _syslog_ mechanism. To get an listing of what _ntfw_ is doing, set _loglevel_ in the config file to _INFO_.
 
@@ -167,7 +157,7 @@ $ sudo nftfw blacklist
 ```
 and that's usually run from _cron_ every 15 minutes. If it makes any changes, it will reload the firewall, usually only changing the parts of the firewall that it uses.
 
-The rules for scanning are supplied by a set of files in _/usr/local/etc/nftfw/patterns.d_. Files here are named by _'pattern-name'.pattern_. Here's part of my _apache2.pattern_ file:
+The rules for scanning are supplied by a set of files in _/etc/nftfw/patterns.d_. Files here are named by _'pattern-name'.pattern_. Here's part of my _apache2.pattern_ file:
 
 ``` sh
 #
@@ -295,7 +285,11 @@ The _rule_ directory contains small shell scripts that translate firewall action
 - COUNTER - adds the 'counter' statement to the rule. The value is usually empty, or the word 'counter'
 - LOGGER - Finally the LOGGER value is either empty or contains ‘log prefix “String ”’, adding a space after any supplied string from _nftfw_.
 
-There are several examples of these scripts in the _/usr/local/etc/nftfw/rule.d_ and the README file in that directory explains what they do.
+There are several examples of these scripts in the _/etc/nftfw/rule.d_ and the README file in that directory explains what they do.
+
+## Rules - local.d
+
+If you want to supply your own rules, or override standard rules in _rule.d_, new and alternative rules can be placed in _local.d_.
 
 ## Other documents
 

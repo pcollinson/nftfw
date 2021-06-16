@@ -56,6 +56,10 @@ def test_rules(rulesrdr):
     for k, val in rules.items():
         assert k in reference.keys(), f'Key {k} not in reference set'
 
+    # check that drop.sh in local.d is overriding the one in rule.d
+    rules_dir = rdr.rules_dir
+    assert rules_dir['drop'].parent.name == 'local.d', f'Key drop should originate in local.d'
+
 def test_errors(rulesrdr):
     """ Test failure of execution """
 

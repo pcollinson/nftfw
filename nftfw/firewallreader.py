@@ -54,7 +54,7 @@ class FirewallReader:
 
         self.cf = cf
         self.direction = direction
-        path = cf.nftfwpath(direction)
+        path = cf.etcpath(direction)
         # enforce strict checking on the name, assisting
         # emacs users that might get ~ appended to the name
         strict = re.compile('[0-9][0-9]-[-_a-z0-9]*$', re.I)

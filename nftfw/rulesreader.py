@@ -1,7 +1,8 @@
 """nftfw RulesReader class
 
 Rules are small shell scripts which are accessed from the firewall
-directory, they are used to generate nft commands
+directory, they are used to generate nft commands. They live in rule.d
+with local variations installed in local.d
 
 """
 
@@ -18,7 +19,7 @@ class RulesReader:
     when initialised reads rules and creates a dict of rule names and
     content
 
-    Also syntax checks all the files on first instanciation
+    Also syntax checks all the files on first instantiation
 
     Provides method to execute the rule using a known enviroment
 
@@ -30,6 +31,8 @@ class RulesReader:
     # this class, they are stored in this static Class variable, and
     # then can be accessed using the property rules
     rules_store = None
+    # maps keys to files
+    rules_dir = None
 
     def __init__(self, cf):
         """ Initialise Rules
@@ -39,11 +42,25 @@ class RulesReader:
         """
 
         self.cf = cf
-        self.rulepath = cf.etcpath('rule')
         if RulesReader.rules_store is None:
-            files = (f for f in self.rulepath.glob('*.sh') if f.is_file())
-            rules = ((p.stem, p.read_text()) for p in files)
+            localpath = cf.etcpath('local')
+            rulepath = cf.etcpath('rule')
+            # get file names
+            localfiles = {p.stem:p \
+                          for p in localpath.glob('*.sh') if p.is_file()} \
+                              if localpath.exists() else {}
+            rulefiles = {p.stem:p \
+                         for p in rulepath.glob('*.sh') if p.is_file()} \
+                             if rulepath.exists() else {}
+            # merge: localfiles entries replace any rulefiles
+            rulesdir = {**rulefiles, **localfiles}
+            # read contents
+            rules = ((stem, rulesdir[stem].read_text()) \
+                     for stem in rulesdir)
+            # create dictionary
             RulesReader.rules_store = {r:c for r, c in rules if any(c)}
+            # and access to rulesdir - for testing purposes
+            RulesReader.rules_dir = rulesdir
             # This may raise an exception
             # so starting this class needs to use a try to report any error
             self.checksyntax()
@@ -52,6 +69,11 @@ class RulesReader:
     def rules(self):
         """ property to access the rules """
         return RulesReader.rules_store
+
+    @property
+    def rulesdir(self):
+        """ property to access the rulesdir """
+        return RulesReader.rules_dir
 
     def items(self):
         """ Return iterable items """
@@ -78,17 +100,23 @@ class RulesReader:
         """
 
         env = {}
-        errorfiles = []
+        errorkeys = []
         for key in self.keys():
             try:
                 self.execute(key, env)
             except RulesReaderError:
-                errorfiles.append(key + '.sh')
+                errorkeys.append(key)
 
-        if any(errorfiles):
+        if any(errorkeys):
+            errorfiles = []
+            for key in errorkeys:
+                errpath = self.rulesdir[key]
+                filename = errpath.name
+                parentname = errpath.parent.name
+                shortname = f'{parentname}/{filename}'
+                errorfiles.append(shortname)
             errors = ", ".join(errorfiles)
-            path = str(self.rulepath)
-            raise RulesReaderError(f'Problems with {errors}, check files in {path} with shell')
+            raise RulesReaderError(f'Syntax problems with {errors}. Run /bin/sh on files to check for errors.')
 
     def execute(self, key, env):
         """ Execute a rule

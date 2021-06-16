@@ -1,0 +1,32 @@
+This directory contains import_to_nftfw.py to allow you to migrate your
+Sympl or Symbiosis firewall settings into nftfw.
+
+There are two types of information that's installed
+
+Rules
+=====
+Checks and installs the contents of incoming.d and outgoing.d.
+
+Files in incoming.d and outgoing.d access small files from rule.d to
+generate firewall setup commands. nftfw has duplicated all of the operational
+commands from Sympl/Symbiosis - but doesn't have synomyms, so a rule using
+a Sympl/Symbiosis alias like 'allow' will be altered to the default 'accept'.
+Some of the Sympl/Symbiosis rules are not needed by nftfw because that are
+installed in the setup script nftfw_init.nft. Files using these rules are
+not installed.
+
+nftfw uses small shell scripts as rules, these are not compatible with the
+Sympl/Symbiosis rule files that are written in ruby. The nftfw distribution
+will update files in rule.d, and your own local rules should be placed in local.d.
+If you have local rules or commands that import_rules doesn't understand, then
+import_to_nftfw.py will flag them because they will need to be recoded.
+
+Lists
+=====
+Checks and installs the contents of blacklist.d and whitelist.d. Can optionally
+update the nftfw firewall database from automatically added entries in the
+original blacklist.d
+
+For more 'How to' information, run the command
+
+$ import_to_nftfw.py

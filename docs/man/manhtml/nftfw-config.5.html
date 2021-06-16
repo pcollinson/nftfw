@@ -30,16 +30,10 @@
 <p><em>sysetc</em>, <em>sysvar</em> These two variables contain the control and working files for the system:</p>
 <pre><code>  sysetc = ${root}/etc/nftfw
   sysvar = ${root}/var/lib/nftfw</code></pre>
-<p><em>nftables_conf</em> <strong>nftfw</strong> needs to know where the system stores the main <em>nftables.conf</em> file. If installing a new system into root (/) you may wish to change this value to prevent <strong>nftfw</strong> from overwriting an extant file. Conversely, if installing a new system into <em>/usr/local/etc</em>, you will need to change this value when things are working to make sure that <strong>nftfw</strong> writes its settings in the correct place.</p>
-<pre><code>  nftables_conf = $(root}/etc/nftables.conf</code></pre>
+<p><em>nftables_conf</em> <strong>nftfw</strong> needs to know where the system writes <em>nftables.conf</em> file that provides input to <em>nftables</em> on system reboot. On installation, the file is written into <em>/etc/nftfw</em> for safety. The variable needs changing to <em>/etc/nftables.conf</em> when the system is live.</p>
+<pre><code>  nftables_conf = ${sysetc}/etc/nftables.conf</code></pre>
 <p><em>nftfw_init</em> The location for the initial nft setup file containing the framework used by the firewall.</p>
 <pre><code>  nftfw_init = ${sysetc}/nftfw_init.nft</code></pre>
-<p><em>nftfw_base</em> <em>nftfw</em> expects to find the five working directories, <em>incoming.d</em>, <em>outgoing.d</em>, <em>blacklist.d</em>, <em>whitelist.d</em> and <em>patterns.d</em> under this directory. It you want to run the system from the Symbiosis control directory, then the <em>nftfw_base</em> option needs to be changed from the default to <em>/etc/symbiosis/firewall</em>. You’ll need to create a <em>blacknets.d</em> directory. <em>Nftfw</em> expects to find its <em>rule.d</em> directory in its own <em>sysetc</em> directory. Symbiosis files in <em>firewall/local.d</em> are not supported by this system. To provide local changes, edit <em>/etc/nftfw_init.nft</em>.</p>
-<pre><code>  nftfw_base = ${sysetc}</code></pre>
-<p><strong>[Owner]</strong></p>
-<p><em>owner</em>, <em>group</em> The <em>owner</em> variable needs to be set to the username of the owner of the files in <em>${sysetc}/nftfw</em>. The intention is to allow a user to have easy non-root access to control the firewall. If the <em>group</em> variable is empty, the group will be set to the main group of the owner, but can be set to another group if this assists. The blacklist and whitelist scanners will make files owned by the user in their control directories. The default is to use the root user.</p>
-<pre><code>   owner=root
-   group</code></pre>
 <p><strong>[Rules]</strong></p>
 <p>This section provides tailoring of the default rules used in the five processing sections of the program when rules are not explicitly given.</p>
 <pre><code>  incoming = accept
@@ -51,8 +45,8 @@
 <p><strong>[Logging]</strong></p>
 <p><em>logfmt</em> Set the format of log statements (see the Python <em>logging</em> documentation for possible formats)</p>
 <pre><code>  logfmt = nftfw[%(process)d]: %(message)s</code></pre>
-<p><em>loglevel</em> Sets the level are we logging at, this value needs to be a level name not a value. Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG. <strong>nftfw</strong> uses the <strong>-v</strong> flag to the set this value to INFO.</p>
-<pre><code>  loglevel = ERROR</code></pre>
+<p><em>loglevel</em> Sets the level are we logging at, this value needs to be a level name not a value. Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG. <strong>nftfw</strong> uses the <strong>-v</strong> flag to the set this value to INFO. On installation, the log level is set to INFO and can be changed to ERROR to reduce information written into the logs.</p>
+<pre><code>  loglevel = INFO</code></pre>
 <p><em>logfacility</em> The logging facility are we using, it needs to be a facility name not a value.</p>
 <pre><code>  logfacility = daemon</code></pre>
 <p><em>logprint</em> Control printing of logged informaion. Set to False to inhibit log printing at the console. This value is initially set to False when the program is not talking to a terminal. <strong>nftfw</strong> uses the <strong>-q</strong> flag to the set this value to False and the option will suppress printing to the terminal.</p>
@@ -98,8 +92,8 @@
 <p><em>sync_check</em> <strong>nftfw blacklist</strong> will check whether the IP addresses in the database that should be active are actually present in the blacklist directory <em>blacklist.d</em>. ‘Should be active’ means that the addresses have not been automatically expired. <strong>nftfw</strong> is largely event driven, but events get missed. So on the basis that if stuff can happen, it will, this code will recover the correct state of the blacklist directory. It seems overkill to call this every time the blacklist scanner runs, so it is executed when number of runs of the scanner is greater than the value of this variable. The default is to run the blacklist scanner 96 times a day, so 50 seems are reasonable way to run the recovery code once a day. Set this to zero to turn this feature off.</p>
 <pre><code> sync_check = 50</code></pre>
 <p><strong>[Nftfwls]</strong></p>
-<p><em>date_fmt</em> Allows change of date format for <em>nftfwls</em>. The default is DD-MM-YYYY HH:MM:SS. I’m using a two digit year number.</p>
-<pre><code>  date_fmt = %d-%m-%Y %H:%M:%S</code></pre>
+<p><em>date_fmt</em> Allows change of date format for <em>nftfwls</em>. The default is DD-MM-YYYY HH:MM.</p>
+<pre><code>  date_fmt = %d-%m-%Y %H:%M</code></pre>
 <p><em>pattern_split</em> Replaces any commas in the pattern listing column by a newline and a space, reducing output width on the terminal output. Can be overridden by <em>-p</em> option to <em>nftfwls</em>.</p>
 <pre><code>  pattern_split = No</code></pre>
 <p><strong>[Nftfwedit]</strong></p>
@@ -108,13 +102,13 @@
 <pre><code>  ;SpamHaus=zen.spamhaus.org
   ;Barracuda=b.barracudacentral.org
   ;SpamCop=bl.spamcop.net</code></pre>
-<h1 id="files">FILES</h1>
-<p>Files can be located in <em>/</em> rather than <em>/usr/local</em>.</p>
+<h1 id="files">Files</h1>
+<p>Files can be located in <em>/usr/local</em> rather than under_/_.</p>
 <dl>
-<dt><em>/usr/local/etc/nftfw</em></dt>
+<dt><em>/etc/nftfw</em></dt>
 <dd><p>Location of control files</p>
 </dd>
-<dt><em>/usr/local/var/lib/nftfw/</em></dt>
+<dt><em>/var/lib/nftfw/</em></dt>
 <dd><p>Location of <em>build</em>, <em>install</em>, lock file and sqlite3 databases storing file positions and blacklist information</p>
 </dd>
 </dl>

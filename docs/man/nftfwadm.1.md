@@ -32,7 +32,7 @@ These are the available options to the program:
 
 :    List all the configuration names and settings
 
-**-o**, **-\-option** OPTION
+**-O**, **-\-Optiono** OPTION
 
 :     OPTION is keyword=value and may be comma separated list of configuration options. The values override any settings in the configuration file.
 
@@ -49,11 +49,11 @@ FILES
 
 Files can be located in _/_ or _/usr/local_.
 
-_/usr/local/etc/nftfw_
+_/etc/nftfw_
 
 :   Location of control files.
 
-_/usr/local/var/lib/nftfw/_
+_/var/lib/nftfw/_
 
 :   Location of the backup file, *build.d*, *test.d*, *install.d*, lock files and the sqlite3 databases storing file positions and blacklist information
 

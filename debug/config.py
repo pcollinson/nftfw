@@ -10,4 +10,5 @@ if __name__ == '__main__':
         print(str(e))
         exit(1)
 
+    print(cf.etc_base)
     print(repr(cf))

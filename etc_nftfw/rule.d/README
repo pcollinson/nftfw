@@ -1,9 +1,10 @@
 These scripts are called from within python to generate text
 lines for the nftables setup. The job of the code is to add rule commands
-using echo and other shell output techniques.
-Originals are in originals/rule/
+using echo and other shell output techniques. This directory might be updated
+on a new installation. Local rules should be added in local.d. Files in local.d
+with the same name supersede files in this directory.
 
-Each is called twice, once for ip and once of ip6
+Each rule is called twice, once for ip and once of ip6
 
 The environment is set up as follows:
 DIRECTION incoming | outgoing
@@ -24,7 +25,7 @@ allowtcpreset.sh       - allow tcp resets
 accept.sh              - general default accept ruleset
 drop.sh                - use as a default reject rule to drop packets
 essential-icmpv6.sh    - accept necessary IPv6 ICMP
-established.sh         - accept established connections
+established.sh         - accept established connections - simply exits
                        - Symbiosis compatibility, rules to do this
 		       - are in nftfw_init.nft
 ftp-helper.sh          - Add ftp helper for the ftp
@@ -35,6 +36,8 @@ ftp-passive.sh	       - Add Passive inbound ports needed for pure-ftpd
 http-meter.sh          - replace http and https by a metering
                        - call to stop http(s) flooding
                        - needs load-http-meter
+icmp.sh		       - allow ICMP for ipv4 only
+icmpv6.sh	       - allow ICMP for ipv6 only
 load-http-meter.sh     - establish chain for http(s) metering
 ping.sh                - allow pings, editable to add limit
 reject-www-data.sh     - for outbound use, prevent packets from

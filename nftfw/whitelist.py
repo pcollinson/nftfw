@@ -49,7 +49,7 @@ class WhiteList:
         config = cf.get_ini_values_by_section('Whitelist')
         self.wtmp_file = config['wtmp_file']
         self.whitelist_expiry = config['whitelist_expiry']
-        self.whitelistpath = self.cf.nftfwpath('whitelist')
+        self.whitelistpath = self.cf.etcpath('whitelist')
 
     def whitelist(self):
         """Scan utmp for new whitelist candidates

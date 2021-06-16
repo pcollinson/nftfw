@@ -47,7 +47,7 @@ def loadactive(cf):
         in blacklist directory
     """
 
-    path = cf.nftfwpath('blacklist')
+    path = cf.etcpath('blacklist')
     out = []
     for p in path.glob('*.auto'):
         ip = p.stem

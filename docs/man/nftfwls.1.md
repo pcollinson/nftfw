@@ -14,7 +14,7 @@ SYNOPSIS
 DESCRIPTION
 =========
 
-**nftfwls** displays the status of the database storing the state of the **nftfw** firewall. The default output only displays the IP addresses found in _/usr/local/etc/nftfw/blacklist.d_. The **-a** option shows all entries in the database, and ignores the contents of the _blacklist.d_ directory. HTML output is also possible.
+**nftfwls** displays the status of the database storing the state of the **nftfw** firewall. The default output only displays the IP addresses found in _/etc/nftfw/blacklist.d_. The **-a** option shows all entries in the database, and ignores the contents of the _blacklist.d_ directory. HTML output is also possible.
 
 **nftfwls** 'pretty prints' a table with these headings:
 
@@ -96,11 +96,11 @@ Options
 
 Files can be located in _/_ or  _/usr/local_.
 
-_/usr/local/etc/nftfw_
+_/etc/nftfw_
 
 :   Location of  control files
 
-_/usr/local/var/lib/nftfw/_
+_/var/lib/nftfw/_
 
 :   Location of *build*, *install*, lock file and sqlite3 databases storing file positions and blacklist information
 

@@ -103,7 +103,7 @@ def checkbasicfiles(cf):
                  '203.0.113.7.auto': ''
                  }
     try:
-        blacklist = cf.nftfwpath('blacklist')
+        blacklist = cf.etcpath('blacklist')
         assert str(blacklist) == 'sys/blacklist.d'
         assert blacklist.exists()
     except AssertionError as e:
@@ -126,7 +126,9 @@ def checkbasicfiles(cf):
 
 
 def write_json(file, obj):
-    """ Write the object to newdata and srcdata """
+    """ Write the object to newdata and srcdata
+        if the file doesn't exist
+    """
     wr = json.dumps(obj)
 
     newpath = Path('srcdata')
@@ -138,9 +140,10 @@ def write_pickle(file, obj):
     """ Write a pickled object """
     newpath = Path('srcdata')
     file = newpath / file
-    fd = open(str(file), 'wb')
-    pickle.dump(obj, fd)
-    fd.close()
+    if not file.exists():
+        fd = open(str(file), 'wb')
+        pickle.dump(obj, fd)
+        fd.close()
 
 if __name__ == '__main__':
     init_tests()

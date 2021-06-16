@@ -50,7 +50,7 @@ class BlackList:
 
         self.cf = cf
         # Path to blacklist.d
-        self.blacklistpath = cf.nftfwpath('blacklist')
+        self.blacklistpath = cf.etcpath('blacklist')
         # Ini values used
         logvars = cf.get_ini_values_by_section('Blacklist')
         self.block_after = int(logvars['block_after'])

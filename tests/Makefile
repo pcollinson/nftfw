@@ -1,16 +1,13 @@
 # Makefile for tests
 SRC = $(sort $(wildcard *.py))
 OUT = $(sort $(SRC:.py=.lint))
-REFERENCE = srcdata/build_files.json srcdata/firewallreader.pickle srcdata/listreader-records.json srcdata/logreader.json srcdata/patternreader.pickle srcdata/rulesreader.json srcdata/srcdict.json srcdata/step1_files.json
 
 .PHONY: lint
 
-all: $(REFERENCE)
+all:
 	pytest-3 -x
 
-$(REFERENCE):
-	python3 init_tests.py
-
+# create reference files
 init:
 	python3 init_tests.py
 

@@ -33,8 +33,9 @@
 <li><em>blacknets.d</em> - contains lists of network address ranges allowing bulk blocking;</li>
 <li><em>patterns.d</em> - contain pattern files for matching lines in log files for blacklist; and</li>
 <li><em>rule.d</em> - hold files for generating <strong>nft</strong> commands from rule names.</li>
+<li><em>local.d</em> - locally installed or modified rules should be placed here to allow for distributions to update rules</li>
 </ul>
-<p>Distributed files can be found in <em>etc/nftfw/etc_nftfw</em>.</p>
+<p>The distributed files can be found in <em>etc/nftfw/etc_nftfw</em>.</p>
 <h2 id="incoming-and-outbound">incoming and outbound</h2>
 <p>Files in these directories specify rules for the firewall. File names have the format:</p>
 <blockquote>
@@ -48,7 +49,7 @@
 <li>the name of a rule found in the rules directories (with the .sh suffix removed)</li>
 </ul>
 <p>When port numbers appear in the filename, the directory name dictates the action file applied for the rule. The <em>config.ini</em> file contains variables that select the default rule based on the directory name (see nftfw-config(1)).</p>
-<p>To allow rules to have the same name as services and replace the default action, <strong>nftfw</strong> searches the rule directory for name matches before querying the service file.</p>
+<p>To allow rules to have the same name as services and replace the default action, <strong>nftfw</strong> searches the local.d and then the rule.d directories for name matches before querying the service file.</p>
 <p>Files are usually empty, but can contain a list of IP addresses (one per line) that <strong>nftfw</strong> uses to specify the source IP or IPs for an incoming rule, or the destination IP or IPs for the outbound rule. For example, supplying a list of known IP addresses for the standard ssh(1) service will prevent tiresome exhaustive attempts to get passwords. Local users can access ssh(1) from unknown addresses using the knowledge of a random port number given by another rule.</p>
 <h2 id="blacklist-and-whitelist">blacklist and whitelist</h2>
 <p>Files in these directories make nftables rules permitting access in the whitelist or blocking access in the blacklist. Whitelisted rules appear before blacklisted ones in the firewall.</p>
@@ -64,8 +65,8 @@
 <p>Administrators can disable the blacklist and whitelist systems separately by creating a file called ‘disabled’ in the relevant directory.</p>
 <p>When building the firewall from these two directories, <strong>nftfw</strong> writes the IP addresses into nftables sets. The program writes the information into two separate files and uses file comparison with the last loaded files to see If it can update the sets of IP addresses without reloading the whole firewall.</p>
 <h2 id="blacknets.d">blacknets.d</h2>
-<p>Files in this directory make nftables rules in a single set that block ranges of IP addresses. To be included, a file must end in <em>.nets</em>.</p>
-<p>Each file contains a list of IP network addresses, expressed in CIDR notation, one to a line. The file can also contain comments with the usual use of # to indicate them. Lines can contain the following formats:</p>
+<p>Files in this directory make nftables rules in a single set that block ranges of IP addresses. Files not ending in <em>.nets</em> are ignored.</p>
+<p>Each file contains a list of IP network addresses, expressed in CIDR notation, one to a line. The file can also contain comments with the usual use of # to show them. Lines can contain the following formats:</p>
 <blockquote>
 <p># IPv4 CIDR 203.0.113.0/24</p>
 <p># IPv6 Compressed 2001:DB8::/32</p>
@@ -99,7 +100,7 @@
 </blockquote>
 <p>will use data from <em>pattern-test.pattern</em> and will scan the named log file (or files). The <em>-x</em> flag scans the log file from the beginning and will not update the stored file position. The command will print a table with any matching IP addresses, along with a match count. The command can be re-run if matches fail after adjusting the regular expression in the pattern file.</p>
 <h2 id="rule.d">rule.d</h2>
-<p>The <em>rule</em> directory contains small shell scripts that translate firewall actions named in the <em>incoming.d</em> and <em>outgoing.d</em> directories into nftables command lines. Default rules are also used for the whitelist and blacklist generation. Note the coding and management of these files are different from Symbiosis, but the same idea is there, a shell file allows easy additions by users. The files do not run any commands, they output <em>nftables</em> statements to <em>nftfw</em> which stores them and passes the file into the <em>nft</em> command.</p>
+<p>The <em>rule.d</em> directory contains small shell scripts that translate firewall actions named in the <em>incoming.d</em> and <em>outgoing.d</em> directories into nftables command lines. Default rules are also used for the whitelist and blacklist generation. Note the coding and management of these files are different from Symbiosis, but the same idea is there, a shell file allows easy additions by users. The files do not run any commands, they output <em>nftables</em> statements to <em>nftfw</em> which stores them and passes the file into the <em>nft</em> command.</p>
 <p>Filenames have the format:</p>
 <blockquote>
 <p>actionname.sh</p>
@@ -110,11 +111,13 @@
 </blockquote>
 <p>The pattern script uses the DIRECTION parameter in both incoming and outgoing contexts and must set directional keywords in <strong>nft</strong> commands correctly. For an incoming rule, an IP address (if present) will be a ‘source’ address. For an outgoing rule, an IP address (if present) will be a ‘destination’ address.</p>
 <p>A rule script will usually create a simpler version of the command when called with no ports.</p>
+<h2 id="local.d"><em>local.d</em></h2>
+<p>The <em>local.d</em> is the place to add locally modified and created rules. The directory allows distributions to update <em>rule.d</em>. <em>local.d</em> is searched before <em>rule.d</em> when looking for rules.</p>
 <h2 id="config.ini"><em>config.ini</em></h2>
 <p>The <em>etc</em> directory contains the <em>config.ini</em> file for <strong>nftfw</strong>. nftfw_config(5) contains a description of the lines in this file.</p>
 <h2 id="nftfw_init.nft"><em>nftfw_init.nft</em></h2>
 <p>The file <em>nftfw_init.nft</em> contains the template rule set for nftables, it’s used to establish the firewall framework and finally uses several include statements to pull in the files created by the system. <strong>nftfw</strong> copies the file into the build directory at the start of the build process.</p>
-<p>The file is user-editable, allowing the framework to be changed. The basic setup assumes that it’s running on a system with a single network connection attached to the internet. See the example supplied in <em>etc/nftfw/etc_nftfw/nftfw_router_example</em> which provides a router setup with WAN and LAN connections using <em>nat</em> and <em>forward</em> tables.</p>
+<p>The file is user-editable, allowing the framework to be changed. The basic setup assumes that it’s running on a system with a single network connection attached to the internet. See the example supplied in <em>nftfw_router_example</em> which provides a router setup with WAN and LAN connections using <em>nat</em> and <em>forward</em> tables.</p>
 <h2 id="etc_nftfw-directory-or-symlink"><em>etc_nftfw</em> directory or symlink</h2>
 <p>Finally, the <em>etc_nftfw</em> directory contains the starting point for all control files, and some examples. The directory allows distributions to update the standard control files while not changing those in use on a running system. <em>etc_nftfw</em> may be a symlink on some installations pointing to the distribution files stored elsewhere.</p>
 <h2 id="files-in-varlibnftfw">Files in <em>var/lib/nftfw</em></h2>
@@ -125,21 +128,20 @@
 <li><em>test.d</em> - <strong>nftfw -x</strong> runs the build process up to the point of validating the files and will use this directory as a target for the build.</li>
 <li><em>firewall.db</em> - is an sqlite3(1) database used by the blacklist command to store state on the IP’s it detects, when and why. The nftfwls(1) command prints its contents.</li>
 <li><em>filepos.db</em> - is an sqlite3(1) database used by the blacklist command to store the last known position in the log files that it scans.</li>
-<li><em>whitelist_scan</em> - is an empty file, the whitelist command sets its modification date registering the last run time that the system was run. The command uses the time to skip over processed entries in the <em>wmtp</em> file</li>
+<li><em>whitelist_scan</em> - is an empty file, the whitelist command sets its modification date registering the last run time that the command was run. The command uses the time to skip over processed entries in the <em>wmtp</em> file</li>
 <li><em>sched.lock</em> - is a lock file used as master lock. <strong>nftfw</strong> locks the file to prevent other instances from running. If another instance of the command starts, it will fail to get the lock, and the queues the intended action before exiting.</li>
 <li><em>sched.queue</em> - stores queued actions. The queuing system permits the storage of only one action of any one type (load, blacklist, whitelist or tidy). When the master lock owner finishes its task, it inspects the queue file and performs the job without relinquishing the master lock. On the last action, lock owner deletes the queue file.</li>
 <li><em>queue.lock</em> - is a lock file controlling access to the queue file.</li>
 </ul>
-<p>Contents of build etc</p>
 <h1 id="files">FILES</h1>
-<p>Files can be located in <em>/usr/local</em>.</p>
+<p>Files can be located under <em>/usr/local</em>.</p>
 <dl>
 <dt><em>/etc/nftfw</em></dt>
 <dd><p>Location of control files</p>
 </dd>
 </dl>
 <h1 id="bugs">BUGS</h1>
-<p>See GitHub Issues: <a href="https://github.com/pcollinson/nftfw/issues" class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<p>See GitHub Issues: ``<a href="https://github.com/pcollinson/nftfw/issues" class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
 <h1 id="author">AUTHOR</h1>
 <p>Peter Collinson (huge credit to the ideas from Patrick Cherry’s work for the firewall for the Symbiosis hosting system).</p>
 <h1 id="see-also">SEE ALSO</h1>

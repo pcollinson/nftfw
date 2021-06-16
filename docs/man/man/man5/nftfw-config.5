@@ -44,16 +44,16 @@ and working files for the system:
 .fi
 .PP
 \f[I]nftables_conf\f[] \f[B]nftfw\f[] needs to know where the system
-stores the main \f[I]nftables.conf\f[] file.
-If installing a new system into root (/) you may wish to change this
-value to prevent \f[B]nftfw\f[] from overwriting an extant file.
-Conversely, if installing a new system into \f[I]/usr/local/etc\f[], you
-will need to change this value when things are working to make sure that
-\f[B]nftfw\f[] writes its settings in the correct place.
+writes \f[I]nftables.conf\f[] file that provides input to
+\f[I]nftables\f[] on system reboot.
+On installation, the file is written into \f[I]/etc/nftfw\f[] for
+safety.
+The variable needs changing to \f[I]/etc/nftables.conf\f[] when the
+system is live.
 .IP
 .nf
 \f[C]
-\ \ nftables_conf\ =\ $(root}/etc/nftables.conf
+\ \ nftables_conf\ =\ ${sysetc}/etc/nftables.conf
 \f[]
 .fi
 .PP
@@ -63,47 +63,6 @@ containing the framework used by the firewall.
 .nf
 \f[C]
 \ \ nftfw_init\ =\ ${sysetc}/nftfw_init.nft
-\f[]
-.fi
-.PP
-\f[I]nftfw_base\f[] \f[I]nftfw\f[] expects to find the five working
-directories, \f[I]incoming.d\f[], \f[I]outgoing.d\f[],
-\f[I]blacklist.d\f[], \f[I]whitelist.d\f[] and \f[I]patterns.d\f[] under
-this directory.
-It you want to run the system from the Symbiosis control directory, then
-the \f[I]nftfw_base\f[] option needs to be changed from the default to
-\f[I]/etc/symbiosis/firewall\f[].
-You'll need to create a \f[I]blacknets.d\f[] directory.
-\f[I]Nftfw\f[] expects to find its \f[I]rule.d\f[] directory in its own
-\f[I]sysetc\f[] directory.
-Symbiosis files in \f[I]firewall/local.d\f[] are not supported by this
-system.
-To provide local changes, edit \f[I]/etc/nftfw_init.nft\f[].
-.IP
-.nf
-\f[C]
-\ \ nftfw_base\ =\ ${sysetc}
-\f[]
-.fi
-.PP
-\f[B][Owner]\f[]
-.PP
-\f[I]owner\f[], \f[I]group\f[] The \f[I]owner\f[] variable needs to be
-set to the username of the owner of the files in
-\f[I]${sysetc}/nftfw\f[].
-The intention is to allow a user to have easy non\-root access to
-control the firewall.
-If the \f[I]group\f[] variable is empty, the group will be set to the
-main group of the owner, but can be set to another group if this
-assists.
-The blacklist and whitelist scanners will make files owned by the user
-in their control directories.
-The default is to use the root user.
-.IP
-.nf
-\f[C]
-\ \ \ owner=root
-\ \ \ group
 \f[]
 .fi
 .PP
@@ -144,10 +103,12 @@ actively rejects the packet.
 be a level name not a value.
 Choose one of CRITICAL, ERROR, WARNING, INFO, DEBUG.
 \f[B]nftfw\f[] uses the \f[B]\-v\f[] flag to the set this value to INFO.
+On installation, the log level is set to INFO and can be changed to
+ERROR to reduce information written into the logs.
 .IP
 .nf
 \f[C]
-\ \ loglevel\ =\ ERROR
+\ \ loglevel\ =\ INFO
 \f[]
 .fi
 .PP
@@ -344,12 +305,11 @@ Set this to zero to turn this feature off.
 \f[B][Nftfwls]\f[]
 .PP
 \f[I]date_fmt\f[] Allows change of date format for \f[I]nftfwls\f[].
-The default is DD\-MM\-YYYY HH:MM:SS.
-I'm using a two digit year number.
+The default is DD\-MM\-YYYY HH:MM.
 .IP
 .nf
 \f[C]
-\ \ date_fmt\ =\ %d\-%m\-%Y\ %H:%M:%S
+\ \ date_fmt\ =\ %d\-%m\-%Y\ %H:%M
 \f[]
 .fi
 .PP
@@ -384,16 +344,16 @@ used to access the list in the DNS lookup.
 \ \ ;SpamCop=bl.spamcop.net
 \f[]
 .fi
-.SH FILES
+.SH Files
 .PP
-Files can be located in \f[I]/\f[] rather than \f[I]/usr/local\f[].
+Files can be located in \f[I]/usr/local\f[] rather than under_/_.
 .TP
-.B \f[I]/usr/local/etc/nftfw\f[]
+.B \f[I]/etc/nftfw\f[]
 Location of control files
 .RS
 .RE
 .TP
-.B \f[I]/usr/local/var/lib/nftfw/\f[]
+.B \f[I]/var/lib/nftfw/\f[]
 Location of \f[I]build\f[], \f[I]install\f[], lock file and sqlite3
 databases storing file positions and blacklist information
 .RS

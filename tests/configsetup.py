@@ -9,7 +9,7 @@ from shutil import copytree
 import pytest
 from nftfw import config
 
-def config_init(config_file='sys/config.ini'):
+def config_init(config_file='data/config.ini'):
     """ Open config
 
     give it the test config file
@@ -28,10 +28,14 @@ def config_init(config_file='sys/config.ini'):
     if not syspath.exists():
         pytest.fail('Cannot find create sys directory')
 
-    # don't catch the AssertError used in the scripts
-    # it shouldn't happen here - and if it does the source
-    # data needs fixing
-    cf = config.Config(dosetup=False)
+    # retain reference results in data/srcdata
+    srcdatapath = Path('srcdata')
+    if not srcdatapath.exists():
+        frompath = syspath / 'srcdata'
+        if frompath.exists():
+            frompath.rename(srcdatapath)
+
+    cf = config.Config(dosetup=False, localroot='.')
     cf.set_ini_value_with_section('Locations', 'ini_file', config_file)
     cf.readini()
     cf.setup()
