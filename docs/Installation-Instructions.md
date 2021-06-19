@@ -1,5 +1,5 @@
-% Installation Instructions
-#  Installation Instructions
+% Manual Installation Instructions
+#  Manual Installation Instructions
 
 For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the [Installing nftfw](Installation.md) document. There are links, shown as 'Explanation', to the Installation document.
 

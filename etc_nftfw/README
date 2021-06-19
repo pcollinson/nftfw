@@ -2,7 +2,7 @@ These files and directories live in
 
 /etc/nftfw or /usr/local/etc/nftfw
 
-depending on your system. Once created, they will not be touched by
+depending on your system. Once created, only rule.d be updated by
 any update system. An original copy of what is uploaded can be
 found in the 'etc_nftfw' directory (or symlink). These files will
 be changed when the distribution changes, and can be used as
@@ -31,6 +31,10 @@ patterns.d	  Control files used by the blacklist scanner,
 		  expressions.
 rule.d		  Rules are a set of shell snippets that inject information into the
 		  nftables rule set, invoked by using a filename in the
-		  incoming.d and outgoing.d files
+		  incoming.d and outgoing.d files. This directory will be updated
+		  by any update system.
+local.d		  This directory is empty, and is the place for the installation
+		  of local rules, which can be adapted copies of rules in rule.d
+		  or new implementations.
 whitelist.d	  IP addresses that are automatically whitelisted.
 See: man 5 nftfw-files

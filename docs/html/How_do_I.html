@@ -108,14 +108,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <!-- markdown-toc end -->
 <h2 id="how-do-i-allow-access-to-a-service-on-my-machine">How do I: Allow access to a service on my machine?</h2>
-<p>Change directory into <em>/etc/nftfw/incoming.d</em> (maybe <em>/usr/local/etc/nftfw/incoming,d</em>)</p>
+<p>Change directory into <em>/etc/nftfw/incoming.d</em> (maybe <em>/usr/local/etc/nftfw/incoming.d</em>).</p>
 <p>You’ll see something like</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">ls</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="ex">05-ping</span>        10-https        30-imaps  50-smtps</a>
 <a class="sourceLine" id="cb1-3" title="3"><span class="ex">06-ftp-helper</span>  20-ftp          40-pop3   50-submission</a>
 <a class="sourceLine" id="cb1-4" title="4"><span class="ex">07-ssh</span>         21-ftp-passive  40-pop3s  60-sieve</a>
 <a class="sourceLine" id="cb1-5" title="5"><span class="ex">10-http</span>        30-imap         50-smtp   99-drop</a></code></pre></div>
-<p>Some of the filenames in the directory access ‘rules’ in the <em>rule.d</em> directory. There’s more information on the manual page in <a href="man/nftfw-files.5.md"><em>nftfw_files</em></a> in man section 5.</p>
+<p>Some of the filenames in the directory access ‘rules’ in the <em>rule.d</em> directory. There’s more information on the manual page in <a href="man/nftfw-files.5.html"><em>nftfw_files</em></a> in man section 5.</p>
 <p>Each file makes a rule for the firewall, and starts with a two digit number that supplies the ordering of the rules. A new entry needs to be adding before the <em>99-reject</em> rule. So let’s pick ‘70’ for that.</p>
 <p>The rest of the filename can be a port number or the service name, but that must be in <em>/etc/services</em>. Let’s say we want to add access to our name server, and that’s on port 53, called <em>domain</em> in <em>/etc/services</em>. We can either add <em>70-domain</em> or <em>70-53</em>. The easiest way to do this is to use the <em>touch</em> command (you may have to use <em>sudo</em>):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="fu">touch</span> 70-domain</a></code></pre></div>
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The <em>blacklist.d</em> directory uses the same convention for files used for the whitelist. Simply create a file named for the IP address in the directory.</p>
 <p>The blacklist scanner will automatically create files in the directory ending in <em>.auto</em> when it finds sites that are misbehaving. The scanner uses files in the <em>patterns.d</em> directory to find log files to scan, and how to interpret lines in the log files as bad.</p>
 <h2 id="how-do-i-block-access-to-countries">How do I: Block access to countries?</h2>
-<p>The <em>blacknets.d</em> directory can contain a set of files each with a list of IP addresses, one to a line, expressed in CIDR notation. To block a country, you’ll need the list of all the networks that the country uses and these are available from several places on the web, see <a href="Getting-cidr-lists.md">Getting CIDR Lists</a> for how to install them.</p>
+<p>The <em>blacknets.d</em> directory can contain a set of files each with a list of IP addresses, one to a line, expressed in CIDR notation. To block a country, you’ll need the list of all the networks that the country uses and these are available from several places on the web, see <a href="Getting-cidr-lists.html">Getting CIDR Lists</a> for how to install them.</p>
 <h2 id="how-do-i-see-what-the-firewall-is-doing">How do I: See what the firewall is doing?</h2>
 <p>The <em>nft</em> command prints the contents of the firewall with the command:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
@@ -167,7 +167,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This will print a table of the IP addresses the scanner has found, the number of matches, the number of ‘incidents’ - each incident is a separate run of the scanner, when it happened first, the last time a match happened, and the name of the pattern that triggered the event.</p>
 <p>If the command says nothing, then possibly the scanner hasn’t detected enough events for the match count to exceed the threshold where it creates blacklist file. The <strong>-a</strong> flag to the program prints all the entries in its database.</p>
 <h2 id="how-do-i-find-the-country-sending-me-blacklisted-packets">How do I: Find the country sending me blacklisted packets?</h2>
-<p>If you install the geoip2 country database on your system, and its python interface, then <em>nftfwls</em> will show the country of origin when it displays its output. Access to the geoip2 databases is free, but MaxMind who produce it ask you to sign up. See the document <a href="Installing-GeoLocation.md">Installing Geolocation</a> for installation and signup information.</p>
+<p>If you install the geoip2 country database on your system, and its python interface, then <em>nftfwls</em> will show the country of origin when it displays its output. Access to the geoip2 databases is free, but MaxMind who produce it ask you to sign up. See the document <a href="Installing-GeoLocation.html">Installing Geolocation</a> for installation and signup information.</p>
 <p>The <em>nftfwedit</em> command also allows you to ask questions about any IP address, including the country of origin and whether the IP address is in selected DNS blacklist sites.</p>
 <h2 id="how-do-i-remove-a-good-ip-address-from-the-blacklist">How do I: Remove a good IP address from the blacklist?</h2>
 <p>If an IP address has found its way into the blacklist in error, then you can delete it using</p>
@@ -185,14 +185,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The blacklist scanner normally ignores pattern files with <em>ports=test</em>, so it’s safe to leave these files in place.</p>
 <h2 id="how-do-i-change-the-settings-for-nftfw">How do I: Change the settings for <em>nftfw</em>?</h2>
 <p>The file <em>/etc/nftfw/config.ini</em> is a readable configuration file that contains all the settings that can be changed. As distributed all the values are commented out, each line starts with a semi-colon. There are many comments in the file explaining what each setting does.</p>
-<p>See the manual page <a href="man/nftfw-config.5.md"><em>nftfw-config</em></a> for a description.</p>
+<p>See the manual page <a href="man/nftfw-config.5.html"><em>nftfw-config</em></a> for a description.</p>
 <h2 id="how-to-i-add-my-own-tables-and-rules-to-nftfw">How to I: Add my own tables and rules to <em>nftfw</em>?</h2>
 <p>The file <em>/etc/nftfw/nftfw_init.nft</em> contains the template <em>nftables</em> framework for <em>nftfw</em>. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with WAN and LAN interfaces in <em>/etc/nftfw/etc_nftfw/nftfw_router_example</em>. Rules for a router adds a <em>nat</em> table and uses the <em>forward</em> table.</p>
 <p><em>nftfw_init.nft</em> uses <em>nft</em>’s readable file format. When deciding what to add or change, the best strategy is to add your new rules to the system using the <em>nft</em> command line interface to check that they work and use:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
 <p>to see how <em>nft</em> ‘sees’ the rules. Rules expressed on the command line can contain syntax that <em>nft</em> thinks is unnessary, and can also use some assumptions about defaults that <em>nft</em> will add to the compiled rules. Extract any changes from the <em>nft</em> output and edit <em>nftfw_init.nft</em>.</p>
 <h2 id="how-do-i-get-more-information-on-nftfw">How do I: Get more information on <em>nftfw</em>?</h2>
-<p>The <a href="Users_Guide.md">User’s Guide to nftfw</a> documents the system and there are also <a href="man/index.md">UNIX manual pages</a>.</p>
+<p>The <a href="Users_Guide.html">User’s Guide to nftfw</a> documents the system and there are also <a href="man/index.md">UNIX manual pages</a>.</p>
 <h2 id="acknowledgement">Acknowledgement</h2>
 <p>All of this is made possible by shamelessly borrowing ideas from Patrick Cherry who created the Symbiosis hosting package for Bytemark of which the firewall system is part.</p>
 </body>

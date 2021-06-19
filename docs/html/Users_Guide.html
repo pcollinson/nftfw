@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>after you’ve changed the directory contents, or wait for the next automatic update.</p>
 <h3 id="blacknets.d">blacknets.d</h3>
 <p>The only rule about filenames in the <em>blacknets.d</em> directory is that they should end with <em>.nets</em>. Each file should contain a list of network address ranges, one per line, in CIDR format. See <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Wikipedia</a> if you need more information on the notation. The files support comments starting with ‘#’.</p>
-<p>Mostly, you can find suitable lists on the web, see <a href="Getting-cidr-lists.md">Getting CIDR Lists</a> for how to install them. However, there’s nothing to stop you creating your own lists.</p>
+<p>Mostly, you can find suitable lists on the web, see <a href="Getting-cidr-lists.html">Getting CIDR Lists</a> for how to install them. However, there’s nothing to stop you creating your own lists.</p>
 <h2 id="starting-with-nftfw">Starting with <em>nftfw</em></h2>
 <p>The root user runs_nftfw_ from the command line to create the firewall:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> nftfw load</a></code></pre></div>
@@ -158,7 +158,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The <em>-f</em> or <em>–full</em> flag to the <em>load</em> command forces the new files to be loaded without reference to the last run. Consider using the <em>-f</em> flag to force a full reload if you think that the firewall isn’t working.</p>
 <p><em>nftfw</em> uses a configuration file in <em>/etc/nftfw/config.ini</em> to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The <em>-i</em> flag to <em>nftfw</em> lists all the values that are in force.</p>
 <p><em>nftfw</em> will write error messages into <em>/var/log/syslog</em> using the standard <em>syslog</em> mechanism. To get an listing of what <em>ntfw</em> is doing, set <em>loglevel</em> in the config file to <em>INFO</em>.</p>
-<p>There are various manual pages - see <a href="man/index.md">Manual page index</a>.</p>
+<p>There are various manual pages - see <a href="man/index.html">Manual page index</a>.</p>
 <p>If you are migrating from another firewall system to <em>nftfw</em>, now’s the time to look at the <a href="Installation.md#migrating-to-nftfw">Migrating to nftfw</a> section of the Installation document.</p>
 <h2 id="blacklist">Blacklist</h2>
 <p><em>nftfw</em> contains a scanner whose job is to watch log files and add offending IP addresses into <em>blacklist.d</em>. The scanner is started by:</p>
@@ -192,7 +192,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>If the match count is over a threshold number, defaulting to 10, and settable in the <em>config.ini</em> file, the scanner will add a file to the <em>blacklist.d</em> directory, triggering a run of <em>nftfw load</em> to put the ip address into the blacklist blocking against the nominated ports. When the match count gets over a second threshold, default 100, and also settable in <em>config.ini</em>, the blacklist entry is promoted to blocking all ports.</p>
 <p>The current state of the blacklist can be seen by using</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="ex">nftfwls</span></a></code></pre></div>
-<p>and the <em>-a</em> option to this command lists all the entries in the database. <em>nftfwls</em> has a manual page, see the <a href="man/index.md">Manual page index</a>.</p>
+<p>and the <em>-a</em> option to this command lists all the entries in the database. <em>nftfwls</em> has a manual page, see the <a href="man/index.html">Manual page index</a>.</p>
 <h3 id="the-portsupdate-option">The ports=update option</h3>
 <p>Once in the firewall, miscreant sites will continue to knock at the door. They are generally robots, and it’s good to know if they are still knocking so we can keep them in the firewall. A firewall rule with logging will write a record into <em>/var/log/syslog</em> and the database is updated using the special port value of <em>update</em>. Here’s <em>blacklist-update.pattern</em>:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="co">#  Blacklist feedback pattern</span></a>
@@ -249,19 +249,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>All documents can be found on the web from the <a href="https://nftfw.uk"><em>nftfw</em> website</a>.</p>
 <p>See documents in the <em>docs</em> directory:</p>
 <ul>
-<li><a href="Installation.md">Installing <em>nftfw</em></a>
+<li><a href="Installation.html">Installing <em>nftfw</em></a>
 <ul>
 <li>Full installation of the system for Debian Buster.</li>
 </ul></li>
-<li><a href="Installation-Instructions.md">Installation Instructions</a>
+<li><a href="Installation-Instructions.html">Installation Instructions</a>
 <ul>
 <li>For those who want a bare bones list of tasks.</li>
 </ul></li>
-<li><a href="Installing-GeoLocation.md">Installing Geolocation</a>
+<li><a href="Installing-GeoLocation.html">Installing Geolocation</a>
 <ul>
 <li>Installing Geolocation, adding country detection to <em>nftfwls</em>, which is optional but desirable.</li>
 </ul></li>
-<li><a href="Getting-cidr-lists.md">Getting CIDR lists</a>
+<li><a href="Getting-cidr-lists.html">Getting CIDR lists</a>
 <ul>
 <li>How to get CIDR files for use with the <em>blacknet</em> feature..</li>
 </ul></li>
@@ -269,15 +269,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li>I’ve added a repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs.</li>
 </ul></li>
-<li><a href="Updating-nftfw.md">Updating <em>nftfw</em></a>
+<li><a href="Updating-nftfw.html">Updating <em>nftfw</em></a>
 <ul>
 <li>How to update <em>nftfw</em>.</li>
 </ul></li>
-<li><a href="How_do_I.md">How do I.. or Quick User’s Guide</a>
+<li><a href="How_do_I.html">How do I.. or Quick User’s Guide</a>
 <ul>
 <li>Answers a bunch of questions about the system.</li>
 </ul></li>
-<li><a href="man/index.md">Manual Page index</a>
+<li><a href="man/index.html">Manual Page index</a>
 <ul>
 <li>Manual Page index</li>
 </ul></li>

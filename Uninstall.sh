@@ -315,7 +315,7 @@ if [ "$remove_local" != "" ]; then
 fi
 if [ "$remove_root" != "" ]; then
     echo "Deleting $remove_root"
-    ${RUNCMD} rm -rf $remove_local
+    ${RUNCMD} rm -rf $remove_root
 fi
 if [ "$remove_man" != "" ]; then
     echo "Deleting manual pages"

@@ -1,3 +1,7 @@
+v0.8.1	Documentation update
+	Create pdf's from the main documentation files
+	Fix typo in Uninstall.sh
+
 v0.8.0	Summary of changes from 0.7 requiring some reconfiguration
 	It's highly likely that you will need to update your config.ini
 	and nftfw_init.nft files from the distributed versions.

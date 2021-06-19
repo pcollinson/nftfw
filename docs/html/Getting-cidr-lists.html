@@ -94,7 +94,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="maxmind-geolocation">Maxmind Geolocation</h2>
 <p>If you’ve installed the GeoLite2 database from Maxmind to assist with identifing countries with <em>nftfwls</em>, then with some little work you can access their country database and also have your system refresh it once a week.</p>
 <h3 id="step-1---getting-the-maxmind-database">Step 1 - Getting the Maxmind database</h3>
-<p>The script you are about to install looks for your MaxMind license information in <em>/etc/GeoIP.conf</em>, so you need to install the Geolocation system first, see <a href="Installing-GeoLocation.md">Installing Geolocation</a>.</p>
+<p>The script you are about to install looks for your MaxMind license information in <em>/etc/GeoIP.conf</em>, so you need to install the Geolocation system first, see <a href="Installing-GeoLocation.html">Installing Geolocation</a>.</p>
 <p>You’ll need <code>wget</code>, so</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">sudo</span> apt install wget</a></code></pre></div>
 <p>Navigate to the <em>nftfw</em> release and find the <em>cidrlist</em> directory. Install the shell script <code>getgeocountry</code> that pulls the database from MaxMind:</p>
@@ -133,7 +133,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>If the command gives no output, check the copy of the file in the <em>etc_nftfw</em> directory using <em>grep</em>.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="fu">grep</span> blacknets /etc/nftfw/etc_nftfw/nftfw_init.nft</a></code></pre></div>
 <p>If this gives output, then copy the <em>originals</em> file over your running version, carefully re-applying any changes you’ve made.</p>
-<p>If there is no output from <em>grep</em> on the copy in <em>etc_nftfw</em>, you need to update your <em>nftfw</em> installation to a version after v0.7.0. See <a href="Updating-nftfw.md">Updating <em>nftfw</em></a>.</p>
+<p>If there is no output from <em>grep</em> on the copy in <em>etc_nftfw</em>, you need to update your <em>nftfw</em> installation to a version after v0.7.0. See <a href="Updating-nftfw.html">Updating <em>nftfw</em></a>.</p>
 <h2 id="general-notes">General notes</h2>
 <p>You can create as many files as you like in <em>blacknets.d</em> as long as they are in the correct format. To remove a set from the firewall, simply remove the file.</p>
 <p>The files can contain a lot of IP addresses, and processing them can take some time. The reader will cope with automatic detection of IPv4 and IPv6, the conversion of IPv4 addresses when expressed in IPv6 format (which <em>ip2location.com</em> uses), and the removal of some addresses that look like networks but are not. It will also remove duplicates and compresses the IP list down to a set of unique networks. It’s possible to run CIDR files from both of the sources shown in this document, and reduce them to a minimal set.</p>

@@ -28,7 +28,7 @@
 
 ## How do I: Allow access to a service on my machine?
 
-Change directory into _/etc/nftfw/incoming.d_ (maybe _/usr/local/etc/nftfw/incoming,d_)
+Change directory into _/etc/nftfw/incoming.d_ (maybe _/usr/local/etc/nftfw/incoming.d_).
 
 You'll see something like
 

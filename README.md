@@ -45,7 +45,7 @@ See documents in the _docs_ directory:
 - [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
   - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
 - [Updating _nftfw_](docs/Updating-nftfw.md)
-  - How to update _nftfw_.
+  - How to update a manual installation of _nftfw_.
 - [User's Guide](docs/Users_Guide.md)
   - The full User guide, the first section explains how the system is controlled.
 - [How do I.. or Quick User's Guide](docs/How_do_I.md)

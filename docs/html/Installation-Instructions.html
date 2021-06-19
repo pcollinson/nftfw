@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Installation Instructions</title>
+  <title>Manual Installation Instructions</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -79,10 +79,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </head>
 <body>
 <header>
-<h1 class="title">Installation Instructions</h1>
+<h1 class="title">Manual Installation Instructions</h1>
 </header>
-<h1 id="installation-instructions">Installation Instructions</h1>
-<p>For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the <a href="Installation.md">Installing nftfw</a> document. There are links, shown as ‘Explanation’, to the Installation document.</p>
+<h1 id="manual-installation-instructions">Manual Installation Instructions</h1>
+<p>For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the <a href="Installation.html">Installing nftfw</a> document. There are links, shown as ‘Explanation’, to the Installation document.</p>
 <h2 id="basic-package-installations">Basic package installations</h2>
 <h3 id="nftables"><em>nftables</em></h3>
 <p>(<a href="Installation.md#nftables">Explanation</a>)</p>
@@ -219,31 +219,31 @@ nftables_conf = /etc/nftables.conf</code></pre>
 <p>Finally a tip that’s hard to find: reload <em>systemd</em> if you change the <em>nftfw</em> files after installation and starting:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb28-1" title="1">$ <span class="fu">sudo</span> systemctl daemon-reload</a></code></pre></div>
 <h2 id="installing-geolocation">Installing Geolocation</h2>
-<p>This will add country detection to <em>nftfwls</em>, which is optional but desirable. See the <a href="Installing-GeoLocation.md">document</a>. If you plan on blocking addresses by country, then the Geolocation system from Maxmind can provide tools to generate lists of IP addresses in the correct format.</p>
+<p>This will add country detection to <em>nftfwls</em>, which is optional but desirable. See the <a href="Installing-GeoLocation.html">document</a>. If you plan on blocking addresses by country, then the Geolocation system from Maxmind can provide tools to generate lists of IP addresses in the correct format.</p>
 <h2 id="configuring-the-firewall">Configuring the firewall</h2>
-<p><em>nftfw</em> is distributed with no rules specified for outbound packets (the <em>nftfw_init.nft</em> file has some builtin default rules. The set of inbound rules are aimed at permitting access to <em>ssh</em>, <em>http</em> and <em>https</em>, <em>ftp</em> and various email ports. The incoming <em>ftp</em> rules are designed to support <em>Pure FTP</em>. Firewall configuration is a matter of creating or deleting files in the various directories in <em>/usr/local/etc/nftfw</em>. You probably need to change settings for your system. Scan through the <a href="How_do_I.md">How do I.. or a User’s Quick Guide</a> document for a quick start on setting up access for your needs.</p>
+<p><em>nftfw</em> is distributed with no rules specified for outbound packets (the <em>nftfw_init.nft</em> file has some builtin default rules. The set of inbound rules are aimed at permitting access to <em>ssh</em>, <em>http</em> and <em>https</em>, <em>ftp</em> and various email ports. The incoming <em>ftp</em> rules are designed to support <em>Pure FTP</em>. Firewall configuration is a matter of creating or deleting files in the various directories in <em>/usr/local/etc/nftfw</em>. You probably need to change settings for your system. Scan through the <a href="How_do_I.html">How do I.. or a User’s Quick Guide</a> document for a quick start on setting up access for your needs.</p>
 <h2 id="sympl-users-update-your-mail-system-after-installation">Sympl users: Update your mail system after installation</h2>
 <p>A repository that steps through the changes I make to the standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve feedback and detection of bad IPs - see <a href="https://github.com/pcollinson/sympl-email-changes">Sympl mail system update</a>.</p>
 <h2 id="you-are-there">You Are There</h2>
 <p>Now look at:</p>
 <ul>
-<li><a href="Updating-nftfw.md">Updating <em>nftfw</em></a>
+<li><a href="Updating-nftfw.html">Updating <em>nftfw</em></a>
 <ul>
 <li>How to update <em>nftfw</em>.</li>
 </ul></li>
-<li><a href="Installing-GeoLocation.md">Installing Geolocation</a>
+<li><a href="Installing-GeoLocation.html">Installing Geolocation</a>
 <ul>
 <li>How to install GeoIP2</li>
 </ul></li>
-<li><a href="Getting-cidr-lists.md">Getting CIDR lists</a>
+<li><a href="Getting-cidr-lists.html">Getting CIDR lists</a>
 <ul>
 <li>How to obtain blocking lists for countries</li>
 </ul></li>
-<li><a href="Users_Guide.md">User’s Guide to nftfw</a>
+<li><a href="Users_Guide.html">User’s Guide to nftfw</a>
 <ul>
 <li>The full User guide, the first section explains how the system is controlled.</li>
 </ul></li>
-<li><a href="How_do_I.md">How do I.. or a User’s Quick Guide</a>
+<li><a href="How_do_I.html">How do I.. or a User’s Quick Guide</a>
 <ul>
 <li>Answers a bunch of questions about the system.</li>
 </ul></li>
