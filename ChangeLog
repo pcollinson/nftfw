@@ -1,4 +1,6 @@
 v0.8.2	Minor text changes, remove inadvertent pdf file in docs
+	Recoded rule.d/icmp.sh and rule.d/icmpv6.sh
+	Fix Uninstall.sh nftfw script removal
 
 v0.8.1	Documentation update
 	Create pdf's from the main documentation files

@@ -84,6 +84,7 @@ letter - so --rules can be -r.
 
 import sys
 import argparse
+import subprocess
 from pathlib import Path
 from config import Config
 from configerr import ConfigError
@@ -202,6 +203,20 @@ def must_be_root(cf):
         sys.exit(1)
 
 
+def is_nftfw_path_running():
+    """ Run external check script to find if the nftfw.path service is running
+
+    Shell script exits with
+    0 if nftfw.path is not running
+    1 if nftfw.path is running
+    2 if systemctl is not installed
+    we just return that value
+    """
+
+    chk = subprocess.run(('/bin/sh', 'check_for_nftfw_path.sh'), stdout=subprocess.PIPE)
+    return chk.returncode
+
+
 if __name__ == '__main__':
 
     # pylint: disable=invalid-name
@@ -232,6 +247,19 @@ if __name__ == '__main__':
     if args.install or args.update:
         must_be_root(cf)
 
+    # worry about automatic path watching
+    sysctl = is_nftfw_path_running()
+    if sysctl != 3:
+        if sysctl == 1:
+            if args.install or args.update:
+                print(f"You need to run\n    sudo systemctl stop nftfw.path")
+                print(f"Please do that and restart this command.\nAfter final import restart the service.")
+                sys.exit(1)
+            else:
+                print(f"*** Warning: you need to run\nsudo systemctl stop nftfw.path\nbefore")
+                print(f"Remember to restart the service after you've updated nftfw.")
+                print()
+                
     install = Installer(cf, args.silent)
 
     # we are doing rules

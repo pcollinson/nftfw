@@ -129,12 +129,14 @@ class Config:
         # Paths to remaining directories
         for outin in ['nftfw', 'src']:
             for key in self.paths[outin]:
+                if key == 'local':
+                    continue
                 if self.paths[outin][key]:
                     continue
                 dirname = key + '.d'
                 self.paths[outin][key] = self.etcs[outin] / dirname
                 if not self.paths[outin][key].is_dir():
-                    raise ConfigError('Cannot find directory: {str(self.paths[outin][key])}')
+                    raise ConfigError(f'Cannot find directory: {str(self.paths[outin][key])}')
 
         # Path to lib/nftfw/firewall.db - so needs an exists() check
         fw = self.vars['nftfw'] / 'firewall.db'
@@ -158,9 +160,10 @@ class Config:
                 errmsg = f'Cannot find rule files in {str(rulepath)}'
                 raise ConfigError(errmsg)
 
-            # local.d is optional
+            # local.d is optional and may be None
             localpath = self.paths[outin]['local']
-            self.rules[outin]['local'] = self.read_rules(localpath, glob, strict)
+            if localpath:
+                self.rules[outin]['local'] = self.read_rules(localpath, glob, strict)
 
 
     def read_rules(self, dirpath, glob, strictmatch):

@@ -107,7 +107,7 @@ remove_cron=""
 remove_systemd=""
 
 if isyes ${LOCAL_SCRIPTS_INSTALLED} ; then
-    remove_scripts='pip3 uninstall nftfw'
+    remove_scripts='(cd nftfw; pip3 uninstall nftfw)'
 fi
 # check local etc and var
 if isyes ${HAS_LOCAL_ETC} || isyes ${HAS_LOCAL_VAR} ; then
@@ -307,7 +307,7 @@ done
 # if we get here then we have some stuff to do.
 if [ "$remove_scripts" != "" ]; then
     echo 'Deleting installed script'
-    ${RUNCMD} pip3 uninstall .
+    ${RUNCMD} sh -c "$remove_scripts"
 fi
 if [ "$remove_local" != "" ]; then
     echo "Deleting $remove_local"
