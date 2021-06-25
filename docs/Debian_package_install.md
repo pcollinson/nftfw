@@ -1,7 +1,7 @@
 % Debian Package Installation
 # Install _nftfw_ from the Debian Package
 
-_nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/tree/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](Debian_package_install.md) for a how-to guide.
+_nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](Debian_package_install.md) for a how-to guide.
 
 Following Debian practice, the system will be installed in the root of the file system, so the control files will be in _/etc/nftfw_ with the library files in _/var/lib/nftfw_.
 
