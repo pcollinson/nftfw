@@ -1,5 +1,7 @@
 These two files will enable nftfw to run and load
 nftables when contents of the control directories change.
+These files are compatible with the manual installed version.
+Separate files are used in the Debian package.
 
 To install:
 

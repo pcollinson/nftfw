@@ -1,0 +1,22 @@
+# Systemd path unit - monitoring /usr/local/etc/nftfw directories
+# Assumes nftfw is installed in /usr/local
+# when triggered starts nftfw.service to run the program
+#
+# NB this path file needs to be started and enabled by systemctl
+# the associated service file is started by this unit
+#
+# sudo systemctl enable nftfw.path
+# sudo systemctl start nftfw.path
+
+[Unit]
+Description="Monitor nftfw directories for changes"
+
+[Path]
+PathModified=/etc/nftfw/incoming.d
+PathModified=/etc/nftfw/outgoing.d
+PathModified=/etc/nftfw/whitelist.d
+PathModified=/etc/nftfw/blacklist.d
+PathModified=/etc/nftfw/blacknets.d
+
+[Install]
+WantedBy=multi-user.target

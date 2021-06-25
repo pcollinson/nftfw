@@ -1,0 +1,37 @@
+# basic etc/nftfw setup
+etc_nftfw/* usr/share/doc/nftfw/etc_nftfw
+
+# router example
+nftfw_router_example/* usr/share/doc/nftfw/nftfw_router_example
+
+# simple web page
+nftfwls_web/* usr/share/doc/nftfw/nftfwls_web
+
+# tools for geolocation
+cidrlists/* usr/share/doc/nftfw/cidrlists
+
+# Symbiosis/Sympl import tool
+import_tool/* usr/share/doc/nftfw/import_tool
+
+# Documentation
+# omit manual installation documents
+docs/Debian_package_install.md usr/share/doc/nftfw/docs_md
+docs/Getting-cidr-lists.md usr/share/doc/nftfw/docs_md
+docs/How_do_I.md usr/share/doc/nftfw/docs_md
+docs/Installing-GeoLocation.md usr/share/doc/nftfw/docs_md
+docs/Users_Guide.md usr/share/doc/nftfw/docs_md
+docs/index.md usr/share/doc/nftfw/docs_md
+
+docs/html/Debian_package_install.html usr/share/doc/nftfw/docs_html
+docs/html/Getting-cidr-lists.html usr/share/doc/nftfw/docs_html
+docs/html/How_do_I.html usr/share/doc/nftfw/docs_html
+docs/html/Installing-GeoLocation.html usr/share/doc/nftfw/docs_html
+docs/html/Users_Guide.html usr/share/doc/nftfw/docs_html
+docs/html/index.html usr/share/doc/nftfw/docs_html
+
+docs/pdf/Debian_package_install.pdf usr/share/doc/nftfw/docs_pdf
+docs/pdf/Getting-cidr-lists.pdf usr/share/doc/nftfw/docs_pdf
+docs/pdf/How_do_I.pdf usr/share/doc/nftfw/docs_pdf
+docs/pdf/Installing-GeoLocation.pdf usr/share/doc/nftfw/docs_pdf
+docs/pdf/Users_Guide.pdf usr/share/doc/nftfw/docs_pdf
+docs/pdf/index.pdf usr/share/doc/nftfw/docs_pdf

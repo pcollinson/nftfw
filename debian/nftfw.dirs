@@ -1,0 +1,3 @@
+var/lib/nftfw/build.d
+var/lib/nftfw/install.d
+var/lib/nftfw/test.d

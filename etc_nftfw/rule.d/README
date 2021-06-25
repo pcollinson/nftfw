@@ -4,6 +4,9 @@ using echo and other shell output techniques. This directory might be updated
 on a new installation. Local rules should be added in local.d. Files in local.d
 with the same name supersede files in this directory.
 
+When files are updated, the previous version is shown by adding '.replaced'
+to the name. These files can be deleted.
+
 Each rule is called twice, once for ip and once of ip6
 
 The environment is set up as follows:

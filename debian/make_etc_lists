@@ -1,0 +1,47 @@
+#!/bin/sh
+set -e
+# Create list of directories and files
+# ../etc_nftfw
+# we need these lists statically for security
+# These are edited into the command files
+# so that can be used to install files
+# when needed - basically the first time around
+#
+# wrap a list into linewrapped format
+# This is going to be called from rules - dh_auto_clean hook
+# so it happens before the build
+# It's assumed that this is being run
+# from one directory above the debian directory
+if [ -e make_etc_lists ]; then
+    cd ..
+fi
+ETC_DIRS=$(cd etc_nftfw || true
+	   find . -type d \! -name . -print | sed -e 's/^..//'
+	  )
+ETC_FILES=$(cd etc_nftfw || true
+	    find . -type f -a \! -name .empty -print | sed -e 's/^..//'
+	    )
+CMDS="ETC_FILES='
+${ETC_FILES}
+'
+ETC_DIRS='
+${ETC_DIRS}
+'
+"
+echo "$CMDS" > debian/filelist
+# Now look for files to edit
+cd debian
+for name in postinst postrm preinst prerm; do
+    if [ -f $name.src ]; then
+	if grep -q '^#ETCLISTS#' $name.src ; then
+	    sed -e '
+	    /#ETCLISTS#/ {
+	        s/#ETCLISTS#//
+	        r filelist
+	        p
+	    }
+	    ' < $name.src > $name
+	fi
+    fi
+done
+rm -f filelist || true

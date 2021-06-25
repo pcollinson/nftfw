@@ -14,7 +14,7 @@ SYNOPSIS
 DESCRIPTION
 =========
 
-**nftfw** is the front-end for the firewall system that generates rules for nftables. It uses files in five directories in _/usr/local/etc/nftfw_ to create firewall rules.  The directories create  incoming and outgoing firewalls, and also  tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system's root or  below _/usr/local_.
+**nftfw** is the front-end for the firewall system that generates rules for nftables. It uses files in five directories in _/etc/nftfw_ to create firewall rules.  The directories create  incoming and outgoing firewalls, and also  tables for whitelisting and blacklisting particular IP addresses. The distribution is installed relative to the system's root or  below _/usr/local_.
 
 The **nftfw** command has several options, and most of these don't change that often when the system is in operation. Editing the ini format file _/etc/nftfw/config.ini_  changes the values of options - see nftfw-config(5). You may make temporary variable changes to configuration values from the command line using the **-o** option to **nftfw** (see below).
 

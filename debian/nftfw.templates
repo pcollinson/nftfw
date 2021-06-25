@@ -1,0 +1,22 @@
+Template: nftfw/askuser
+Type: string
+Default: root
+_Description: The username:
+ To make controlling the firewall easier, you can make the contents of
+ /etc/nftfw owned by a non-root user. The user must exist. If you Cancel
+ you can reconfigure later using 'sudo dpkg-reconfigure nftfw'.
+
+Template: nftfw/mustexist
+Type: note
+_Description: "${username}" doesn't exist
+ Suggest that you leave the current user in place, and can reconfigure
+ later using 'sudo dpkg-reconfigure nftfw'.
+
+Template: nftfw/confirm
+Type: boolean
+Default: false
+_Description: Happy with this user "${username}"?
+  Yes to use "${username}", No to return to the
+  first page.
+  Use Cancel on the first page to abandon, leaving
+  "${currentuser}" in place.

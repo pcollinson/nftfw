@@ -1,0 +1,55 @@
+Source: nftfw
+Section: contrib/net
+Priority: optional
+Maintainer: Peter Collinson <support@nftfw.uk>
+Build-Depends: debhelper (>= 11),
+	       dh-python,
+	       python3-all,
+	       python3-setuptools,
+	       python3-pytest,
+	       po-debconf
+Standards-Version: 4.3.0
+Homepage: https://nftfw.uk
+#Vcs-Browser: https://salsa.debian.org/debian/nftfw
+Vcs-Git: https://github.com/pcollinson/nftfw
+X-Python-Version: >= 3.6
+Rules-Requires-Root: binary-targets
+
+Package: nftfw
+Architecture: all
+Depends: nftables,
+	 adduser,
+	 dh-python,
+	 python3-all,
+	 python3-dnspython,
+         python3-prettytable,
+	 ${python3:Depends},
+	 ${misc:Depends}
+Recommends: python3-geoip2, geoipupdate, sqlite3
+Suggests: python3-pytest, pylint3
+Description: nftables firewall builder for Debian
+ The nftfw package builds firewalls for nftables. Configuration is
+ based on files stored in directories in /etc/nftfw. For example,
+ adding a new IP address to the whitelist is done by creating a file
+ named for the IP address in the whitelist.d directory. Adding a new
+ rule permitting access to a port just takes the addition of a
+ suitably named file in incoming.d. Blacklisting address ranges is
+ done by adding a CIDR address to a file in blacknets.d.
+ .
+ nftfw can automatically maintain the blacklist by efficiently scanning
+ log files using regular expressions and adding miscreant IP addresses
+ into blacklist.d. It maintains a database of activity and will
+ timeout the entries after a user-defined period. When an IP is
+ blocked, nftfw allows for feedback from nftables to notice and
+ maintain blocking for frequent attempts from unwanted visitors.
+ .
+ nftfw makes extensive use of nftables sets to maintain exclusion and
+ inclusion lists. It tries to minimise changes to the live firewall by
+ only updating sets that have changed. It adds its created statements
+ to an nftables template that can be modified to extend the firewall
+ setup if needed.
+ .
+ After installation, some configuration is needed to make the system active,
+ see /usr/share/doc/nftfw/README.Debian
+ .
+ The package is written and developed in Python 3.7.

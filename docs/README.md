@@ -4,6 +4,8 @@
   - The full User guide, the first section explains how the system is controlled.
 - [How do I.. or Quick User's Guide](How_do_I.md)
   - Answers a bunch of questions about the system.
+- [Install _nftfw_ from Debian package](Debian_package_install.md)
+  - Installation from the package found in the package directory
 - [Installing _nftfw manually_](Installation.md)
   - Full installation of the system for Debian Buster.
 - [Manual Installation Instructions](Installation-Instructions.md)

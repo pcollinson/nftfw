@@ -2,7 +2,7 @@
 #
 # Allow icmp for ipv4
 #
- if [ "$PROTO" = 'ip' ]; then
+if [ "$PROTO" = 'ip' ]; then
     if [ "$DIRECTION" = 'incoming' ]; then
 	ADDRCMD='saddr'
     else

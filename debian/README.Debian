@@ -1,0 +1,51 @@
+nftfw for Debian
+----------------
+
+The nftfw package creates an easy-to-use firewall generation system
+for nftables.
+
+To get a handle on how to use it, you can look in /usr/share/doc/nftfw for
+various pieces of documentation. These are also available on the web,
+visit https://nftfw.uk.
+
+The Debian binary package unpacks into the root of the file system using:
+
+/etc/nftfw         - for control files
+/usr/var/lib/nftfw - for working files and data storage
+/usr/bin           - for the four commands: nftfw, nftfwls, nftfwedit and
+		     nftfwadm.
+/etc/cron.d        - regularly calling the nftfw to perform various tasks
+/usr/lib/systemd/system - making the /etc/nftfw directory structure
+		     active, so a change there causes nftfw to
+                     update itself.
+/usr/share/doc/nftfw - for documentation, examples and currently
+		     distributed control files
+
+Contents of /usr/share/doc/nftfw:
+README.Debian	     - this file
+changelog.Debian.gz  - Official Debian changelog file
+changelog.gz         - Developer changelog
+cidrlists	     - tools to import MaxMind Geolocation files
+                       into blacknets.d
+copyright	     - Copyright file
+docs_html	     - Documents in html format
+docs_md              - Documents in markdown format
+docs_pdf	     - Documents on pdf format
+etc_nftfw	     - Initial setup files for /etc/nftfw
+                       retained as source, and updated
+import_tool          - import Symbiosis/Sympl setup from /usr/local
+                       into nftfw
+nftfw_router_example - Sample nftfw_init.nft file for use with a
+                       router system with multiple interfaces
+nftfwls_web	     - Sample webpage for displaying nftfwls output
+
+
+Installation
+------------
+For full installation instructions see
+/nftfw/doc_{md,html,pdf}/Debian_package_install.*
+
+For safety, this package loads in an inactive state, and needs some
+configuration to activate.
+
+ -- Peter Collinson <support@nftfw.uk>  Wed, 23 June 2021 09:23:26 +0100

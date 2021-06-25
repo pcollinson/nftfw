@@ -10,3 +10,6 @@ to reflect the locations on your system.
       read-only to root.
       sudo cp cron-nftfw /etc/cron.d/nftfw
       sudo chmod 644 /etc/cron.d/nftfw
+
+This file is for a manual installation. A separate
+file is supplied for the Debian package.

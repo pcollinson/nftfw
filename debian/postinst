@@ -1,0 +1,370 @@
+#!/bin/sh
+# postinst script for nftfw
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see https://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+# Install configuration files - but only
+# if the destination directory doesn't exist
+# or is empty
+# The source for these files are loaded into
+# /usr/share/doc/nftfw
+# these two definitions need to be absolute for symlink to work
+INSTALL_BASE=/etc/nftfw
+SOURCE_BASE=/usr/share/doc/nftfw/etc_nftfw
+
+# ETC_FILES and ETC_DIRS contain the list of files and directories
+# that should be found in /etc/pktest
+# Only want to install the contents here once - and then leave it alone
+# for manual update.
+
+
+ETC_FILES='
+incoming.d/30-imap
+incoming.d/05-ping
+incoming.d/50-smtps
+incoming.d/30-imaps
+incoming.d/06-ftp-helper
+incoming.d/40-pop3s
+incoming.d/10-https
+incoming.d/20-ftp
+incoming.d/07-ssh
+incoming.d/10-http
+incoming.d/21-ftp-passive
+incoming.d/40-pop3
+incoming.d/99-drop
+incoming.d/50-submission
+incoming.d/60-sieve
+incoming.d/50-smtp
+README
+nftfw_init.nft
+rule.d/drop.sh
+rule.d/reject-www-data.sh
+rule.d/ping.sh
+rule.d/allowtcpreset.sh
+rule.d/icmp.sh
+rule.d/ftp-helper.sh
+rule.d/essential-icmpv6.sh
+rule.d/related.sh
+rule.d/icmpv6.sh
+rule.d/README
+rule.d/established.sh
+rule.d/collector.sh
+rule.d/syn-ack-flood-protection.sh
+rule.d/load-http-meter.sh
+rule.d/accept.sh
+rule.d/reject.sh
+rule.d/imager.sh
+rule.d/ftp-passive.sh
+rule.d/http-meter.sh
+config.ini
+patterns.d/blacklist-update.patterns
+patterns.d/ftpd.patterns
+patterns.d/http-overlimit.patterns
+patterns.d/phpmyadmin-suhosin.patterns
+patterns.d/check-mailbox-password.patterns
+patterns.d/openssh.patterns
+patterns.d/exim4.patterns
+patterns.d/apache2.patterns
+local.d/README
+'
+ETC_DIRS='
+incoming.d
+blacklist.d
+blacknets.d
+rule.d
+outgoing.d
+patterns.d
+local.d
+whitelist.d
+'
+
+
+# Count number of files in a directory
+# count_files_in_dir dir
+count_files_in_dir() {
+    if [ -d $1 ]; then
+	COUNT=$(cd $1; ls -1 | wc -l)
+	echo ${COUNT}
+    else
+	echo 0
+    fi
+}
+
+#
+# see if INSTALL_BASE needs installing
+# this cannot be too clever for safety
+# do the install
+#  if the directory doesn't exist
+#  if is it empty
+#  if .newinstall exists - indicating a failed or
+#        aborted initial install
+# Once installed, only rule.d contents are updated
+# on future installs
+etc_install_needed() {
+    [ ! -d ${INSTALL_BASE} ] && return 0
+    [ $(count_files_in_dir ${INSTALL_BASE}) -eq 0 ] && return 0
+    [ -e ${INSTALL_BASE}/.newinstall ] && return 0
+    return 1
+}
+
+# See if the user exists
+# and if necessary default to root
+# return the user installed
+get_dir_owner() {
+    # get the user from debconf
+    db_get nftfw/askuser || true
+    if [ "${RET}" = 'root' ]; then
+	echo 'root'
+	return 0
+    fi
+    if getent passwd $RET > /dev/null; then
+	echo ${RET}
+	return 0
+    fi
+    echo 'root'
+    return 0
+}
+
+# change ownership of a file if needed
+# file is known to exist
+# called with
+# user group file
+chown_if_needed() {
+    USER=$1
+    GROUP=$2
+    FILE=$3
+    stat -c '%U %G' $FILE|read U G
+    if [ $? -eq 0 ]; then
+	if [ "$U" != "$USER" -o "$G" != "$GROUP" ]; then
+	    chown ${USER}:${GROUP} ${FILE} || true
+	fi
+    fi
+    return 0
+}
+
+# Ownership changes to config files
+# nftfw uses the uid/gid of /etc/nftfw
+# to create files.
+#
+# Debian install insists on the use of static file
+# lists rather than recursive changes.
+#
+# called with USER and GROUP
+#
+change_config_owner() {
+    USER=$1
+    GROUP=$2
+    chown_if_needed ${USER} ${GROUP} ${INSTALL_BASE} || true
+    for dir in ${ETC_DIRS}; do
+	if [ -d ${INSTALL_BASE}/$dir ]; then
+	    chown_if_needed ${USER} ${GROUP} ${INSTALL_BASE}/$dir || true
+	fi
+    done
+    for file in ${ETC_FILES}; do
+	if [ -f ${INSTALL_BASE}/$file ]; then
+	    chown_if_needed  ${USER} ${GROUP} ${INSTALL_BASE}/$file || true
+	fi
+    done
+    return 0
+}
+
+# install script
+# if $INSTALL_BASE doesn't exist
+# or is empty - do a full installation from the values
+# in $SOURCE_BASE
+# create a flag file .newinstall so if this fails, a retry will
+# finish the job
+install_config_files() {
+    USER=$1
+    GROUP=$2
+    USERGROUP=${USER}:${GROUP}
+    # check we have source to copy
+    if [ ! -d ${SOURCE_BASE} -o $(count_files_in_dir ${SOURCE_BASE}) -eq 0 ]; then
+	echo "Cannot find source configuration files - should be in ${SOURCE_BASE}" >&2
+	return 1
+    fi
+    if [ ! -d ${INSTALL_BASE} ]; then
+	mkdir ${INSTALL_BASE} || true
+	chmod 2775 ${INSTALL_BASE} || true
+	chown ${USERGROUP} ${INSTALL_BASE} || true
+    fi
+    touch ${INSTALL_BASE}/.newinstall || true
+    for dir in ${ETC_DIRS}; do
+	d=${INSTALL_BASE}/$dir
+	if [ ! -d $d ]; then
+	    mkdir $d  || true
+	fi
+	chmod 0775 $d || true
+	chown ${USERGROUP} $d || true
+    done
+    # install files
+    ( cd ${SOURCE_BASE}
+      for file in $ETC_FILES; do
+	  dir=$(dirname $file)
+	  if [ ! -e ${INSTALL_BASE}/$dir/$file ]; then
+	      install -p -o $USER -g $GROUP -m 0664 $file ${INSTALL_BASE}/$dir || true
+	  fi
+      done
+    )
+    rm -f ${INSTALL_BASE}/.newinstall || true
+    return 0
+}
+
+# Check essential control files exist
+# 1) creates empty directories if missing
+# 2) adds control files if missing
+repair_control_files() {
+    USER=$1
+    GROUP=$2
+    USERGROUP=${USER}:${GROUP}
+
+    for dir in ${ETC_DIRS}; do
+	d=${INSTALL_BASE}/$dir
+	if [ ! -e $d ]; then
+	    mkdir $d || true
+	    chmod 0775 $d || true
+	    chown ${USERGROUP} $d || true
+	fi
+    done
+
+    ( cd ${SOURCE_BASE}
+      for file in ${ETC_FILES}; do
+	  # use case to choose top level files
+	  case $file in
+	      */*) ;;
+	      *)   if [ ! -e ${INSTALL_BASE}/$file ]; then
+		       install -p -o $USER -g $GROUP -m 0664 $file ${INSTALL_BASE} || true
+		   fi
+		   ;;
+	  esac
+      done
+     )
+    return 0
+}
+
+# The plan is maintain files in rule.d, replacing any updated files
+# and adding new ones. Don't worry about pruning old files.
+# Only rule.d is maintained like this
+#
+update_rule_files() {
+    USER=$1
+    GROUP=$2
+    ( cd ${SOURCE_BASE}
+      for file in ${ETC_FILES}; do
+	  case ${file} in
+	      rule.d/*)
+		  # paranoia check
+		  if [ -e $file ]; then
+		      DESTFILE=${INSTALL_BASE}/${file}
+		      # The gnu install command uses more criteria than contents when
+		      # comparing files, it will backup the file if the ownership differs
+		      # which is overkill here and results in loads of copies
+		      # so do the compare based on contents only using cmp
+		      if [ -e ${DESTFILE} ]; then
+		      	 if ! cmp -s $file ${DESTFILE}; then
+			    rm -f ${DESTFILE}.replaced || true
+			    mv ${DESTFILE} ${DESTFILE}.replaced || true
+			 fi
+		      fi
+		      install -p -o $USER -g $GROUP -m 0664 ${file} ${DESTFILE} || true
+		  fi
+		;;
+	  esac
+      done
+    )
+    return 0
+}
+
+# remove old contents from ${INSTALL_BASE}/etc_nftfw
+# if it was installed by an old version
+#  it might be a directory
+#  it might be called original
+# complain if it cannot be done, but don't fail
+clean_etc_nftfw_link() {
+    for possible in original etc_nftfw; do
+	FILE=${INSTALL_BASE}/$possible
+	RMARG=""
+	if [ -e ${FILE} ]; then
+	    if [ ! -h ${FILE} -a -d ${FILE} ]; then
+		RMARG='-rf'
+	    fi
+	    if ! rm ${RMARG} ${FILE} ; then
+		if [ "$possible" = "etc_nftfw" ]; then
+	    	    echo "Cannot remove ${FILE}, please clean and install link by hand" >&2
+		fi
+	    fi
+	fi
+    done
+    return 0
+}
+#
+# Make the import_tool/import_to_nftfw.py executable
+# to make life easier
+activate_import_tool() {
+    FILE=/usr/share/doc/nftfw/import_tool/import_to_nftfw.py
+    if [ -f ${FILE} -a ! -x ${FILE} ]; then
+	chmod +x /usr/share/doc/nftfw/import_tool/import_to_nftfw.py || true
+    fi
+    return 0
+}
+
+case "$1" in
+    configure)
+	USER=$(get_dir_owner)
+	GROUP=$(id -gn $USER) || true
+	if etc_install_needed ; then
+	    if ! install_config_files $USER $GROUP; then
+		exit 1
+	    fi
+	else
+	    # update the rule files of needed
+	    if ! update_rule_files $USER $GROUP; then
+		exit 1
+	    fi
+	    change_config_owner $USER $GROUP || true
+	fi
+	# repair missing control files
+	# this creates empty directories if any are missing
+	# and adds top level files if needed
+	repair_control_files $USER $GROUP
+
+	# create symlink from ${INSTALL_BASE}/etc_nftfw to ${SOURCE_BASE}
+	clean_etc_nftfw_link
+        ( cd ${INSTALL_BASE} && ln -s ${SOURCE_BASE} etc_nftfw ) || true
+
+	# make import tool script executable
+	activate_import_tool
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0

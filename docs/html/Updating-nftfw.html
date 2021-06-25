@@ -108,11 +108,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="changes-for-nftfw-version-0.8-and-onwards">Changes for <em>nftfw</em> version 0.8 and onwards</h2>
 <p>Summary of changes from 0.7 requiring some reconfiguration:</p>
 <ul>
-<li>Edit config.ini to remove: [Owner] section - ownership of files created in etc/nftfw now taken from owner of that directory nftfw_base - nftfw now uses it’s own control files</li>
+<li>Edit config.ini to remove: [Owner] section - ownership of files created in etc/nftfw now taken from owner of that directory nftfw_base - nftfw now uses it’s own control files exclusively.</li>
 <li><em>etc/nftfw/original</em> renamed <em>etc/nftfw/etc_nftfw</em></li>
 <li>Change to nftfw_init.nft to include essential ipv6 icmp coding. Change to <em>rule.d/essential-icmpv6.sh</em>. Can remove reference to this rule in incoming.d and outgoing.d.</li>
 <li>Updated regular expressions in exim4.patterns - now find IP addresses correctly</li>
-<li>Local action rules should be placed in <em>/etc/nftfw/local.d</em>, so that _/rule.d can be updated by distributions.</li>
+<li>Local action rules should be placed in <em>/etc/nftfw/local.d</em>, so that <em>/rule.d</em> can be updated by distributions.</li>
 </ul>
 <p>Other changes:</p>
 <ul>

@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+export DH_VERBOSE = 1
+
+export DEB_RULES_REQUIRES_ROOT = binary_targets
+
+export PYBUILD_NAME=nftfw
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf nftfw.egg-info
+	rm -rf .pytest_cache
+# make postinst from postinst.src
+	debian/make_etc_lists
+
+override_dh_installsystemd:
+	dh_installsystemd --no-enable --no-start --no-restart-on-upgrade nftfw.path
+
+override_dh_install:
+	dh_install -X.empty
+
+override_dh_compress:
+	dh_compress -Xetc_nftfw -Ximport_tool

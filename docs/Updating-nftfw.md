@@ -51,11 +51,11 @@ Summary of changes from 0.7 requiring some reconfiguration:
 
  - Edit config.ini to remove:
     [Owner] section - ownership of files created in etc/nftfw now taken from owner of that directory
-    nftfw_base - nftfw now uses it's own control files
+    nftfw_base - nftfw now uses it's own control files exclusively.
  - _etc/nftfw/original_ renamed _etc/nftfw/etc_nftfw_
  - Change to nftfw_init.nft to include essential ipv6 icmp coding. Change to _rule.d/essential-icmpv6.sh_. Can remove reference to this rule in incoming.d and outgoing.d.
  - Updated regular expressions in exim4.patterns - now find IP addresses correctly
- - Local action rules should be placed in _/etc/nftfw/local.d_, so that _/rule.d can be updated by distributions.
+ - Local action rules should be placed in _/etc/nftfw/local.d_, so that _/rule.d_ can be updated by distributions.
 
 Other changes:
 

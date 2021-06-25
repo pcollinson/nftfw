@@ -1,0 +1,8 @@
+debian/nftfw/usr/share/doc/nftfw/changelog.gz
+debian/nftfw/usr/share/doc/nftfw/changelog.Debian.gz
+debian/nftfw/usr/share/man/man1/nftfwedit.1.gz
+debian/nftfw/usr/share/man/man1/nftfwadm.1.gz
+debian/nftfw/usr/share/man/man1/nftfwls.1.gz
+debian/nftfw/usr/share/man/man1/nftfw.1.gz
+debian/nftfw/usr/share/man/man5/nftfw-files.5.gz
+debian/nftfw/usr/share/man/man5/nftfw-config.5.gz
