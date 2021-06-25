@@ -1,7 +1,7 @@
 % Debian Package Installation
 # Install _nftfw_ from the Debian Package
 
-_nftfw_ can now be installed and updated from a Debian binary package. The package is available in the _package_ directory on the [nftfw github site](https://github.com/pcollinson/nftfw/package).
+_nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/tree/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](Debian_package_install.md) for a how-to guide.
 
 Following Debian practice, the system will be installed in the root of the file system, so the control files will be in _/etc/nftfw_ with the library files in _/var/lib/nftfw_.
 
@@ -26,7 +26,7 @@ Download the zipfile containing the most recent debian binary package from [nftf
 
 ### What to do if you are running a manually installed _nftfw_ version
 
-See [Manually _installed _nftfw](#manually-installed-nftfw) below, and return here when done.
+See [Manually installed nftfw](#manually-installed-nftfw) below, and return here when done.
 
 ### Install the package
 
@@ -255,7 +255,7 @@ $ sudo nftfw -f -v load
 ```
 you can check the rules using the _nft_ commands
 
-If are are here from the text above, [return to Loading the rules](#loading-the-rules). Otherwise, if you are upgrading a manually installed firewall return to complete the end of Section 3 below.
+If are are here from the text above, [return to Loading the rules](#loading-the-rules). Otherwise, if you are upgrading a manually installed firewall, complete the end of Section 3 below.
 
 ### Manually installed _nftfw_
 

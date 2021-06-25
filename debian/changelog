@@ -1,3 +1,9 @@
+nftfw (0.9.1-1) unstable; urgency=medium
+
+   * Documentation changes for github links
+
+ -- Peter Collinson <support@nftfw.uk>  Fri, 25 Jun 2021 11:34:03 +0100
+
 nftfw (0.9.0-1) unstable; urgency=medium
 
   * Initial release (Closes: #990291)

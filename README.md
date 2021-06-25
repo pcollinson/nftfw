@@ -4,7 +4,7 @@ The _nftfw_ package builds firewalls for _nftables_. The system creates a simple
 
 _nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system. It should work on other Linux distributions. The package is written in Python 3 and needs at least the 3.6 release.
 
-_nftfw_ can be installed from a Debian binary package, there is a zip file in the [package directory](package/nftfw_current.zip) containing the most recent version. Because this is a firewall, the installation needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md).
+_nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/tree/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md) for a how-to guide.
 
 ## Features
 

@@ -82,7 +82,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 class="title">Debian Package Installation</h1>
 </header>
 <h1 id="install-nftfw-from-the-debian-package">Install <em>nftfw</em> from the Debian Package</h1>
-<p><em>nftfw</em> can now be installed and updated from a Debian binary package. The package is available in the <em>package</em> directory on the <a href="https://github.com/pcollinson/nftfw/package">nftfw github site</a>.</p>
+<p><em>nftfw</em> can be installed from a Debian binary package, there is a zip file called <em>nftfw_current.zip</em> in the <a href="https://github.com/pcollinson/nftfw/tree/package">package directory</a> containing the most recent version. For safety, <em>nftfw</em> needs some configuration after installation. See the installation document <a href="Debian_package_install.html">Install <em>nftfw</em> from Debian package</a> for a how-to guide.</p>
 <p>Following Debian practice, the system will be installed in the root of the file system, so the control files will be in <em>/etc/nftfw</em> with the library files in <em>/var/lib/nftfw</em>.</p>
 <h2 id="getting-started">Getting started</h2>
 <p>This section presents the bare bones of installing the <em>nftfw</em> package on a vanilla system. To cope with some special circumstances, links in the document jump to sets of instructions which start after the main installation documentation.</p>
@@ -94,7 +94,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 id="download-the-package">Download the package</h3>
 <p>Download the zipfile containing the most recent debian binary package from <a href="https://github.com/pcollinson/nftfw/package/nftfw_current_deb.zip">nftfw github site</a>. This will download a file (<em>nftfw_current_deb.zip</em>) used to hide the version number and running <em>unzip</em> on the file will yield the package. The filename of the package contains a version number and ends in <em>.deb</em>, for example <em>nftfw_1.0.0-1_all.deb</em>.</p>
 <h3 id="what-to-do-if-you-are-running-a-manually-installed-nftfw-version">What to do if you are running a manually installed <em>nftfw</em> version</h3>
-<p>See <a href="#manually-installed-nftfw">Manually _installed _nftfw</a> below, and return here when done.</p>
+<p>See <a href="#manually-installed-nftfw">Manually installed nftfw</a> below, and return here when done.</p>
 <h3 id="install-the-package">Install the package</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="fu">sudo</span> dpkg -i nftfw_XXXXX_all.deb</a></code></pre></div>
 <p>where XXXXX is the version number of the file you downloaded. <em>dpkg</em> doesn’t install dependencies and may complain and stop. If this happens run:</p>
@@ -208,7 +208,7 @@ nftables_conf = /etc/nftables.conf</code></pre>
 <p>Once you’ve updated the firewall, run <em>nftfw</em> to load the new settings:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1">$ <span class="fu">sudo</span> nftfw -f -v load</a></code></pre></div>
 <p>you can check the rules using the <em>nft</em> commands</p>
-<p>If are are here from the text above, <a href="#loading-the-rules">return to Loading the rules</a>. Otherwise, if you are upgrading a manually installed firewall return to complete the end of Section 3 below.</p>
+<p>If are are here from the text above, <a href="#loading-the-rules">return to Loading the rules</a>. Otherwise, if you are upgrading a manually installed firewall, complete the end of Section 3 below.</p>
 <h3 id="manually-installed-nftfw">Manually installed <em>nftfw</em></h3>
 <p>There have been some small changes in the way that <em>nftfw</em> works that have been developed to make things simpler for users, and also to remove some of the lesser used features. Mostly, the package installs and expects its control files in <em>/etc/nftfw</em> and will use working files in <em>/var/lib/nftfw</em>.</p>
 <p>There are a small number of steps that are needed to switch to the package version, the idea here is to retain a working firewall while you are upgrading.</p>
