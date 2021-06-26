@@ -36,7 +36,7 @@ All documents can be found on the web from the [_nftfw_ website](https://nftfw.u
 
 See documents in the _docs_ directory:
 
-- [Install _nftfw_ from Debian package](Debian_package_install.md)
+- [Install _nftfw_ from Debian package](docs/Debian_package_install.md)
   - Installation from the Debian package found in the package directory.
 - [Installing _nftfw manually_](docs/Installation.md)
   - Full installation of the system for Debian Buster.
