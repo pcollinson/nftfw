@@ -1,0 +1,13 @@
+Document: nftfw-get-cidr-lists
+Title: Getting CIDR lists
+Author: Peter Collinson
+Abstract: Getting lists of CIDR IP addresses by country
+ How to install and use them for nftfw
+Section: Debian
+
+Format: PDF
+Files: /usr/share/doc/nftfw/docs_pdf/Getting-cidr-lists.pdf.gz
+
+Format: HTML
+Index: /usr/share/doc/nftfw/docs_html/index.html
+Files: /usr/share/doc/nftfw/docs_html/Getting-cidr-lists.html

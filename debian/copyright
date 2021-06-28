@@ -1,5 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: nftfw
+Upstream-Contact: Peter Collinson <support@nftfw.uk>
 Source: https://github.com/pcollinson/nftfw
 
 Files: *

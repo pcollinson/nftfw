@@ -1,0 +1,17 @@
+Document: nftfw-package-install
+Title: Install _nftfw_ from the Debian Package
+Author: Peter Collinson
+Abstract: How to install nftfw from the Debian package
+ Includes: how to check for correct version of iptables.
+ What it will install.
+ What precautions to take to keep your firewall running
+ when installing
+ Migrating from a Sympl/Symbiosis firewall
+Section: Debian
+
+Format: PDF
+Files: /usr/share/doc/nftfw/docs_pdf/Debian_package_install.pdf.gz
+
+Format: HTML
+Index: /usr/share/doc/nftfw/docs_html/index.html
+Files: /usr/share/doc/nftfw/docs_html/Debian_package_install.html

@@ -11,8 +11,9 @@
 #10,25,40,55 * * * * root /usr/bin/nftfw -q whitelist
 
 # check on firewall changes
-# incron does some of this, but can miss events
-# if many happen at once
+# systemd can miss events when many files in directories
+# change and also doesn't include watches for control.ini
+# and nftfw_init.nft
 #@hourly root /usr/bin/nftfw -q load
 
 # Keep firewall database under control

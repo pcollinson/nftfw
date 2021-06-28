@@ -1,0 +1,15 @@
+Document: nftfw-installing-geo
+Title: Installing Maxmind Geolocation
+Author: Peter Collinson
+Abstract: The nftfwls command can use geolocation
+ to indicate the location of IP addresses.
+ This document describes how to install the necessary
+ packages and files.
+Section: Debian
+
+Format: PDF
+Files: /usr/share/doc/nftfw/docs_pdf/Installing-GeoLocation.pdf.gz
+
+Format: HTML
+Index: /usr/share/doc/nftfw/docs_html/index.html
+Files: /usr/share/doc/nftfw/docs_html/Installing-GeoLocation.html

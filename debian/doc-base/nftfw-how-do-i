@@ -1,0 +1,14 @@
+Document: nftfw-how-do-i
+Title: How do I... or a Users' Quick Guide
+Author: Peter Collinson
+Abstract: An FAQ style document
+ Contain several questions and simple
+ examples of how to configure and run nftfw
+Section: Debian
+
+Format: PDF
+Files: /usr/share/doc/nftfw/docs_pdf/How_do_I.pdf.gz
+
+Format: HTML
+Index: /usr/share/doc/nftfw/docs_html/index.html
+Files: /usr/share/doc/nftfw/docs_html/How_do_I.html

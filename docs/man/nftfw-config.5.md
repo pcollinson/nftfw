@@ -66,7 +66,7 @@ The logging facility are we using, it needs to be a facility name not a value.
       logfacility = daemon
 
 _logprint_
-Control printing of logged informaion. Set to False to inhibit log printing at the console. This value is initially set to False when the program is not talking to a terminal. **nftfw**  uses the **-q** flag to the set this value to False and the option will suppress printing to the terminal.
+Control printing of logged information. Set to False to inhibit log printing at the console. This value is initially set to False when the program is not talking to a terminal. **nftfw**  uses the **-q** flag to the set this value to False and the option will suppress printing to the terminal.
 
       logprint = True
 

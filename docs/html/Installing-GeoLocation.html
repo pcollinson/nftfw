@@ -98,7 +98,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>It seems that this package is not available on RPi servers. However, compiled versions for the 32-bit armhf architecture exists on the internet. Visit</p>
 <pre class="text"><code>https://packages.debian.org/buster/armhf/geoipupdate/download</code></pre>
 <p>Clicking on a link on that page should download a Debian package that can be installed; you should get a file called <code>geoipupdate_3.1.1-1_armhf.deb</code>. Then</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> apt install ./geoipupdate_3.1.1-1_armhf.deb</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">sudo</span> dpkg -i ./geoipupdate_3.1.1-1_armhf.deb</a></code></pre></div>
 <p>will install the package for you.</p>
 <p>You have all the bits we need, we’ll set them up later.</p>
 <h2 id="getting-a-maxmind-account">Getting a MaxMind Account</h2>

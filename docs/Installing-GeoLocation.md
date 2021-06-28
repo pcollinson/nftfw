@@ -41,7 +41,7 @@ https://packages.debian.org/buster/armhf/geoipupdate/download
 Clicking on a link on that page should download a Debian package that can be installed; you should get a file called ```geoipupdate_3.1.1-1_armhf.deb```. Then
 
 ``` sh
-$ sudo apt install ./geoipupdate_3.1.1-1_armhf.deb
+$ sudo dpkg -i ./geoipupdate_3.1.1-1_armhf.deb
 ```
 will install the package for you.
 

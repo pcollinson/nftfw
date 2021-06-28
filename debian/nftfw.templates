@@ -16,7 +16,4 @@ Template: nftfw/confirm
 Type: boolean
 Default: false
 _Description: Happy with this user "${username}"?
-  Yes to use "${username}", No to return to the
-  first page.
-  Use Cancel on the first page to abandon, leaving
-  "${currentuser}" in place.
+  Agree to use "${username}", otherwise return to the start.

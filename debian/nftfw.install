@@ -35,3 +35,10 @@ docs/pdf/How_do_I.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/Installing-GeoLocation.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/Users_Guide.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/index.pdf usr/share/doc/nftfw/docs_pdf
+
+# Docbase registration
+debian/doc-base/nftfw-get-cidr-lists /usr/share/doc-base
+debian/doc-base/nftfw-how-do-i /usr/share/doc-base
+debian/doc-base/nftfw-installing-geo /usr/share/doc-base
+debian/doc-base/nftfw-package-install /usr/share/doc-base
+debian/doc-base/nftfw-users-guide /usr/share/doc-base

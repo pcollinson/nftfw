@@ -9,12 +9,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='nftfw',
-    version='0.9.3',
+    version='0.9.4',
     packages=find_packages(),
     include_package_data=True,
 
     license='MIT',
-    description="Nftfw - an nftables firewall generator for Debian",
+    description="Nftfw - nftables firewall generator for Debian",
     keywords="firewall nftables symbiosis",
     url='https://github.com/pcollinson/nftfw',
     long_description=long_description,

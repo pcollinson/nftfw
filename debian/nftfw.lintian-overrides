@@ -1,1 +1,18 @@
-nftfw: zero-byte-file-in-doc-directory
+
+# /usr/share/doc contains etc_nftfw
+# containing several zero length files
+nftfw binary: zero-byte-file-in-doc-directory *
+
+# The systemd timer seems to be aimed at starting a single task at
+# regular intervals, and then ensuring that task is done. The cron job
+# for nftfw acts as an event generator. It contains four different
+# tasks, each set at different times. It would be possible to create
+# an nftfw@.service to invoke the different tasks. However setting up
+# the timers seems more problematic. As far as I can see it would need
+# four different timer units. Then it would be really necessary for
+# ease of use to make a single unit to create the all the services
+# without starting them, and also to setup all the timers. I don't
+# think that systemd at present makes an effective and easy to use
+# replacement for cron in this case. So for now, I will make nftfw
+# depend on cron.
+nftfw binary: missing-systemd-timer-for-cron-script

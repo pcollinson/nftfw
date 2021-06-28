@@ -7,8 +7,29 @@
 [Unit]
 Description="nftfw systemd trigger"
 # Only allow starting from nftfw.path
-RefuseManualStart=true
+#RefuseManualStart=true
+# Docs
+Documentation=man:nftfw(1) man:nftfw-files(5)
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/nftfw -q load
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+DevicePolicy=closed
+# nftfw wants to write in /etc
+# and /var/lib/nftfw
+ProtectSystem=true
+# Don't need home access
+ProtectHome=true
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+# Probably don't need this for load action
+# but may for blacklist
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
