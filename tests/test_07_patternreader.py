@@ -20,20 +20,33 @@ def test_patternreader(cf):
     patterns = pattern_reader(cf)
 
     # can't use json because of the compiled re's
-    # save reference
+    # save reference as pickle
+    # dataformat is
+    # { key : [{args:values,},] }
+
     file = open('newdata/patternreader.pickle', 'wb')
     pickle.dump(patterns, file)
     file.close()
+    # check we have 'pattern' in each dict
+    for key, val in patterns.items():
+        for lines in val:
+            assert 'pattern' in lines.keys()
+    # sort the dicts in to pattern key order
+    patsort = {key: sorted(val, key=lambda x: x['pattern']) \
+               for key,val in patterns.items()}
 
     file = open('srcdata/patternreader.pickle', 'rb')
     reference = pickle.load(file)
     file.close()
+    refsort = {key: sorted(val, key=lambda x: x['pattern']) \
+               for key,val in reference.items()}
 
-    for key, val in reference.items():
-        assert key in patterns.keys()
+
+    for key, val in refsort.items():
+        assert key in patsort.keys()
         for i in range(len(val)):           # pylint: disable=consider-using-enumerate
             refval = val[i]
-            patval = patterns[key][i]
+            patval = patsort[key][i]
             for vkey in ('pattern', 'ports', 'file'):
                 if vkey in refval:
                     assert vkey in patval.keys()
@@ -42,8 +55,8 @@ def test_patternreader(cf):
                 assert 'regex' in patval
                 for reix in range(len(refval['regex'])):
                     assert refval['regex'][reix] == patval['regex'][reix]
-    for key, val in patterns.items():
-        assert key in reference.keys()
+    for key, val in patsort.items():
+        assert key in refsort.keys()
 
 def test_parsefile(cf):
     """ Test file parsing """
