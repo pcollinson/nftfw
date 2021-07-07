@@ -1,3 +1,10 @@
+v0.9.5	The getgeocountry script in cidrlists was broken because
+	evidently MaxMind changed their packaging of the zip file.
+	The script tries to get the name of their distribution
+	which includes the date, and this was failing. This bug
+	is fixed, and also some more error reporting was added
+	to the script to report other failures.
+
 v0.9.4	Changes in Debian packaging suggested by comments
 	when version 0.9.3 was uploaded to mentors.debian.net
 

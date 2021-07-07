@@ -61,11 +61,14 @@ import() {
        PREVIOUS=$(readlink $OUTPUT)
    fi
 
-   if wget -q -O $TEMP "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=$KEY&suffix=zip"; then
+   wget -q -O $TEMP "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=$KEY&suffix=zip"
+   RES=$?
+   if [ $RES -eq 0 ]; then
        # see if we have a zip file
        if unzip -l -qq $TEMP > /dev/null; then
 	   # get directory name
- 	   DIR=$(unzip -l -qq $TEMP | grep $OUTPUT | head -1 | sed -e 's/^.*Geo/Geo/' -e 's,/.*$,,')
+	   PATHTO=$(unzip -l -qq $TEMP | grep $OUTPUT | head -1 | cut -d' ' -f6-)
+           DIR=$(dirname $PATHTO)
 	   if [ ! -d "${DIR}" ]; then
 	       unzip -qq $TEMP
 	       rm -f $OUTPUT
@@ -76,9 +79,33 @@ import() {
 	   fi
 	   rm -rf $TEMP
            return 0
+       else
+	  echo "Failed to unzip $PWD/$TEMP"
+	  return 127
        fi
+   else
+       # From wget manual page
+       case $RES in
+	   1)   errmsg="Generic error code."
+		;;
+	   2)   errmsg="Parse error---for instance, when parsing command-line options, the .wgetrc or .netrc..."
+		;;
+	   3)   errmsg="File I/O error."
+		;;
+	   4)   errmsg="Network failure."
+		;;
+	   5)   errmsg="SSL verification failure."
+		;;
+	   6)   errmsg="Username/password authentication failure."
+		;;
+	   7)   errmsg="Protocol errors."
+		;;
+	   8)   errmsg="Server issued an error response."
+		;;
+       esac
+       echo "Error using wget to obtain file: $errmsg"
+       return 127
    fi
-   return 127
 }
 # Make sqlite3 database
 makesql() {
