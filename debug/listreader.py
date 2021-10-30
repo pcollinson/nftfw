@@ -7,12 +7,12 @@ for whitelist and blacklist
 """
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
+    sys.path.insert(0, '..')
     import logging
     log = logging.getLogger('nftfw')
 
-    from config import Config
-    from listreader import ListReader
+    from nftfw.config import Config
+    from nftfw.listreader import ListReader
 
     cf = Config()
     wf = ListReader(cf, 'whitelist', need_compiled_ix=False)

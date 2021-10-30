@@ -23,6 +23,10 @@ define gateadminnet = 192.168.1.0/24
 table ip filter {
 	chain input {
 		type filter hook input priority 0; policy drop;
+
+		ct state invalid counter drop
+		ct state {established,related} counter accept
+
 		iif "lo" counter accept
 
 		# not sure I need this
@@ -38,11 +42,6 @@ table ip filter {
 		# allow direct from admin on the gateway
 		ip saddr $gateadminnet counter accept
 
-		# better to put these related checks before looking
-		# at any thing else, so the firewall is only
-		# processing new connections
-		ct state {established,related} counter accept
-		ct state invalid counter drop
 
 		counter jump whitelist
 		counter jump blacknets
@@ -53,14 +52,11 @@ table ip filter {
 	chain forward {
 		type filter hook forward priority 0; policy drop;
 
+		ct state invalid counter drop
+		ct state {established,related} counter accept
+
 		# allow all from local
 		iif $localif counter accept
-
-		# better to put these related checks before looking
-		# at any thing else, so the firewall is only
-		# processing new connections
-		ct state {established,related} counter accept
-		ct state invalid counter drop
 
 		counter jump whitelist
 		counter jump blacknets
@@ -70,9 +66,9 @@ table ip filter {
 
 	chain output {
 		type filter hook output priority 0; policy accept;
-		oif "lo" counter accept
-		ct state {established,related} counter accept
 		ct state invalid counter drop
+		ct state {established,related} counter accept
+		oif "lo" counter accept
 		counter jump outgoing
 	}
 
@@ -128,14 +124,16 @@ table ip myhelpers {
 table ip6 filter {
 	chain input {
 		type filter hook input priority 0; policy drop;
+
+		ct state invalid counter drop
+		ct state {established,related} counter accept
+
 		iif "lo" counter accept
 
                 # These are better here, to allow selective blocking of neighbours
                 icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem } counter accept
                 icmpv6 type { nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, nd-redirect } ip6 hoplimit 255 counter accept
 
-		ct state {established,related} counter accept
-		ct state invalid counter drop
 
 		# allow all from local interface
 		iif $localif counter accept
@@ -150,8 +148,8 @@ table ip6 filter {
 	chain forward {
 		type filter hook forward priority 0; policy drop;
 
-		ct state {established,related} counter accept
 		ct state invalid counter drop
+		ct state {established,related} counter accept
 
 		# allow all from local
 		iif $localif counter accept
@@ -164,14 +162,16 @@ table ip6 filter {
 
 	chain output {
 		type filter hook output priority 0; policy accept;
+
+		ct state invalid counter drop
+		ct state {established,related} counter accept
+
 		oif "lo" counter accept
 
 		# These are better here, to allow selective blocking of neighbours
                 icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem } counter accept
                 icmpv6 type { nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, nd-redirect } ip6 hoplimit 255 counter accept
 
-		ct state {established,related} counter accept
-		ct state invalid counter drop
 		counter jump outgoing
 	}
 

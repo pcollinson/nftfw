@@ -4,10 +4,10 @@
 
 import pickle
 import pytest
-from configsetup import config_init
-from rulesreader import RulesReader
-from ruleserr import RulesReaderError
-from firewallreader import FirewallReader
+from nftfw.rulesreader import RulesReader
+from nftfw.ruleserr import RulesReaderError
+from nftfw.firewallreader import FirewallReader
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():          # pylint: disable=invalid-name

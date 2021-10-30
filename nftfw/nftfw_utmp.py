@@ -7,7 +7,7 @@ import socket
 import struct
 from ctypes import *
 from ctypes.util import find_library
-from utmpconst import *
+from .utmpconst import *
 
 # Definitions are derived from running ccp
 # on a c file containing

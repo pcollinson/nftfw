@@ -16,12 +16,13 @@ and in some cases properties to return values
 """
 import os
 import sys
+import pwd
 from functools import wraps
 from pathlib import Path
 from configparser import ConfigParser, ExtendedInterpolation
 from configparser import Error as ConfigParserError
 import logging
-from loggermanager import LoggerManager
+from .loggermanager import LoggerManager
 log = logging.getLogger('nftfw')
 
 def cache(func):
@@ -394,13 +395,13 @@ pattern_split = No
 
     # Directories we expect to find in sysetc
     etc_dir = {'incoming':  'incoming.d',
-                'outgoing':  'outgoing.d',
-                'whitelist': 'whitelist.d',
-                'blacklist': 'blacklist.d',
-                'blacknets': 'blacknets.d',
-                'patterns':  'patterns.d',
-                'rule':      'rule.d',
-                'local':     'local.d'}
+               'outgoing':  'outgoing.d',
+               'whitelist': 'whitelist.d',
+               'blacklist': 'blacklist.d',
+               'blacknets': 'blacknets.d',
+               'patterns':  'patterns.d',
+               'rule':      'rule.d',
+               'local':     'local.d'}
 
     # Directories we expect to find in the sysvar
     var_dir = {'build': 'build.d',
@@ -541,6 +542,11 @@ pattern_split = No
         self.fileuid = 0
         self.filegid = 0
 
+        # These are used in rulesreader to demote the shell script
+        # execution away from root
+        self.execuid = 0
+        self.execgid = 0
+
         # now setup loggermanager
         self.logger_mgr = LoggerManager(self, log)
 
@@ -618,6 +624,25 @@ pattern_split = No
         dirstat = dirpath.stat()
         self.fileuid = dirstat.st_uid
         self.filegid = dirstat.st_gid
+        # establish exec values
+        if self.fileuid == 0 \
+           and self.filegid == 0:
+            # get uid/gid for 'nobody'
+            try:
+                nobody = pwd.getpwnam('nobody')
+            except KeyError as e:
+                err = ( "We need to find a non-root user, and there is no 'nobody'\n"
+                        "account on this system. As a work-around use\n"
+                        "   sudo dpkg-reconfigure nftfw\n"
+                        "and set the user not to be root."
+                      )
+                print(err)
+                sys.exit(1)
+            self.execuid = nobody.pw_uid
+            self.execgid = nobody.pw_gid
+        else:
+            self.execuid = self.fileuid
+            self.execgid = self.filegid
 
         # Finally check on the installation
         self._check_installation()

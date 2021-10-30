@@ -2,9 +2,9 @@
 
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
-    from config import Config
-    from normaliseaddress import NormaliseAddress
+    sys.path.insert(0, '..')
+    from nftfw.config import Config
+    from nftfw.normaliseaddress import NormaliseAddress
 
     cf = Config()
     na = NormaliseAddress(cf, 'Testing')

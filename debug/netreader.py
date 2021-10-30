@@ -9,12 +9,12 @@ Uses the filereader directly
 """
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
+    sys.path.insert(0, '..')
     import logging
     log = logging.getLogger('nftfw')
 
-    from config import Config
-    from netreader import NetReader, NetReaderFromFiles
+    from nftfw.config import Config
+    from nftfw.netreader import NetReader, NetReaderFromFiles
 
     cf = Config()
     nr = NetReaderFromFiles(cf, 'blacknets')

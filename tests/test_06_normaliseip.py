@@ -2,9 +2,9 @@
 
 from pathlib import Path
 import pytest
-from configsetup import config_init
-from normaliseaddress import NormaliseAddress
-from whitelistcheck import WhiteListCheck
+from nftfw.normaliseaddress import NormaliseAddress
+from nftfw.whitelistcheck import WhiteListCheck
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():          # pylint: disable=invalid-name

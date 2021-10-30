@@ -49,13 +49,7 @@ Optional commands:
 # It seems that the only way NOT to have to change the import code in every file
 # is to meddle with the sys.path variable here
 #
-import os
 import sys
-# get the path of this file
-install = os.path.dirname(__file__) # pylint: disable=invalid-name
-# add it at the start of path
-sys.path.insert(0, install)
-
 # check version of python
 # this code has been tested on 3.6 and is really
 # aimed at running on 3.7

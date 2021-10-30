@@ -3,9 +3,10 @@
 import json
 from pathlib import Path
 import pytest
-from configsetup import config_init
-from logreader import log_reader
-from fileposdb import FileposDb
+
+from nftfw.logreader import log_reader
+from nftfw.fileposdb import FileposDb
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():          # pylint: disable=invalid-name

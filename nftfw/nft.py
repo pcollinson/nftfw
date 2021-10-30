@@ -60,7 +60,8 @@ def nft_load(cf, dirname, filename, test=False):
 
     args += ['-f', str(filename)]
     compl = subprocess.run(args,
-                           stderr=subprocess.PIPE)
+                           stderr=subprocess.PIPE,
+                           check=False)
     if compl.stderr != b'':
         errs = compl.stderr.decode()
         log.error('nft using %s: failed', str(filename))
@@ -76,7 +77,9 @@ def nft_flush(cf):
 
     log.info('Flushing nft rulesets')
     args = ['/usr/sbin/nft', 'flush', 'ruleset']
-    compl = subprocess.run(args, stderr=subprocess.PIPE)
+    compl = subprocess.run(args,
+                           stderr=subprocess.PIPE,
+                           check=False)
     if compl.stderr != b'':
         errs = compl.stderr.decode()
         log.error('nft flush failed')
@@ -96,8 +99,10 @@ def nft_ruleset(cf):
     # pylint: disable=unused-argument
 
     args = ['/usr/sbin/nft', 'list', 'ruleset']
-    compl = subprocess.run(args, stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE)
+    compl = subprocess.run(args,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           check=False)
     rules = '' if compl.stdout == b'' else compl.stdout.decode()
     errs = ''  if compl.stderr == b'' else compl.stderr.decode()
     return (rules, errs)

@@ -2,12 +2,12 @@
 """
 
 from socket import gethostbyaddr, herror
-from nftfwls import datefmt
-from stats import duration, frequency
-from nf_edit_validate import validate_and_return_ip
-from fwdb import FwDb
-from geoipcountry import GeoIPCountry
-from dnsbl import Dnsbl
+from .nftfwls import datefmt
+from .stats import duration, frequency
+from .nf_edit_validate import validate_and_return_ip
+from .fwdb import FwDb
+from .geoipcountry import GeoIPCountry
+from .dnsbl import Dnsbl
 
 class PrintInfo:
     """ Class to print ip addresses """

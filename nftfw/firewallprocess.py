@@ -6,7 +6,7 @@ and outgoing control directories
 """
 
 import logging
-from ruleserr import RulesReaderError
+from .ruleserr import RulesReaderError
 log = logging.getLogger('nftfw')
 
 class FirewallProcess:

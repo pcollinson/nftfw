@@ -15,7 +15,7 @@ ts : int
 
 import time
 import logging
-from sqdb import SqDb
+from .sqdb import SqDb
 log = logging.getLogger('nftfw')
 
 class FileposDb(SqDb):

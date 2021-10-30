@@ -14,12 +14,18 @@ available before running.
 """
 
 from pathlib import Path
-from locker import Locker
-from fwmanage import fw_manage
-from blacklist import BlackList
+from .locker import Locker
+from .fwmanage import fw_manage
+from .blacklist import BlackList
 
 class Scheduler:
     """ Scheduler Class """
+
+    # imports are dynamic
+    # but pylint will complain on bullseye with import-outside-toplevel
+    # if the disable code is installed, pylint will complain on buster
+    # about the disable code below (now deactivated)
+    # pylint argument disable=import-outside-toplevel
 
     # list of 'user' tasks
     # edit is nftfwedit
@@ -126,7 +132,7 @@ class Scheduler:
             fw_manage(cf)
 
         elif command == 'whitelist':
-            from whitelist import WhiteList
+            from .whitelist import WhiteList
             wt = WhiteList(cf)
             changes = wt.whitelist()
             # rebuild the firewall if needed
@@ -150,20 +156,20 @@ class Scheduler:
             bl.clean_database()
 
         elif command == 'clean':
-            from fwcmds import fw_clean
+            from .fwcmds import fw_clean
             fw_clean(cf)
 
         elif command == 'save':
-            from fwcmds import fw_save
+            from .fwcmds import fw_save
             fw_save(cf)
 
         elif command == 'restore':
-            from fwcmds import fw_restore
+            from .fwcmds import fw_restore
             fw_restore(cf)
 
         elif command == 'edit':
             # args to fns stored in cf
-            from nf_edit_dbfns import DbFns
+            from .nf_edit_dbfns import DbFns
             dbf = DbFns(cf)
             changes = dbf.execute()
             if changes > 0:

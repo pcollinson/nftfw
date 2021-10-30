@@ -6,14 +6,14 @@ for whitelist and blacklist
 
 """
 import sys
-sys.path.insert(0, '../nftfw')
+sys.path.insert(0, '..')
 import logging
 log = logging.getLogger('nftfw')
 
 if __name__ == '__main__':
 
-    from config import Config
-    from whitelistcheck import WhiteListCheck
+    from nftfw.config import Config
+    from nftfw.whitelistcheck import WhiteListCheck
 
     cf = Config()
     wh = WhiteListCheck(cf)

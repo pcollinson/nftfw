@@ -4,13 +4,13 @@ import json
 import pickle
 import hashlib
 from pathlib import Path
-from configsetup import config_init
-from rulesreader import RulesReader
-from listreader import ListReader
-from firewallreader import FirewallReader
+from nftfw.rulesreader import RulesReader
+from nftfw.listreader import ListReader
+from nftfw.firewallreader import FirewallReader
 from nftfw import fwmanage
-from patternreader import pattern_reader
-from logreader import log_reader
+from nftfw.patternreader import pattern_reader
+from nftfw.logreader import log_reader
+from .configsetup import config_init
 
 def init_tests():
     """ Initialise data used to compare test values """

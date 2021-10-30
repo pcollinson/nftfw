@@ -3,8 +3,9 @@
 from pathlib import Path
 import time
 import pytest
-from configsetup import config_init
-from netreader import NetReader
+from nftfw.netreader import NetReader
+from .configsetup import config_init
+
 
 @pytest.fixture
 def cf():     # pylint: disable=invalid-name

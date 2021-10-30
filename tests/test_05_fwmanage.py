@@ -1,16 +1,14 @@
-
 """ Pytest fwmanage - can't do nft steps """
 import json
 import hashlib
 from pathlib import Path
 import pytest
 from nftfw import fwmanage
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():          # pylint: disable=invalid-name
     """ Get config from configsetup """
-    from configsetup import config_init
-
     _cf = config_init()
     return _cf
 

@@ -35,16 +35,18 @@ from any DNS blocklists, if specified in config.ini.
 import sys
 import argparse
 import logging
-from config import Config
-from nf_edit_validate import validate_and_return_ip_list
-from nf_edit_validate import validate_port
-from nf_edit_validate import validate_pattern
-from nf_edit_print import PrintInfo
-from scheduler import Scheduler
+from .config import Config
+from .nf_edit_validate import validate_and_return_ip_list
+from .nf_edit_validate import validate_port
+from .nf_edit_validate import validate_pattern
+from .nf_edit_print import PrintInfo
+from .scheduler import Scheduler
 log = logging.getLogger('nftfw')
 
 def main():
     """ Main action """
+
+    # pylint: disable=too-many-branches,too-many-statements
 
     desc = """Manage IP addresses in the nftfw blacklist database"""
     epilog = """
@@ -54,6 +56,7 @@ printed if available, along with the country of origin (if geoip2 is
 installed) and output from any DNS blocklists, if specified in
 config.ini.
 """
+
 
     ap = argparse.ArgumentParser(prog='nftfwedit',
                                  description=desc,
@@ -93,7 +96,7 @@ config.ini.
         cf.set_logger(logprint=False)
         emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
         log.critical(emsg)
-        exit(1)
+        sys.exit(1)
 
     # Load the ini file if there is one
     # options can set new values into the ini setup
@@ -104,7 +107,7 @@ config.ini.
         cf.set_logger(logprint=False)
         emsg = 'Aborted: {0}'.format(str(e))
         log.critical(emsg)
-        exit(1)
+        sys.exit(1)
 
     if args.quiet:
         cf.set_logger(logprint=False)
@@ -119,7 +122,7 @@ config.ini.
         cf.set_logger(logprint=False)
         emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
         log.critical(emsg)
-        exit(1)
+        sys.exit(1)
 
     if args.delete:
         run_delete(cf, ap, args)

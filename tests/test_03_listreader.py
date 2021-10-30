@@ -6,9 +6,8 @@ Uses IP addresses in blacklist.d
 import json
 from pathlib import Path
 import pytest
-from configsetup import config_init
-from listreader import ListReader, SetName
-
+from nftfw.listreader import ListReader, SetName
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():         # pylint: disable=invalid-name

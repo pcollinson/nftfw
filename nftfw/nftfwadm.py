@@ -4,16 +4,16 @@ import sys
 import argparse
 from pathlib import Path
 import pkg_resources
-from config import Config
-from scheduler import Scheduler
-from stdargs import nftfw_stdargs
+from .config import Config
+from .scheduler import Scheduler
+from .stdargs import nftfw_stdargs
 
 def main():
     """ Main action """
 
     version = pkg_resources.require('nftfw')[0].version
 
-    desc = f'Admin tools for managing nftfw installation'
+    desc = 'Admin tools for managing nftfw installation'
     epilog = '\n'.join(["""Actions:
     save       Saves the currently installed nftables settings
                in a file, which is used for recovery by nftfw if problems
@@ -64,7 +64,7 @@ def main():
     except AssertionError as e:
         emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
         print(emsg)
-        exit(1)
+        sys.exit(1)
 
     # allow change of config file
     if args.config:
@@ -82,7 +82,7 @@ def main():
     except AssertionError as e:
         emsg = 'Aborted: {0}'.format(str(e))
         print(emsg)
-        exit(1)
+        sys.exit(1)
 
     # decode and action standard args
     nftfw_stdargs(cf, args)
@@ -103,7 +103,7 @@ def main():
     except AssertionError as e:
         emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
         print(emsg)
-        exit(1)
+        sys.exit(1)
 
     # no return if not true
     cf.am_i_root()

@@ -47,14 +47,14 @@ import sys
 import shutil
 from filecmp import cmpfiles
 import logging
-from rulesreader import RulesReader
-from ruleserr import RulesReaderError
-from firewallreader import FirewallReader
-from firewallprocess import FirewallProcess
-from listreader import ListReader
-from listprocess import ListProcess
-from netreader import NetReader
-import nft
+from .rulesreader import RulesReader
+from .ruleserr import RulesReaderError
+from .firewallreader import FirewallReader
+from .firewallprocess import FirewallProcess
+from .listreader import ListReader
+from .listprocess import ListProcess
+from .netreader import NetReader
+from . import nft
 
 log = logging.getLogger('nftfw')
 

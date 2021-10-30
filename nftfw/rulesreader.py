@@ -6,9 +6,10 @@ with local variations installed in local.d
 
 """
 
+import os
 import subprocess
 import logging
-from ruleserr import RulesReaderError
+from .ruleserr import RulesReaderError
 log = logging.getLogger('nftfw')
 
 class RulesReader:
@@ -116,7 +117,20 @@ class RulesReader:
                 shortname = f'{parentname}/{filename}'
                 errorfiles.append(shortname)
             errors = ", ".join(errorfiles)
-            raise RulesReaderError(f'Syntax problems with {errors}. Run /bin/sh on files to check for errors.')
+            errstr = f'Syntax problems with {errors}. Run /bin/sh on files to check for errors.'
+            raise RulesReaderError(errstr)
+
+    def demote(self):
+        """ Demote owner of shell scripts
+
+            In 3.9, subprocess.run has user and group arguments
+            but they are not there in 3.7, so this technique has
+            to be used
+        """
+
+        if os.getuid() == 0:
+            os.setgid(self.cf.execgid)
+            os.setuid(self.cf.execuid)
 
     def execute(self, key, env):
         """ Execute a rule
@@ -134,6 +148,8 @@ class RulesReader:
 
         key should be checked for validity before calling execute
 
+        Demote running to a mortal user - if that user is available
+
         This is codes much more easily in 3.7, but has been coded
         with 3.6 API to support subprocess
         """
@@ -146,13 +162,17 @@ class RulesReader:
                                input=bytes(self.contents(key), 'utf-8'),
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
-                               env=env)
+                               env=env,
+                               check=False,
+                               preexec_fn = self.demote,
+                               # user=self.cf.execuid,
+                               # group=self.cf.execgid,
+                               start_new_session=True)
 
         if compl.returncode != 0:
             err = f'Action {key}: returned error code'
             raise RulesReaderError(err)
-        elif compl.stderr != b'':
+        if compl.stderr != b'':
             err = f'Action {key}: returned error {compl.stderr.decode()}'
             raise RulesReaderError(err)
-        else:
-            return compl.stdout.decode()
+        return compl.stdout.decode()

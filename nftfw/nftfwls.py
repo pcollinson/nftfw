@@ -8,10 +8,10 @@ from pathlib import Path
 import argparse
 import logging
 from prettytable import PrettyTable
-from fwdb import FwDb
-from config import Config
-from geoipcountry import GeoIPCountry
-from stats import duration
+from .fwdb import FwDb
+from .config import Config
+from .geoipcountry import GeoIPCountry
+from .stats import duration
 log = logging.getLogger('nftfw')
 
 def loaddb(cf, orderby='last DESC'):
@@ -305,7 +305,7 @@ time of last incident (in descending order)
         cf.set_logger(logprint=False)
         emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
         log.critical(emsg)
-        exit(1)
+        sys.exit(1)
 
     # allow change of config file
     if args.config:
@@ -314,7 +314,7 @@ time of last incident (in descending order)
             cf.set_ini_value_with_section('Locations', 'ini_file', str(file))
         else:
             cf.set_logger(logprint=False)
-            log.critical(f'Aborted: Cannot find config file: {args.config}')
+            log.critical('Aborted: Cannot find config file: %s', args.config)
             sys.exit(1)
 
     # Load the ini file if there is one
@@ -326,7 +326,7 @@ time of last incident (in descending order)
         cf.set_logger(logprint=False)
         emsg = 'Aborted: {0}'.format(str(e))
         log.critical(emsg)
-        exit(1)
+        sys.exit(1)
 
     if args.quiet:
         cf.set_logger(logprint=False)
@@ -339,7 +339,7 @@ time of last incident (in descending order)
     except AssertionError as e:
         emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
         log.critical(emsg)
-        exit(1)
+        sys.exit(1)
 
     orderby = 'last DESC'
     if args.reverse:

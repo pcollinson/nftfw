@@ -1,9 +1,9 @@
 """ nftfwedit - Implement functions to support database actions"""
 
 import logging
-from normaliseaddress import NormaliseAddress
-from fwdb import FwDb
-from blacklist import BlackList
+from .normaliseaddress import NormaliseAddress
+from .fwdb import FwDb
+from .blacklist import BlackList
 log = logging.getLogger('nftfw')
 
 class DbFns:

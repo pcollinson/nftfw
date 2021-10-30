@@ -2,8 +2,8 @@
 
 from pathlib import Path
 import pytest
-from configsetup import config_init
-from fwdb import FwDb
+from tests.configsetup import config_init
+from nftfw.fwdb import FwDb
 
 @pytest.fixture
 def cf():         # pylint: disable=invalid-name

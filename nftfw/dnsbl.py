@@ -33,17 +33,23 @@ class Dnsbl:
         """
 
         self.cf = cf
-        self.lists = []
+        self.lists = {}
 
         # get possible lookups
-        self.lists = {k:v for k, v in cf.parser['Nftfwedit'].items()}
+        #self.lists = {k:v for k, v in cf.parser['Nftfwedit'].items()}
+        for k, v in cf.parser['Nftfwedit'].items():
+            self.lists[k] = v
 
         try:
+            # Import here because the module may not be installed on the system
+            # but pylint will complain on bullseye with import-outside-toplevel
+            # if the disable code is installed, pylint will complain on buster
+            # about the disable code below (now deactivated)
             import dns.resolver
             self.resolver = dns.resolver.Resolver()
             self.NXDOMAIN = dns.resolver.NXDOMAIN
         except ImportError:
-            self.lists = []
+            self.lists = {}
             print("Installation of python3-dnspython is required, run:")
             print("sudo apt install python3-dnspython")
             print("It's also recommended to run a caching nameserver")

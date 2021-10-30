@@ -8,7 +8,7 @@ have moved into the nft module Decided to leave this in place
 
 """
 import logging
-import nft
+from . import nft
 log = logging.getLogger('nftfw')
 
 

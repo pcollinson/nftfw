@@ -1,14 +1,14 @@
 """ nftfw - prints the file position database """
 
 import sys
-sys.path.insert(0, '../nftfw')
+sys.path.insert(0, '..')
 from prettytable import PrettyTable
 import time, datetime
 import argparse
 import logging
 log = logging.getLogger('nftfw')
-from config import Config
-from fileposdb import FileposDb
+from nftfw.config import Config
+from nftfw.fileposdb import FileposDb
 
 def datefmt(timeint):
     """ Return formatted date - here so it can be changed

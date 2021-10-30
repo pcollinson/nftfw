@@ -14,8 +14,8 @@ import time
 from pathlib import Path
 import ipaddress
 import logging
-from nftfw_utmp import Utmp, UtmpDecode
-from utmpconst import *    # pylint: disable=unused-wildcard-import,wildcard-import
+from .nftfw_utmp import Utmp, UtmpDecode
+from .utmpconst import *    # pylint: disable=unused-wildcard-import,wildcard-import
 
 log = logging.getLogger('nftfw')
 

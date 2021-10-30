@@ -6,8 +6,8 @@ Creates a data structure used by blacklist
 from pathlib import Path
 from hashlib import md5
 import logging
-from fileposdb import FileposDb
-from patternreader import pattern_reader
+from .fileposdb import FileposDb
+from .patternreader import pattern_reader
 log = logging.getLogger('nftfw')
 
 def log_reader(cf, update_position=True):

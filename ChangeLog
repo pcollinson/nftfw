@@ -1,3 +1,12 @@
+v0.9.6	Reorder ignore and established rules in nftfw_init
+	The original ordering tended to output unwanted packets
+	on connection close.
+	Rework all the import statements to avoid use of implicit
+	imports.
+	Use pylint to find and clean some minor problems.
+	Ensure that action scripts are run as a mortal user
+	and not root.
+
 v0.9.5	The getgeocountry script in cidrlists was broken because
 	evidently MaxMind changed their packaging of the zip file.
 	The script tries to get the name of their distribution

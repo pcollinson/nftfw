@@ -6,9 +6,9 @@ Uses standard set of rules in data/rules.d
 from pathlib import Path
 import json
 import pytest
-from configsetup import config_init
-from rulesreader import RulesReader
-from ruleserr import RulesReaderError
+from nftfw.rulesreader import RulesReader
+from nftfw.ruleserr import RulesReaderError
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():     # pylint: disable=invalid-name
@@ -38,7 +38,7 @@ def test_rules(rulesrdr):
     rules = rdr.rules
     rulestotal = len(rules)
     # should be 13
-    assert rulestotal == 13, f'Should be 13 rules'
+    assert rulestotal == 13, 'Should be 13 rules'
 
     # create reference text
     newpath = Path('newdata/rulesreader.json')
@@ -58,7 +58,7 @@ def test_rules(rulesrdr):
 
     # check that drop.sh in local.d is overriding the one in rule.d
     rules_dir = rdr.rules_dir
-    assert rules_dir['drop'].parent.name == 'local.d', f'Key drop should originate in local.d'
+    assert rules_dir['drop'].parent.name == 'local.d', 'Key drop should originate in local.d'
 
 def test_errors(rulesrdr):
     """ Test failure of execution """

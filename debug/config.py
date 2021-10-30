@@ -2,8 +2,8 @@
 
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
-    from config import Config
+    sys.path.insert(0, '..')
+    from nftfw.config import Config
     try:
         cf = Config()
     except AssertionError as e:

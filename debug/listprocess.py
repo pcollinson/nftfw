@@ -5,15 +5,15 @@ Prints datastructures created from listprocess
 """
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
+    sys.path.insert(0, '..')
     import logging
     log = logging.getLogger('nftfw')
 
-    from config import Config
-    from rulesreader import RulesReader
-    from ruleserr import RulesReaderError
-    from listreader import ListReader
-    from listprocess import ListProcess
+    from nftfw.config import Config
+    from nftfw.rulesreader import RulesReader
+    from nftfw.ruleserr import RulesReaderError
+    from nftfw.listreader import ListReader
+    from nftfw.listprocess import ListProcess
 
     cf = Config()
     cf.rulesreader = RulesReader(cf)

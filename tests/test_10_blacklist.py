@@ -3,10 +3,10 @@
 import time
 from pathlib import Path
 import pytest
-from configsetup import config_init
-from blacklist import BlackList
-from nf_edit_dbfns import DbFns
-from fwdb import FwDb
+from nftfw.blacklist import BlackList
+from nftfw.nf_edit_dbfns import DbFns
+from nftfw.fwdb import FwDb
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():          # pylint: disable=invalid-name

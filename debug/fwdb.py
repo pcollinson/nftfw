@@ -3,9 +3,9 @@
 if __name__ == '__main__':
     import sys
     import time
-    sys.path.insert(0, '../nftfw')
-    from config import Config
-    from fwdb import FwDb
+    sys.path.insert(0, '..')
+    from nftfw.config import Config
+    from nftfw.fwdb import FwDb
 
     cf = Config()
     db = FwDb(cf, createdb=False)

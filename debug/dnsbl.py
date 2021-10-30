@@ -2,9 +2,9 @@
 
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
-    from dnsbl import Dnsbl
-    from config import Config
+    sys.path.insert(0, '..')
+    from nftfw.dnsbl import Dnsbl
+    from nftfw.config import Config
 
     cf = Config()
     dn = Dnsbl(cf)

@@ -1,18 +1,18 @@
-""" firewall process Standalone debug 
+""" firewall process Standalone debug
 
 Print data structures
 
 """
 if __name__ == '__main__':
     import sys
-    sys.path.insert(0, '../nftfw')
+    sys.path.insert(0, '..')
     import logging
     log = logging.getLogger('nftfw')
-    from config import Config
-    from rulesreader import RulesReader
-    from ruleserr import RulesReaderError
-    from firewallreader import FirewallReader
-    from firewallprocess import FirewallProcess
+    from nftfw.config import Config
+    from nftfw.rulesreader import RulesReader
+    from nftfw.ruleserr import RulesReaderError
+    from nftfw.firewallreader import FirewallReader
+    from nftfw.firewallprocess import FirewallProcess
 
     cf = Config()
     try:

@@ -2,9 +2,10 @@
 
 import pickle
 import pytest
-from configsetup import config_init
-from patternreader import pattern_reader
-from patternreader import parsefile
+
+from nftfw.patternreader import pattern_reader
+from nftfw.patternreader import parsefile
+from .configsetup import config_init
 
 @pytest.fixture
 def cf():          # pylint: disable=invalid-name
@@ -33,13 +34,13 @@ def test_patternreader(cf):
             assert 'pattern' in lines.keys()
     # sort the dicts in to pattern key order
     patsort = {key: sorted(val, key=lambda x: x['pattern']) \
-               for key,val in patterns.items()}
+               for key, val in patterns.items()}
 
     file = open('srcdata/patternreader.pickle', 'rb')
     reference = pickle.load(file)
     file.close()
     refsort = {key: sorted(val, key=lambda x: x['pattern']) \
-               for key,val in reference.items()}
+               for key, val in reference.items()}
 
 
     for key, val in refsort.items():

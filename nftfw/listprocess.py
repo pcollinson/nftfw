@@ -5,7 +5,7 @@ using data structiure created by listreader
 """
 
 import logging
-from ruleserr import RulesReaderError
+from .ruleserr import RulesReaderError
 log = logging.getLogger('nftfw')
 
 class ListProcess:

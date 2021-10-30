@@ -9,8 +9,8 @@ Offers is_white method to see if it's there
 
 """
 import logging
-from listreader import ListReader
-from normaliseaddress import NormaliseAddress
+from .listreader import ListReader
+from .normaliseaddress import NormaliseAddress
 log = logging.getLogger('nftfw')
 
 class WhiteListCheck:

@@ -17,11 +17,11 @@ Clean the entries in the sqlite3 database
 
 import time
 import logging
-from logreader import log_reader
-from listreader import ListReader
-from fwdb import FwDb
-from whitelistcheck import WhiteListCheck
-from stats import duration, frequency
+from .logreader import log_reader
+from .listreader import ListReader
+from .fwdb import FwDb
+from .whitelistcheck import WhiteListCheck
+from .stats import duration, frequency
 log = logging.getLogger('nftfw')
 
 class BlackList:
@@ -107,7 +107,11 @@ class BlackList:
 
         -x entry point from scheduler
         """
-
+        # Dynamic load, pretty table is not always needed
+        # but pylint will complain on bullseye with import-outside-toplevel
+        # if the disable code is installed, pylint will complain on buster
+        # about the disable code below (now deactivated)
+        # pylint argument disable=import-outside-toplevel
         from prettytable import PrettyTable
 
         work = log_reader(self.cf, update_position=False)
