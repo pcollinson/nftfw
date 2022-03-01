@@ -3,6 +3,8 @@
 
 ## Prerequisites
 
+This document and its actions has been superseded by the [Install _nftfw_ from Debian package](Debian_package_install.md). Users are recommended to use that route to install and update _nftfw_.
+
 This document assumes that you are installing on Debian Buster (and possibly later Debian systems). The manual installation places files under /usr/local and not /. However, all the documentation (apart from the two documents on manual instllation) now assumes that the system is installed under the root of the file system, so some mental translation might be needed.
 
 You will need root access to the machine to install this package.
@@ -14,7 +16,7 @@ This system is provides a firewall, and it would not be sensible to implement th
 ``` sh
 $ sudo apt install nftables
 ```
-The standard version of _nftables_ at the time of writing is: 0.9.0-2. Buster backports (sadly not available on Raspberry Pi OS, previously known as Raspian) has a more recent version - 0.9.3-2~bpo10+1, and it's a good idea to upgrade to that. Look in _/etc/apt/sources.list_, and if necessary append:
+The standard version of _nftables_  for Buster at the time of writing is: 0.9.0-2. Buster backports (sadly not available on Raspberry Pi OS, previously known as Raspian) has a more recent version - 0.9.3-2~bpo10+1, and it's a good idea to upgrade to that. Look in _/etc/apt/sources.list_, and if necessary append:
 
 ``` sh
 # backports

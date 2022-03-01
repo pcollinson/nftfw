@@ -21,7 +21,7 @@ The downside of this is that you have to download the file by hand, but it's eas
 
 ## Maxmind Geolocation
 
-If you've installed the GeoLite2 database from Maxmind to assist with identifing countries with _nftfwls_, then with some little work you can access their country database and also have your system refresh it once a week.
+If you've installed the GeoLite2 database from Maxmind to assist with identifying countries with _nftfwls_, then with some little work you can access their country database and also have your system refresh it once a week.
 
 ### Step 1 - Getting the Maxmind database
 

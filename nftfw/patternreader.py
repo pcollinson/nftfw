@@ -249,7 +249,7 @@ def _pattern_scan(contents, filename):
         else:
             log.error('Pattern: Unknown line in %s: Line %s - line ignored',
                       filename, lineno)
-    return (file, ports, regex)
+    return file, ports, regex
 
 def filelist(recordlist):
     """Create dict From the raw data obtained from files

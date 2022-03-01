@@ -1,0 +1,13 @@
+Document: nftfw-with-fail2ban
+Title: Using fail2ban with nftfw
+Author: Peter Collinson
+Abstract: Install nftfw actions for fail2ban
+ Short HOW-TO style guide
+Section: Debian
+
+Format: PDF
+Files: /usr/share/doc/nftfw/docs_pdf/Using-fail2ban-with-nftfw.pdf.gz
+
+Format: HTML
+Index: /usr/share/doc/nftfw/docs_html/index.html
+Files: /usr/share/doc/nftfw/docs_html/Using-fail2ban-with-nftfw.html

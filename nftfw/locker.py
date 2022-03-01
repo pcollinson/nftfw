@@ -51,7 +51,7 @@ class Locker:
         try:
             fcntl.flock(self.fd, fcntl.LOCK_EX)
             return True
-        except IOError as e:
+        except IOError:
             return False
 
     def nb_lockfile(self):
@@ -70,7 +70,7 @@ class Locker:
         try:
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             return True
-        except IOError as e:
+        except IOError:
             return False
 
     def unlockfile(self):

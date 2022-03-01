@@ -101,7 +101,6 @@ class FwDb(SqDb):
         before : int
             Timestamp to use as a reference
 
-
         Returns
         -------
         List[Dict[

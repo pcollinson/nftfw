@@ -124,7 +124,7 @@ class Dnsbl:
         reverse = ip.reverse_pointer
         ma = re.match('^(.*)(in-addr.arpa|ip6.arpa)$', reverse)
         if ma is None:
-            return (False, "")
+            return False, ""
         query = ma.group(1) + domain
         try:
             #perform a record lookup. A failure will trigger the NXDOMAIN exception
@@ -132,8 +132,8 @@ class Dnsbl:
             #No exception was triggered, IP is listed in bl. Now get TXT record
             answer_txt = self.resolver.query(query, "TXT")
             result = f'{my_ip} in {domain} ({answers[0]}: {answer_txt[0]})'
-            return (True, result)
+            return True, result
         except self.NXDOMAIN:
-            return (False, f'{my_ip} not in {domain}')
+            return False, f'{my_ip} not in {domain}'
         except: # pylint: disable=bare-except
-            return (False, sys.exc_info()[0])
+            return False, sys.exc_info()[0]

@@ -12,3 +12,6 @@ getcountrynet - install to obtain CIDR lists for a specific country or countries
 	      for countries that follow
 
 These tools need the sqlite3 package installed.
+
+NB. As of February 2022, the filename extraction in getgeocountry failed because
+the format changed. A new version is provided here.

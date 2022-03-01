@@ -33,6 +33,8 @@ docs_md              - Documents in markdown format
 docs_pdf	     - Documents on pdf format
 etc_nftfw	     - Initial setup files for /etc/nftfw
                        retained as source, and updated
+fail2ban             - Action files for fail2ban, see the
+		       /nftfw/doc_{md,html,pdf}/Using-fail2ban-with-nftfw.*
 import_tool          - import Symbiosis/Sympl setup from /usr/local
                        into nftfw
 nftfw_router_example - Sample nftfw_init.nft file for use with a

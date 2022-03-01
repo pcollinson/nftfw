@@ -47,6 +47,8 @@ class SqDb:
     def lookup(self, table, what='*', where=None, vals=None, orderby=''):
         """Lookup a value in the table with a WHERE condition
 
+        Parameters
+        ----------
         table:str table name
         all remaining args are optional
         what:str  what is being looked up
@@ -54,7 +56,10 @@ class SqDb:
                   ? where values need replacing
         vals:tuple of values matching the ?
         orderby:  order by value
-        return list of dicts indexed by keyname
+
+        Returns
+        -------
+        list of dicts indexed by keyname
         """
 
         # pylint: disable=too-many-arguments
@@ -107,7 +112,7 @@ class SqDb:
         allkeys = ",".join(keys)
         allcols = ",".join(cols)
         sqlcmd = f'{statement} INTO {table} ({allkeys}) VALUES ({allcols})'
-        return (sqlcmd, tuple(values))
+        return sqlcmd, tuple(values)
 
     def insert(self, table, argdict, ignore=None, statement='INSERT'):
         """Execute and commit insert statement in a named table

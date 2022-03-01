@@ -67,7 +67,7 @@ import() {
        # see if we have a zip file
        if unzip -l -qq $TEMP > /dev/null; then
 	   # get directory name
-	   PATHTO=$(unzip -l -qq $TEMP | grep $OUTPUT | head -1 | cut -d' ' -f6-)
+	   PATHTO=$(unzip -l -qq $TEMP | grep $OUTPUT | head -1 | sed -e "s/^.*$OUTPUT/$OUTPUT/")
            DIR=$(dirname $PATHTO)
 	   if [ ! -d "${DIR}" ]; then
 	       unzip -qq $TEMP

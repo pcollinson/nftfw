@@ -194,7 +194,8 @@ class FirewallReader:
         srcfile: str
             Action name used to show on error
 
-        Returns:
+        Returns
+        -------
         str,None
             address if OK
             None if not
@@ -234,7 +235,7 @@ class FirewallReader:
 
         Returns
         -------
-        Any ip or ip6 addresses found for the name
+        Sets ip or ip6 to addresses found for the name
         """
 
         # NB will not return ipv6 if host is not configured for it

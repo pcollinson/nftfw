@@ -36,7 +36,7 @@ class WhiteListCheck:
 
         # used as a hook from blacklist.py
         # to avoid starting a new instance
-        self.normalise_addr = NormaliseAddress(cf, error_name='Blacklist')
+        self.normalise_addr = NormaliseAddress(cf, error_name='Whitelist')
 
         for ipstr in whitelist:
             proto = 'ip'
@@ -48,6 +48,9 @@ class WhiteListCheck:
                 self.whitedict[proto].append(ipa)
                 if self.normalise_addr.is_network(proto, ipa):
                     self.havenets[proto] = True
+
+        # set error prefix for later use
+        self.normalise_addr.error_name = 'Blacklist'
 
     def is_white(self, proto, ipaddr):
         """ Lookup ipaddr in white list dict

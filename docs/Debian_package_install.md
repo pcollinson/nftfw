@@ -3,11 +3,11 @@
 
 _nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](Debian_package_install.md) for a how-to guide.
 
-Following Debian practice, the system will be installed in the root of the file system, so the control files will be in _/etc/nftfw_ with the library files in _/var/lib/nftfw_.
+Following Debian practice, the system is installed in the root of the file system, so the control files will be in _/etc/nftfw_ with the library files in _/var/lib/nftfw_.
 
 ## Getting started
 
-This section presents the bare bones of installing the _nftfw_ package on a vanilla system. To cope with some special circumstances, links in the document jump to sets of instructions which start after the main installation documentation.
+This section presents the bare bones of installing the _nftfw_ package on a vanilla system. To cope with some special circumstances, links in this document jump to sets of instructions which start after the main installation documentation.
 
 ### Iptables check
 
@@ -18,7 +18,7 @@ $ sudo iptables -V
 iptables v1.8.2 (nf_tables)
 ```
 
-If the output is not as above, then you need to swap your _iptables_ version. See [Switching iptables](#switching-iptables)  below, then come back here when you've done that.
+If the output doesn't say _nf_tables_, then you need to swap your _iptables_ version. See [Switching iptables](#switching-iptables)  below, then come back here when you've done that.
 
 ### Download the package
 
@@ -104,7 +104,7 @@ for ipv4 and
 ``` sh
 $ sudo nft list ruleset ip6 | less
 ```
-for ipv6. Hint: this is a lot to type and you may want to use the commands again, so create and store shell aliases in your shell's .rc file for them.
+for ipv6. Hint: this is a lot to type and you may want to use the commands again, so create and store shell aliases in your shell's _.rc_ file for them.
 
 ``` sh
 alias nfl='sudo nft list ruleset ip|less'
@@ -162,6 +162,22 @@ $ sudo systemctl start nftfw.path
 ```
 
 making _nftfw_ run when anything changes in the _incoming.d_, _outgoing.d_, _blacklist.d_, _whitelist.d_ and _blacknets.d_ directories in _/etc_.
+
+### Running on Sympl/Symbiosis?
+
+Sympl has a cron job to reload its firewall and this must be removed. Move _/etc/cron.d/sympl-firewall_ to a safe place, so you can re-install it if you want to revert to the distributed firewall system.
+
+Also for Sympl, remove or move two links to _/usr/sbin/sympl-firewall_ under _/etc/network_:
+
+
+``` sh
+$ cd /etc/network
+# put into a safe place - in case you want to revert
+$ sudo mv if-up.d/symbiosis-firewall ~/up-symbiosis-firewall
+$ sudo mv if-down.d/symbiosis-firewall ~/down-symbiosis-firewall
+```
+
+Symbiosis has similar files prefixed by _symbiosis_ that should be removed or saved.
 
 ### You are done
 
@@ -279,7 +295,7 @@ $ sudo systemctl daemon-reload
 ```
 
 #### 2. Update your source distribution
-pp
+
 You are going to need some scripts to help you to migrate and also later to remove the installed source distribution. You don't need (and shouldn't) install or update anything.
 
 #### 3. Are you using part of the Sympl/Symbiosis firewall?
@@ -289,7 +305,7 @@ The latest version of _nftfw_ does not support _nftfw_base_ in _config.ini_ that
 Otherwise you need to unwind the linkage and ensure that all the _nftfw_ information is derived from files in _/usr/local/etc/nftfw_. This can be done with the _import_to_nftfw.py_ tool. The command will work to move the current settings from _firewall_ into the directories in _/usr/local/etc/nftfw_. The help information in the tool talks about moving files into _/etc/nftfw_, but the tool will work to install files in _/usr/local/etc/nftfw_ as long as _/etc/nftfw_ doesn't exist. When using the tool, you won't need to update the database. See [Migrating a Sympl or Symbiosis firewall](#migrating-a-sympl-or-symbiosis-firewall) above, then return to complete the para below.
 
 Copy the new version of _nftfw_init.nft_ from _etc_nftfw_ in the source directory to _/usr/local/etc/nftfw_. There are some recent changes in this file. Having updated _/usr/local/etc/nftfw_, you can edit _config.ini_ to remove or comment out the definition for _nftfw_base_ and your current version of _nftfw_ can be used to update the firewall. If you want to check that it's all working as expected:
-n
+
 ``` sh
 $ sudo nftfw -x -f load
 ```

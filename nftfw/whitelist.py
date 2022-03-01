@@ -123,7 +123,7 @@ class WhiteList:
                 ufile = self.wtmp_file
                 if not Path(ufile).exists():
                     log.error('User specified wtmp file %s not found', ufile)
-                    return ([], [])
+                    return [], []
 
         utmp = Utmp()
         utmp.utmpname(ufile)
@@ -141,7 +141,7 @@ class WhiteList:
 
         # update the time file
         scantime.touch()
-        return (ip, ip6)
+        return ip, ip6
 
     def fileinstall(self, ip):
         """Add filenames to the whitelist directory

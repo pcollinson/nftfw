@@ -250,8 +250,11 @@ def portmerge(current, new):
     ----------
     current : str or List
         Current set of ports
+    new : str or List
+        New port to add
 
-    Returns:
+    Returns
+    -------
     str or List
         The list will be a sorted unique set of ports
     """

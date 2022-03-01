@@ -1,7 +1,7 @@
 """ nftfwedit - Print IP address information
 """
 
-from socket import gethostbyaddr, herror
+from socket import gethostbyaddr, herror, getservbyport
 from .nftfwls import datefmt
 from .stats import duration, frequency
 from .nf_edit_validate import validate_and_return_ip
@@ -109,11 +109,11 @@ class PrintInfo:
             if host is not None:
                 print(fmt % ('Hostname:', host))
             if any(alias):
-                print(fmt % ('Alias:', alias.join(', ')))
+                print(fmt % ('Alias:', ', '.join(alias)))
             if any(ips):
                 rem = [i for i in ips if i != ipstr]
                 if any(rem):
-                    print(fmt % ('Other IPs:', rem.join(', ')))
+                    print(fmt % ('Other IPs:', ', '.join(rem)))
         except herror:
             print(fmt % ('Hostname:', 'Unknown'))
 
@@ -130,7 +130,8 @@ class PrintInfo:
         cf = self.cf
 
         print(fmt % ('Pattern:', current['pattern']))
-        print(fmt % ('Ports:', current['ports']))
+        portlist = self.ports_by_name(current['ports'])
+        print(fmt % ('Ports:', portlist))
         if current['useall']:
             print(fmt % ('', "Forced to 'all' in firewall"))
         print(fmt % ("Latest:", datefmt(cf.date_fmt, current['last'])))
@@ -141,6 +142,25 @@ class PrintInfo:
             print(fmt % ("Duration:", duration(first, last)))
         print(fmt % ("Matches:", self.format_freq(first, last, current['matchcount'])))
         print(fmt % ("Incidents:", self.format_freq(first, last, current['incidents'])))
+
+    @staticmethod
+    def ports_by_name(ports):
+        """ Turn comma separated port list into list with
+        service names
+        """
+
+        if ports == 'all':
+            return ports
+        out = []
+        plist = ports.split(',')
+        for pno in plist:
+            portno = pno.strip()
+            try:
+                serv = getservbyport(int(portno))
+                out.append(serv)
+            except OSError:
+                out.append(portno)
+        return ", ".join(out)
 
     @staticmethod
     def format_freq(first, last, val):

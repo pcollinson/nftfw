@@ -1,16 +1,26 @@
-# nftfw - nftables firewall builder for Debian
+# Nftfw - Nftables firewall builder for Debian
 
 The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package and also for Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
 
-_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system. It should work on other Linux distributions. The package is written in Python 3 and needs at least the 3.6 release.
+_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system or later. It should work on other Linux distributions. The package is written in Python 3 and needs at least the 3.6 release.
 
 _nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md) for a how-to guide.
 
-_nftfw_ has been started on the road to becoming a Debian Package. A version for testing which splits the source and the packaging has been installed on [https://salsa.debian.org/pcollinson/pkg-nftfw](https://salsa.debian.org/pcollinson/pkg-nftfw).
+## New in current release
+
+For update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog).
+
+Main changes:
+
+- Fix for the _getgeocountry_ script in cidrlists, the format of the downloaded MaxMind zip file has changed.
+
+- Changes to _nftfwedit_ to provide full editing of the active _blacklist.d_ directory and the _nftfw_ database.
+
+- Configure _fail2ban_ to drive _nftfw_ - see [Using fail2ban with nftfw](docs/Using-fail2ban-with-nftfw.md).
 
 ## Features
 
-- **Easy-to-use firewall admin**.  Five directories control the firewall. Placing files in the directories create firewall rules configured from the file names. Two directories, _incoming.d_ and _outgoing.d_, supply rules allowing access to ports for incoming and outgoing connections. These files are usually empty, but can contain IP addresses to make the rule more specific. Two more directories, _blacklist.d_ and _whitelist.d_, contain IP addresses, blocking or allowing access for named addresses. These files can contain ports, modifying the action of the rule. The final directory, _blacknets.d_ can contain files with lists of IP address ranges and makes rules that block access to all the addresses. Changing the firewall is simply a matter of making or removing a file in one of these directories. The directory contents are described in detail in the [User's Guide](docs/Users_Guide.md), while the [How do I... or Quick Users' Guide](docs/How_do_I.md) gives a more task oriented decription.
+- **Easy-to-use firewall admin**.  Five directories control the firewall. Placing files in the directories create firewall rules configured from the file names. Two directories, _incoming.d_ and _outgoing.d_, supply rules allowing access to ports for incoming and outgoing connections. These files are usually empty, but can contain IP addresses to make the rule more specific. Two more directories, _blacklist.d_ and _whitelist.d_, contain IP addresses, blocking or allowing access for named addresses. These files can contain ports, modifying the action of the rule. The final directory, _blacknets.d_ can contain files with lists of IP address ranges and makes rules that block access to all the addresses. Changing the firewall is simply a matter of making or removing a file in one of these directories. The directory contents are described in detail in the [User's Guide](docs/Users_Guide.md), while the [How do I... or Quick Users' Guide](docs/How_do_I.md) gives a more task oriented description.
 
 - **Automatic blacklisting**. The system contains a log file scanner that uses regular expressions to detect unwanted access and then creates files in the _blacklist.d_ directory to block access to any matched IP address. Files to scan, the relevant ports to block for the file and the regular expressions for matching are all contained in a set of files in _patterns.d_. Pattern files are small text files, easy to add and edit,  and the system contains a method of testing them. The _nftfw_ configuration file controls the number of matched lines needed for blocking and how long to wait before removing the IP address from the blacklist.
 
@@ -48,6 +58,8 @@ See documents in the _docs_ directory:
   - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
 - [Getting CIDR lists](docs/Getting-cidr-lists.md)
   - How to get CIDR files for use with the _blacknet_ feature.
+- [Using fail2ban with nftfw](docs/Using-fail2ban-with-nftfw.md)
+  - How to configure _fail2ban_ to use nftfw as its firewall.
 - [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
   - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
 - [Updating _nftfw_](docs/Updating-nftfw.md)

@@ -177,7 +177,7 @@ class ListReader:
         # shouldn't have commas, but people may type them
         pt = ptstr.replace(',', '\n')
         # split at newlines also lose any whitespace
-        li = [n.strip() for n in pt.split("\n") \
+        li = [n.strip() for n in pt.split("\n")
               if n.strip().isnumeric()]
         if any(li):
             li = list(set(li))

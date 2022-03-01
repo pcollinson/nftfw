@@ -5,80 +5,81 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>How Do I… or a User’s Quick Guide</title>
-  <style type="text/css">
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      span.underline{text-decoration: underline;}
-      div.column{display: inline-block; vertical-align: top; width: 50%;}
-  </style>
-  <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
 </head>
 <body>
-<header>
+<header id="title-block-header">
 <h1 class="title">How Do I… or a User’s Quick Guide</h1>
 </header>
 <h1 id="how-do-i-or-a-users-quick-guide">How Do I… or a User’s Quick Guide</h1>
@@ -110,19 +111,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="how-do-i-allow-access-to-a-service-on-my-machine">How do I: Allow access to a service on my machine?</h2>
 <p>Change directory into <em>/etc/nftfw/incoming.d</em> (maybe <em>/usr/local/etc/nftfw/incoming.d</em>).</p>
 <p>You’ll see something like</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">ls</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="ex">05-ping</span>        10-https        30-imaps  50-smtps</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="ex">06-ftp-helper</span>  20-ftp          40-pop3   50-submission</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="ex">07-ssh</span>         21-ftp-passive  40-pop3s  60-sieve</a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="ex">10-http</span>        30-imap         50-smtp   99-drop</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="fu">ls</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ex">05-ping</span>        10-https        30-imaps  50-smtps</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ex">06-ftp-helper</span>  20-ftp          40-pop3   50-submission</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ex">07-ssh</span>         21-ftp-passive  40-pop3s  60-sieve</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="ex">10-http</span>        30-imap         50-smtp   99-drop</span></code></pre></div>
 <p>Some of the filenames in the directory access ‘rules’ in the <em>rule.d</em> directory. There’s more information on the manual page in <a href="man/nftfw-files.5.html"><em>nftfw_files</em></a> in man section 5.</p>
 <p>Each file makes a rule for the firewall, and starts with a two digit number that supplies the ordering of the rules. A new entry needs to be adding before the <em>99-reject</em> rule. So let’s pick ‘70’ for that.</p>
 <p>The rest of the filename can be a port number or the service name, but that must be in <em>/etc/services</em>. Let’s say we want to add access to our name server, and that’s on port 53, called <em>domain</em> in <em>/etc/services</em>. We can either add <em>70-domain</em> or <em>70-53</em>. The easiest way to do this is to use the <em>touch</em> command (you may have to use <em>sudo</em>):</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="fu">touch</span> 70-domain</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="fu">touch</span> 70-domain</span></code></pre></div>
 <p>because the file is empty, connections from any IP address may access this service.</p>
 <p>The command:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="fu">sudo</span> netstat -pat</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="ex">...</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> netstat -pat</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">...</span></span></code></pre></div>
 <p>lists the services currently being used on your machine, along with the process that is using them. Some of these will be used internally, and you may not wish to make them globally available.</p>
 <h2 id="how-do-i-deny-access-to-a-service">How do I: Deny access to a service?</h2>
 <p>By default, the incoming firewall will reject advances from IP addresses. To permit access, you must create a rule as above. You can remove the files in this directory for services you don’t need. For example, If you don’t need to use the POP service, you can simply delete <em>40_pop3</em> and <em>40_pop3s</em> in the incoming directory. You should delete any file that names a service you don’t want to allow people to have access to.</p>
@@ -130,21 +131,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>If you want to only allow access to say <em>ssh</em> to a known set of IP addresses, then you can add those IP addresses into the <em>07-ssh</em> file, one per line. Only the addresses found in the file can access the_ssh_ service. You can add the domain name of system to the file, and that will include both their IPv4 and IPv6 addresses, if they have both. It’s probably a good idea to run a caching domain name server on your machine if you use names in the files.</p>
 <h2 id="how-do-i-give-full-access-my-server-to-known-set-of-machines">How do I: Give full access my server to known set of machines?</h2>
 <p>First you need to find the IP addresses of the machines, the easiest way is to use the <em>host</em> command:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="ex">host</span> notarealmachine.co.uk</a>
-<a class="sourceLine" id="cb4-2" title="2"><span class="ex">notarealmachine.co.uk</span> has address 203.0.113.134</a>
-<a class="sourceLine" id="cb4-3" title="3"><span class="ex">notarealmachine.co.uk</span> has IPv6 address 2001:db8::a676:7186</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="ex">host</span> notarealmachine.co.uk</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="ex">notarealmachine.co.uk</span> has address 203.0.113.134</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="ex">notarealmachine.co.uk</span> has IPv6 address 2001:db8::a676:7186</span></code></pre></div>
 <p>Armed with the IP addresses, create a file in <em>whitelist.d</em> using the address as the name.</p>
 <pre><code>$ touch 203.0.113.134</code></pre>
 <p>If you want to allow all the addresses from the network, allowing 1-254 in the last section of the address, you can add a ‘CIDR’ mask of 24 bits to match the first three sections of the address. CIDR addresses are usually written with ‘/’, in this case 203.0.113.0/24, but we cannot use / in a filename, so replace it by the vertical bar symbol:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="fu">rm</span> 203.0.113.134</a>
-<a class="sourceLine" id="cb6-2" title="2">$ <span class="fu">touch</span> <span class="st">&#39;203.0.113.0|24&#39;</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>$ <span class="fu">rm</span> 203.0.113.134</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>$ <span class="fu">touch</span> <span class="st">&#39;203.0.113.0|24&#39;</span></span></code></pre></div>
 <p>If you put the full address from the <em>host</em> command into the directory, <em>nftfw</em> will ‘normalise’ the address to replace the 134 by zero.</p>
 <p>For IPv6 addresses we always match the first 64 bits of the address. IPv6 addresses are abbreviated by writing ‘::’ for any sequences of zeros in the address, so to allow their IPv6 address you can write:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">touch</span> <span class="st">&#39;2001:db8::|64&#39;</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="fu">touch</span> <span class="st">&#39;2001:db8::|64&#39;</span></span></code></pre></div>
 <p>You may find some files ending with <em>.auto</em> in the directory, the whitelist scanner has installed these when it’s found that a user has logged in from the address. The scanner will look after these, and will expire them automatically after 90 days.</p>
 <h2 id="how-do-i-restrict-the-services-accessed-by-a-whitelisted-address">How do I: Restrict the services accessed by a whitelisted address?</h2>
 <p>The files in the <em>whitelist.d</em> directory are empty to allow access to all services, but can contain a list of port numbers, one per line, restricting access from the named address to only those ports. For example, restricting access to <em>ssh</em> is done by:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="bu">echo</span> 22 <span class="op">&gt;&gt;</span> <span class="st">&#39;203.0.113.0|24&#39;</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>$ <span class="bu">echo</span> 22 <span class="op">&gt;&gt;</span> <span class="st">&#39;203.0.113.0|24&#39;</span></span></code></pre></div>
 <h2 id="how-do-i-block-access-to-abusive-sites">How do I: Block access to abusive sites?</h2>
 <p>The <em>blacklist.d</em> directory uses the same convention for files used for the whitelist. Simply create a file named for the IP address in the directory.</p>
 <p>The blacklist scanner will automatically create files in the directory ending in <em>.auto</em> when it finds sites that are misbehaving. The scanner uses files in the <em>patterns.d</em> directory to find log files to scan, and how to interpret lines in the log files as bad.</p>
@@ -152,18 +153,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The <em>blacknets.d</em> directory can contain a set of files each with a list of IP addresses, one to a line, expressed in CIDR notation. To block a country, you’ll need the list of all the networks that the country uses and these are available from several places on the web, see <a href="Getting-cidr-lists.html">Getting CIDR Lists</a> for how to install them.</p>
 <h2 id="how-do-i-see-what-the-firewall-is-doing">How do I: See what the firewall is doing?</h2>
 <p>The <em>nft</em> command prints the contents of the firewall with the command:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nft list ruleset</span></code></pre></div>
 <p>You can print just the IPv4 and IPv6 sets separately with</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">sudo</span> nft list ruleset ip</a>
-<a class="sourceLine" id="cb10-2" title="2">$ <span class="fu">sudo</span> nft list ruleset ip6</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nft list ruleset ip</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>$ <span class="fu">sudo</span> nft list ruleset ip6</span></code></pre></div>
 <p>This is too much typing, so I alias these commands in my shell startup files:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="bu">alias</span> nfl=<span class="st">&#39;sudo nft list ruleset ip|less&#39;</span></a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="bu">alias</span> nfl6=<span class="st">&#39;sudo nft list ruleset ip6|less&#39;</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="bu">alias</span> nfl=<span class="st">&#39;sudo nft list ruleset ip|less&#39;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="bu">alias</span> nfl6=<span class="st">&#39;sudo nft list ruleset ip6|less&#39;</span></span></code></pre></div>
 <p>You’ll see that most rules have counters, so you can see what has happened in the past, what’s busy and what’s in use.</p>
 <h2 id="how-do-i-check-what-the-blacklist-scanner-is-doing">How do I: Check what the blacklist scanner is doing?</h2>
 <p>The blacklist scanner uses files in the <em>patterns.d</em> directory. Each file here supplies a file (or files) processed by the scanner, a port number (or a comma-separated list) used for blocking and a set of regular expressions that match the lines in the log files indicating bad behaviour.</p>
 <p>You can find out what’s blocked on your system by using:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1">$ <span class="ex">nftfwls</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>$ <span class="ex">nftfwls</span></span></code></pre></div>
 <p>This will print a table of the IP addresses the scanner has found, the number of matches, the number of ‘incidents’ - each incident is a separate run of the scanner, when it happened first, the last time a match happened, and the name of the pattern that triggered the event.</p>
 <p>If the command says nothing, then possibly the scanner hasn’t detected enough events for the match count to exceed the threshold where it creates blacklist file. The <strong>-a</strong> flag to the program prints all the entries in its database.</p>
 <h2 id="how-do-i-find-the-country-sending-me-blacklisted-packets">How do I: Find the country sending me blacklisted packets?</h2>
@@ -171,16 +172,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The <em>nftfwedit</em> command also allows you to ask questions about any IP address, including the country of origin and whether the IP address is in selected DNS blacklist sites.</p>
 <h2 id="how-do-i-remove-a-good-ip-address-from-the-blacklist">How do I: Remove a good IP address from the blacklist?</h2>
 <p>If an IP address has found its way into the blacklist in error, then you can delete it using</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$ <span class="fu">sudo</span> nftfwedit -d IP.ADD.RE.SS</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nftfwedit -d IP.ADD.RE.SS</span></code></pre></div>
 <p>this will remove the address from the blacklist database and also delete the entry in the <em>blacklist.d</em> directory. If you just remove the address from the directory, <em>nftfw</em> will reinstate it because it’s in the database.</p>
 <h2 id="how-do-i-add-a-new-reason-for-blacklisting">How do I: Add a new reason for blacklisting?</h2>
 <p>If you’ve spotted a line in a logfile that you want to use to blacklist a site, then first see if the logfile is already scanned by the system and just add a new regular expression to the file. You can create a new pattern file if needed, calling it anything, but it must end in <em>.pattern</em>. Do beware that some log entries can appear in several log files.</p>
-<p>The regular expression doesn’t need to match the whole line, you need to identify where the IP address is in the line and use the string <code>__IP__</code> (that’s two underscores at each end) to pick it out. There should be enough information on the regular expression to make it only select one line. Look in the pattern files for examples. There’s also a section in the <a href="Users_Guide.md#blacklist">User’s Guide</a>.</p>
+<p>The regular expression doesn’t need to match the whole line, you need to identify where the IP address is in the line and use the string <code>__IP__</code> (that’s two underscores at each end) to pick it out. There should be enough information on the regular expression to make it only select one line. Look in the pattern files for examples. There’s also a section in the <a href="Users_Guide.html">User’s Guide</a>.</p>
 <h2 id="how-do-i-debug-my-new-blacklisting-expression">How do I: Debug my new blacklisting expression?</h2>
 <p>You can use the <em>nftfw</em> command to see if your expression works. Create a new pattern file and set</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">ports</span> = test</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="ex">ports</span> = test</span></code></pre></div>
 <p>and add your regular expression. Now say:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1">$ <span class="fu">sudo</span> nftfw -x -p PATTERN blacklist</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nftfw -x -p PATTERN blacklist</span></code></pre></div>
 <p>and this will print a table showing the number of matches that the expression has detected. The PATTERN is the name of your file but without the <em>.pattern</em> appended. The <em>-x</em> option makes the program print a table, and also starts scanning the file from the beginning and doesn’t record where it found the end of the file, so using this command will not interfere with normal processing.</p>
 <p>The blacklist scanner normally ignores pattern files with <em>ports=test</em>, so it’s safe to leave these files in place.</p>
 <h2 id="how-do-i-change-the-settings-for-nftfw">How do I: Change the settings for <em>nftfw</em>?</h2>
@@ -189,7 +190,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="how-to-i-add-my-own-tables-and-rules-to-nftfw">How to I: Add my own tables and rules to <em>nftfw</em>?</h2>
 <p>The file <em>/etc/nftfw/nftfw_init.nft</em> contains the template <em>nftables</em> framework for <em>nftfw</em>. Add new rules by editing the file. You can find an example of a template used for handling a gateway machine with WAN and LAN interfaces in <em>/etc/nftfw/etc_nftfw/nftfw_router_example</em>. Rules for a router adds a <em>nat</em> table and uses the <em>forward</em> table.</p>
 <p><em>nftfw_init.nft</em> uses <em>nft</em>’s readable file format. When deciding what to add or change, the best strategy is to add your new rules to the system using the <em>nft</em> command line interface to check that they work and use:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$ <span class="fu">sudo</span> nft list ruleset</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nft list ruleset</span></code></pre></div>
 <p>to see how <em>nft</em> ‘sees’ the rules. Rules expressed on the command line can contain syntax that <em>nft</em> thinks is unnessary, and can also use some assumptions about defaults that <em>nft</em> will add to the compiled rules. Extract any changes from the <em>nft</em> output and edit <em>nftfw_init.nft</em>.</p>
 <h2 id="how-do-i-get-more-information-on-nftfw">How do I: Get more information on <em>nftfw</em>?</h2>
 <p>The <a href="Users_Guide.html">User’s Guide to nftfw</a> documents the system and there are also <a href="man/index.md">UNIX manual pages</a>.</p>

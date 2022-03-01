@@ -1,6 +1,7 @@
 """ Validate IPs, Ports and Patterns """
 
 import ipaddress
+import socket
 import logging
 log = logging.getLogger('nftfw')
 
@@ -70,8 +71,9 @@ def validate_port(ports):
     ----------
     ports : str
     	Must be: the string all
+        A valid service name in /etc/services
         A numeric port number
-        A comma separated list of numbers
+        A comma separated list of numbers or names
         	converted to a list for blacklist code use
 
     Returns
@@ -85,23 +87,26 @@ def validate_port(ports):
 
     ports = ports.strip()
     if not any(ports):
-        return (False, 'Ports cannot be empty')
+        return False, 'Ports cannot be empty'
     plist = (l.strip() for l in ports.split(','))
     slist = (l for l in plist if l != '')
     out = []
     for p in slist:
         if p == 'all':
-            return (True, 'all')
+            return True, 'all'
         try:
             pi = int(p)
             out.append(pi)
         except ValueError:
-            return (False, f'Non-numeric port value found {p}')
-
+            try:
+                pi = socket.getservbyname(p)
+                out.append(pi)
+            except OSError:
+                return False, f'Unknown service name found: {p}'
     # make ordered list with no duplicates
     # ports are already ints
     ordered = sorted(list(set(out)))
-    return (True, ordered)
+    return True, ordered
 
 def validate_pattern(pattern):
     """Validate a pattern suppied by the user
@@ -121,8 +126,8 @@ def validate_pattern(pattern):
 
     pattern = pattern.strip()
     if not any(pattern):
-        return (False, 'Pattern cannot be empty')
+        return False, 'Pattern cannot be empty'
     if ',' in pattern \
        or ' ' in pattern:
-        return (False, 'Pattern cannot contain spaces or commas')
-    return(True, pattern)
+        return False, 'Pattern cannot contain spaces or commas'
+    return True, pattern

@@ -24,4 +24,4 @@ override_dh_install:
 	dh_install -X.empty
 
 override_dh_compress:
-	dh_compress -Xetc_nftfw -Ximport_tool
+	dh_compress -Xetc_nftfw -Ximport_tool -Xcidrlists -X.html -X.css

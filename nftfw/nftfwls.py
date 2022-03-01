@@ -145,13 +145,13 @@ def formatline(date_fmt, pattern_split, line, geoip, is_html=False):
     else:
         pats = line['pattern']
 
-    return ([ip, \
-             pstring, \
-             str(line['matchcount']) + '/' + str(line['incidents']), \
-             datefmt(date_fmt, line['last']), \
-             estring, \
-             dstring, \
-             pats])
+    return [ip,
+            pstring,
+            str(line['matchcount']) + '/' + str(line['incidents']),
+            datefmt(date_fmt, line['last']),
+            estring,
+            dstring,
+            pats]
 
 def displaytable(cf, dt, noborder=False):
     """Display the data to terminal

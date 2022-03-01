@@ -8,7 +8,7 @@ NAME
 SYNOPSIS
 ======
 
-| **nftfwedit** \[**-h**\]  \[** -d | -a | -b | -g **\]  \[**-p** _PORT_] \[**-n** _PATTERN_] \[** -q **] \[** -v **] \[** ipaddress [ ipaddress ... ]**\]
+| **nftfwedit** \[**-h**\]  \[** -d | -r | -a | -b **\]  \[**-p** _PORT_] \[**-m** _MATCHES_] \[**-n** _PATTERN_] \[** -q **] \[** -g **] \[** -v **] \[** ipaddress [ ipaddress ... ]**\]
 
 
 DESCRIPTION
@@ -16,7 +16,7 @@ DESCRIPTION
 
 _nftfwedit_ is a command line tool to add or remove IP addresses from the _nftfw_ blacklist database, and also optionally from the _blacklist.d_ directory affecting the running firewall. Options on the command line are followed by one of more IP addresses.
 
-If one of the **delete** (**-d**) , **add** (**-a**) or **blacklist** (**-b**) options is not supplied, _nftfwedit_ prints information about its ip address arguments. Information from the blacklist database is printed if available, along with the country of origin (if _geoip2_ is installed) and output from any DNS blocklists, if specified in _config.ini_.
+If one of the **delete** (**-d**) , **remove** (**-r**), **add** (**-a**) or **blacklist** (**-b**) options is not supplied, _nftfwedit_ prints information about its ip address arguments. Information from the blacklist database is printed if available, along with the country of origin (if _geoip2_ is installed) and output from any DNS blocklists, if specified in _config.ini_.
 
 These are the available options to the program:
 
@@ -28,13 +28,17 @@ These are the available options to the program:
 
 :   The nominated IP addresses are deleted from the blacklist database, and if present, the file is removed from the _blacklist.d_ directory. Requires root access.
 
+**-r**, **-\-remove**
+
+:   The nominated IP addresses are removed from the _blacklist.d_ directory. The database is not touched. Requires root access.
+
 **-a**, **-\-add**
 
-:   The nominated IP addresses are added to the blacklist database. The port (**-p**) and pattern (**-n**) options must be supplied to create a valid database entry. Requires root access.
+:   The nominated IP addresses are added to the blacklist database. For a new item, the port (**-p**) and pattern (**-n**) options must be supplied. A match count (**-m***) can also be supplied. Requires root access.
 
 **-b**, **-\-blacklist**
 
-:   The nominated IP addresses are added to the _blacklist.d_ directory. If an address to be added is present in the blacklist database, then the installation uses that information to create the file. When the database doesn't contain the address, it's added to the database, and in this case the port and pattern options must be supplied. Requires root access.
+:   The nominated IP addresses are added to the _blacklist.d_ directory and the blacklist database. For a new item, the port (**-p**) and pattern (**-n**) options must be supplied. A match count (**-m***) can also be supplied. The count may be adjusted to ensure that the nftfw blacklist command will not remove the file automatically. Subsequent use with the same IP address will increment the counts. Requires root access.
 
 **-g**, **-\-gethostname**
 
@@ -42,17 +46,23 @@ These are the available options to the program:
 
 **-p**,**-\-port** PORT
 
-:   Supply the ports used when blocking the IP address. The PORT value can be _all_, a single numeric port number or a comma separated list of ports.
+:   Supply the ports used when blocking the IP address. The PORT value can be _all_, a single numeric port number, the name of a service found in _/etc/services_ or a comma separated list of numeric ports and names.
 
 **-n**,**-\-pattern** PATTERN
 
 :   Supply the pattern name stored in the database and used to indicate the source of the blacklist entry when listed by _nftfwls_.
 
-:   Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal
+:   Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal.
+
+**-m**,**-\-matches** MATCHES
+
+:   For the **-a** or **-b** actions, set the number of matches used to count the number of problems found in logfiles. For new database entries with the **-b*** option, this is forced to be a minimum of 10 (the default 'block after' value), ensuring that the control file in blacklist.d isn't deleted. For the **-a** option, the value defaults to 1.
+
+:   When the **-a** and **-b** options are updating extant database entries, the count defaults to 1 which is added to the stored count.
 
 **-q**, **-\-quiet**
 
-:   Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal
+:   Suppress printing of errors and information messages to the terminal, syslog output remains active. Terminal output is suppressed when the output is not directed to a terminal.
 
 **-v**, **-\-verbose**
 

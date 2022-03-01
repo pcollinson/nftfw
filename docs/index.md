@@ -10,3 +10,5 @@
   - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
 - [Getting CIDR lists](Getting-cidr-lists.md)
   - How to get CIDR files for use with the _blacknet_ feature.
+- [Using fail2ban with nftfw](Using-fail2ban-with-nftfw.md)
+  - How to configure _fail2ban_ to use _nftfw_ as its firewall.

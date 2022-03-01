@@ -1,3 +1,21 @@
+v0.9.7  Change nftfwedit to allow service names in port lists (-p argument).
+	Changes to nftfwedit interface to assist external automatic editing:
+	  -b adds IP into database and creates file in blacklist.
+        	The count & incident count are initially set to
+		10/1. Subsequent use with the same ip address increments the
+		counts. The 10 is the default value taken from block_after
+		in the config.
+	  -a adds ip into the database, but doesn't create the file.
+	        Both commands now ignore any whitelisted address.
+	  -r is a new option, just to remove any file in blacklist.d
+                and leave the database alone.
+	   -m is a new option allowing the matchcount to be supplied.
+	IP address output from nftfwedit now shows ports as service names
+	where they can be decoded.
+	Change to cidrlists/getgeocountry to reflect changes in the
+	zip file that's downloaded.
+	Add fail2ban integration files
+
 v0.9.6	Reorder ignore and established rules in nftfw_init
 	The original ordering tended to output unwanted packets
 	on connection close.

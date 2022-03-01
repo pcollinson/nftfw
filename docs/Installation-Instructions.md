@@ -1,6 +1,8 @@
 % Manual Installation Instructions
 #  Manual Installation Instructions
 
+This document and its actions has been superseded by the [Install _nftfw_ from Debian package](Debian_package_install.md). Users are recommended to use that route to install and update _nftfw_.
+
 For those of you who just want to follow a list of instructions without any verbiage, this document lists all the steps in the [Installing nftfw](Installation.md) document. There are links, shown as 'Explanation', to the Installation document.
 
 ## Basic package installations
@@ -101,8 +103,6 @@ questions. Answers for default installation:
 - _Install Manual pages?_ yes
 
 ## Disable cron and incron actions for Sympl or Symbiosis
-
-([Explanation](Installation.md#installation))
 
 On Symbiosis move _/etc/cron.d/symbiosis-firewall_ to a safe place.
 On Symbiosis move _/etc/incron.d/symbiosis-firewall_ to a safe place.

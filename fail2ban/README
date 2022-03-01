@@ -1,0 +1,4 @@
+These two action files allow fail2ban to communicate with a running nftfw instance.
+They rely on various changes in the nftfwedit program distributed with nftfw version 0.9.7.
+
+For information how to use them see the 'Using fail2ban with nftfw' document.

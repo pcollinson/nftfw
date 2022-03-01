@@ -83,7 +83,9 @@ class FirewallProcess:
             As in __init__ single record to process
         proto : {'ip', 'ip6'}
 
-        returns string
+        Returns
+        -------
+        str
         """
 
         # step 1 make the environment

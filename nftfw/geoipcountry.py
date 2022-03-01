@@ -74,7 +74,7 @@ class GeoIPCountry:
         # pylint: disable=no-member
 
         if self.countryreader is None:
-            return(None, None)
+            return None, None
 
         # remove any mask from ip
         if ip[-3] == '/':
@@ -90,6 +90,6 @@ class GeoIPCountry:
                 iso = cn.country.iso_code
             if cn.country.name:
                 cname = cn.country.name
-            return(cname, iso)
+            return cname, iso
         except (ValueError, AttributeError, self.AddressNotFoundError, self.InvalidDatabaseError):
-            return(None, None)
+            return None, None

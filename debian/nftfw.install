@@ -1,4 +1,4 @@
-# basic etc/nftfw setup
+ # basic etc/nftfw setup
 etc_nftfw/* usr/share/doc/nftfw/etc_nftfw
 
 # router example
@@ -10,6 +10,9 @@ nftfwls_web/* usr/share/doc/nftfw/nftfwls_web
 # tools for geolocation
 cidrlists/* usr/share/doc/nftfw/cidrlists
 
+# fail2ban actions
+fail2ban/* usr/share/doc/nftfw/fail2ban
+
 # Symbiosis/Sympl import tool
 import_tool/* usr/share/doc/nftfw/import_tool
 
@@ -20,6 +23,7 @@ docs/Getting-cidr-lists.md usr/share/doc/nftfw/docs_md
 docs/How_do_I.md usr/share/doc/nftfw/docs_md
 docs/Installing-GeoLocation.md usr/share/doc/nftfw/docs_md
 docs/Users_Guide.md usr/share/doc/nftfw/docs_md
+docs/Using-fail2ban-with-nftfw.md usr/share/doc/nftfw/docs_md
 docs/index.md usr/share/doc/nftfw/docs_md
 
 docs/html/Debian_package_install.html usr/share/doc/nftfw/docs_html
@@ -27,13 +31,27 @@ docs/html/Getting-cidr-lists.html usr/share/doc/nftfw/docs_html
 docs/html/How_do_I.html usr/share/doc/nftfw/docs_html
 docs/html/Installing-GeoLocation.html usr/share/doc/nftfw/docs_html
 docs/html/Users_Guide.html usr/share/doc/nftfw/docs_html
+docs/html/Using-fail2ban-with-nftfw.html usr/share/doc/nftfw/docs_html
 docs/html/index.html usr/share/doc/nftfw/docs_html
+docs/html/nftfw-doc.css usr/share/doc/nftfw/docs_html
+docs/html/pandoc.css usr/share/doc/nftfw/docs_html
+
+docs/man/manhtml/index.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfw-config.5.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfw-files.5.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfw.1.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfwadm.1.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfwedit.1.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfwls.1.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfw.css usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/pandoc.css usr/share/doc/nftfw/docs_html/man
 
 docs/pdf/Debian_package_install.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/Getting-cidr-lists.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/How_do_I.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/Installing-GeoLocation.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/Users_Guide.pdf usr/share/doc/nftfw/docs_pdf
+docs/pdf/Using-fail2ban-with-nftfw.pdf usr/share/doc/nftfw/docs_pdf
 docs/pdf/index.pdf usr/share/doc/nftfw/docs_pdf
 
 # Docbase registration
@@ -42,3 +60,4 @@ debian/doc-base/nftfw-how-do-i /usr/share/doc-base
 debian/doc-base/nftfw-installing-geo /usr/share/doc-base
 debian/doc-base/nftfw-package-install /usr/share/doc-base
 debian/doc-base/nftfw-users-guide /usr/share/doc-base
+debian/doc-base/nftfw-with-fail2ban /usr/share/doc-base

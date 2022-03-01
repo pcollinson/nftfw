@@ -630,7 +630,7 @@ pattern_split = No
             # get uid/gid for 'nobody'
             try:
                 nobody = pwd.getpwnam('nobody')
-            except KeyError as e:
+            except KeyError:
                 err = ( "We need to find a non-root user, and there is no 'nobody'\n"
                         "account on this system. As a work-around use\n"
                         "   sudo dpkg-reconfigure nftfw\n"

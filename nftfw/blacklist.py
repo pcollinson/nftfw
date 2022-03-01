@@ -53,6 +53,11 @@ class BlackList:
         self.blacklistpath = cf.etcpath('blacklist')
         # Ini values used
         logvars = cf.get_ini_values_by_section('Blacklist')
+        # set to false in nftfwedit
+        self.file_create = True
+        # log error if ip is whitelisted
+        self.report_whitelisting = False
+
         self.block_after = int(logvars['block_after'])
         self.block_all_after = int(logvars['block_all_after'])
         self.expire_after = int(logvars['expire_after'])
@@ -179,9 +184,12 @@ class BlackList:
             # need to sort out ips
             # only blacklist global ips
             # and not if they are whitelisted
-            ip = wlchk.normalise_addr.normal(ip, is_white=wlchk.is_white)
-            if ip is None:
+            test_ip = wlchk.normalise_addr.normal(ip, is_white=wlchk.is_white)
+            if test_ip is None:
+                if self.report_whitelisting:
+                    log.error("%s is either an illegal format, or is whitelisted", ip)
                 continue
+            ip = test_ip
             ipsmatched += 1
             log.info("%s match count %d from %s", ip,
                      patinfo['matchcount'], patinfo['pattern'])
@@ -197,14 +205,15 @@ class BlackList:
             if current is None:
                 log.error("%s database update from %s - not in database",
                           ip, patinfo['pattern'])
-            else:
-                # update file
+            elif self.file_create:
+                # update file - allow the nftfwedit 'add' code to
+                # use this code without adding a file
                 filesinstalled += self.install_file(fwdb, current, ports_have_changed)
 
         fwdb.close()
-        return (filesinstalled, ipsmatched)
+        return filesinstalled, ipsmatched
 
-    def db_store(self, fwdb, ip, patinfo, forcenew=False):
+    def db_store(self, fwdb, ip, patinfo):
         """Update the database with info from ip and patinfo
 
         Parameters
@@ -223,8 +232,6 @@ class BlackList:
             incidents : int
                  number of different incident sets
             ]
-        forcenew : bool
-            used by nftfwedit to force new entries
 
         Returns
         -------
@@ -239,13 +246,11 @@ class BlackList:
         # Flag used for file update
         ports_have_changed = False
         # Now let's lookup this ip in the database
-        if not forcenew:
-            lookup = fwdb.lookup_by_ip(ip)
-        if forcenew \
-           or not any(lookup):
+        lookup = fwdb.lookup_by_ip(ip)
+        if not any(lookup):
             # not found cannot update
             if patinfo['ports'] == 'update':
-                return (None, None)
+                return None, None
 
             # make ports into a single string
             # ports will now be 'all' or numeric list
@@ -339,7 +344,7 @@ class BlackList:
             update['last'] = tnow
             fwdb.update_ip(update, ip)
 
-        return (current, ports_have_changed)
+        return current, ports_have_changed
 
     @staticmethod
     def log_frequency(ip, matchcount, first, last):
@@ -590,7 +595,7 @@ class BlackList:
         if any(poss):
 
             # get list of ips from db output
-            possibles = [dict['ip'] for dict in poss]
+            possibles = [keys['ip'] for keys in poss]
 
             # Get the current files in the blacklist directory
             # we can use ListReader for this

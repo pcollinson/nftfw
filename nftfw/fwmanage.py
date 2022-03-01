@@ -264,6 +264,11 @@ def step5(cf, install, buildpath):
         Config class instance
     install : ('full', List[str] - list of sets to update
     buildpath : path to buildarea
+
+    Returns
+    ------
+    'full' or install list that passed in
+
     """
 
     assert isinstance(install, list)
@@ -280,8 +285,7 @@ def step6(cf):
 
     Parameters
     ----------
-    cf : class
-        Config class instance
+    cf : Config
 
     Returns
     -------
@@ -307,7 +311,7 @@ def step6(cf):
         # provide argument for restoreBackup
         retain_backup = True
 
-    return (backup_result, retain_backup)
+    return backup_result, retain_backup
 
 def step7(cf, install, backup_result, retain_backup):
     """Step 7 - Perform the install
@@ -376,7 +380,7 @@ def step8(cf):
     Parameters
     ----------
     cf : Config
-"""
+    """
 
     log.info('Install rules in %s', cf.nftables_conf)
     rules, errs = nft.nft_ruleset(cf)
@@ -399,7 +403,6 @@ def check_for_update_type(files):
 
     Parameters
     ----------
-    cf : Config
     files : Dict[name : contents]
         name : str
             is the name of a file to be used
