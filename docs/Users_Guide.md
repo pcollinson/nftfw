@@ -146,7 +146,7 @@ _nftfw_ will write error messages into _/var/log/syslog_ using the standard _sys
 
 There are various manual pages - see [Manual page index](man/index.md).
 
- If you are migrating from another firewall system to _nftfw_, now's the time to look at the [Migrating to nftfw](Installation.md#migrating-to-nftfw) section of the Installation document.
+ If you are migrating from another firewall system to _nftfw_, now's the time to look at the [Migrating a Sympl or Symbiosis firewall](Debian_package_install.md#migrating-a-sympl-or-symbiosis-firewall) section of the Package Installation document.
 
 ## Blacklist
 
@@ -300,10 +300,6 @@ See documents in the _docs_ directory:
 
 - [Install _nftfw_ from Debian package](Debian_package_install.md)
   - Installation from the Debian package found in the package directory.
-- [Installing _nftfw_](Installation.md)
-  - Full installation of the system for Debian Buster.
-- [Installation Instructions](Installation-Instructions.md)
-  - For those who want a bare bones list of tasks.
 - [Installing Geolocation](Installing-GeoLocation.md)
   - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
 - [Getting CIDR lists](Getting-cidr-lists.md)

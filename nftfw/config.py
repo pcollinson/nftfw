@@ -881,7 +881,10 @@ pattern_split = No
         """Check if running as root and die if not"""
 
         if os.geteuid() != 0:
-            print("Run the program as root")
+            if sys.stdout.isatty():
+                print("Run the program as root")
+            else:
+                log.critical("Run the program as root")
             sys.exit(1)
 
     def chownpath(self, path):

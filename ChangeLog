@@ -1,3 +1,10 @@
+v0.9.8	Update fail2ban document.
+	Other documentation changes and edits.
+	Make am_i_root() use the logging interface if running in the
+	background. Some commands are now running as part of system tasks.
+	Change warning message when nftfw backup file exists. It now tells
+	users what to do to allow backups to be taken.
+
 v0.9.7  Change nftfwedit to allow service names in port lists (-p argument).
 	Changes to nftfwedit interface to assist external automatic editing:
 	  -b adds IP into database and creates file in blacklist.

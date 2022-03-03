@@ -160,7 +160,7 @@
 <p><em>nftfw</em> uses a configuration file in <em>/etc/nftfw/config.ini</em> to supply tailoring of various aspects of its operation. The distributed version contains a complete set of the default settings, with the values commented out. The <em>-i</em> flag to <em>nftfw</em> lists all the values that are in force.</p>
 <p><em>nftfw</em> will write error messages into <em>/var/log/syslog</em> using the standard <em>syslog</em> mechanism. To get an listing of what <em>ntfw</em> is doing, set <em>loglevel</em> in the config file to <em>INFO</em>.</p>
 <p>There are various manual pages - see <a href="man/index.html">Manual page index</a>.</p>
-<p>If you are migrating from another firewall system to <em>nftfw</em>, now’s the time to look at the <a href="Installation.html">Migrating to nftfw</a> section of the Installation document.</p>
+<p>If you are migrating from another firewall system to <em>nftfw</em>, now’s the time to look at the <a href="Debian_package_install.html">Migrating a Sympl or Symbiosis firewall</a> section of the Package Installation document.</p>
 <h2 id="blacklist">Blacklist</h2>
 <p><em>nftfw</em> contains a scanner whose job is to watch log files and add offending IP addresses into <em>blacklist.d</em>. The scanner is started by:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nftfw blacklist</span></code></pre></div>
@@ -253,14 +253,6 @@
 <li><a href="Debian_package_install.html">Install <em>nftfw</em> from Debian package</a>
 <ul>
 <li>Installation from the Debian package found in the package directory.</li>
-</ul></li>
-<li><a href="Installation.html">Installing <em>nftfw</em></a>
-<ul>
-<li>Full installation of the system for Debian Buster.</li>
-</ul></li>
-<li><a href="Installation-Instructions.html">Installation Instructions</a>
-<ul>
-<li>For those who want a bare bones list of tasks.</li>
 </ul></li>
 <li><a href="Installing-GeoLocation.html">Installing Geolocation</a>
 <ul>

@@ -83,23 +83,28 @@
 <h1 class="title">Using fail2ban with nftfw</h1>
 </header>
 <h1 id="using-fail2ban-with-nftfw">Using fail2ban with nftfw</h1>
-<p>The 0.9.7 release of <em>nftfw</em> contains a new directory <em>fail2ban</em> installed in <em>/usr/share/doc/nftfw</em>. The directory contains two action files for <em>fail2ban</em> allowing the system to use <em>nftfw</em> as its firewall. The action interface for <em>fail2ban</em> uses expanded editing functions in the <em>nftfwedit</em> command.</p>
+<p>The 0.9.7 and later releases of <em>nftfw</em> contains a new directory <em>fail2ban</em> installed in <em>/usr/share/doc/nftfw</em>. The directory contains two action files for <em>fail2ban</em> allowing the system to use <em>nftfw</em> as its firewall. The ban action interface for <em>fail2ban</em> uses expanded editing functions in the <em>nftfwedit</em> command to add an IP address into <em>nftfw</em>. It will create a file in <code>/etc/nftfw/blacklist.d</code> and add the IP to <em>nftfw</em>’s database. The unban action will remove the file but will leave the IP address information in the database.</p>
 <h2 id="installation">Installation</h2>
 <p>Install the action files:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="bu">cd</span> /usr/share/doc/nftfw/fail2ban</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp *.conf /etc/fail2ban/action.d</span></code></pre></div>
-<p>Setup the fail2ban configuration to use the new action files. It’s probably wise to stop <em>fail2ban</em> while doing this.</p>
+<p>Setup the <em>fail2ban</em> configuration to use the new action files. It’s probably wise to stop <em>fail2ban</em> while doing this.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl stop fail2ban</span></code></pre></div>
-<p>Set up a copy of the main configuration file:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> copy jail.conf jail.local</span></code></pre></div>
-<p>Then edit the <code>jail.local</code> file changing these lines to read:</p>
+<p>We need to make a change to <code>fail2ban</code>’s main configuration file, as distributed it’s in <code>/etc/fail2ban/jail.conf</code>. The file should not be edited, instead it’s conventional to make a copy called <code>jail.local</code> and edit that.</p>
+<p>If you don’t have <code>/etc/jail.local</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="bu">cd</span> /etc/fail2ban</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp jail.conf jail.local</span></code></pre></div>
+<p>If you do:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="bu">cd</span> /etc/fail2ban</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp jail.local jail.local.bak</span></code></pre></div>
+<p>Then edit (use <em>sudo</em> before your edit command) the <code>jail.local</code> file changing these lines to read:</p>
 <pre class="text"><code>banaction = nftfw-multiport
 banaction_allports = nftfw-allports</code></pre>
 <p>You are now set. Restart <em>fail2ban</em>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl start fail2ban</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl start fail2ban</span></code></pre></div>
 <h2 id="testing">Testing</h2>
 <p>The <em>fail2ban</em> client can test the ban and unban actions.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> fail2ban-client set JAIL banip IP</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> fail2ban-client set JAIL banip IP</span></code></pre></div>
 <p>You need to replace JAIL with a jail that is configured in <em>jail.d</em>, and IP by an IP address that will be banned.</p>
 <p>The results should be:</p>
 <ul>
@@ -108,9 +113,23 @@ banaction_allports = nftfw-allports</code></pre>
 <li><p>The nftables firewall will have been reloaded, assuming that you have actioned <em>nftfw.path</em> in <em>systemd</em> running <em>nftfw</em>’s <em>blacklist</em> command when files are changed on the <em>blacklist.d</em> directory. See ‘Start the active control directories’ in <a href="Debian_package_install.html">Install <em>nftfw</em> from Debian package</a>.</p></li>
 </ul>
 <p>To undo this test, use:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> fail2ban-client set JAIL unbanip IP</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> fail2ban-client set JAIL unbanip IP</span></code></pre></div>
+<h2 id="is-it-working">Is it working?</h2>
+<p><em>fail2ban</em> logs the ban action and the IP that it used but says nothing about the action that is executed. The action will create a file named <code>ipaddress.auto</code> in <code>/etc/nftfw/blacklist.d</code> and the IP address will be entered into <em>nftfw</em>’s database. Database entries are accompanied by a ‘pattern’ which indicates the source of the ban. The <em>fail2ban</em> actions for <em>nftfw</em> set the pattern to be <code>f2b-</code> followed by the name of the Jail.</p>
+<p>Use the <em>nftfwls</em> command to see the current state of <em>nftfw</em>. It uses the contents of <code>/etc/nftfw/blacklist.d</code> to select only active blacklisted IPs. To show all the entries in the database use <code>nftfwls -a</code>. You should see some <code>f2b</code> entries in the database.</p>
+<p>Alternatively you can use the <em>nftfwedit</em> command to look at one of the IP’s that <em>fail2ban</em> has logged.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>$ <span class="ex">nftfwedit</span> IPADDRESS</span></code></pre></div>
+<p>Will tell you if the IP is in the database, and if so, whether it’s active (i.e. in <code>/etc/nftfw/blacklist.d</code>).</p>
+<h2 id="what-to-do-for-fail2ban-unban">What to do for <em>fail2ban</em> unban</h2>
+<p>As distributed, the two <em>fail2ban</em> action files will act on <em>fail2ban</em> unban actions by removing the IP from the <code>/etc/nftfw/blacklist.d</code> directory but not from the <em>nftfw</em> database. It’s not clear whether this is the right thing to do, it may be better to just ignore the unban instruction and let <em>nftfw</em> time out the IP address. If you would like to try this, cd to <code>/etc/fail2ban/action.d</code> and use sudo with your editor to modify each of <code>nftfw-allports.conf</code> and <code>nftfw-multiport.conf</code>. Change</p>
+<pre class="text"><code>actionunban = /usr/bin/nftfwedit -r &lt;ip&gt;
+</code></pre>
+<p>to</p>
+<pre class="text"><code># actionunban = /usr/bin/nftfwedit -r &lt;ip&gt;
+actionunban =</code></pre>
+<p>The # is a comment so you can put it back later if needed. Now restart <em>fail2ban</em>.</p>
 <h2 id="caveat">Caveat</h2>
-<p>I have tested the two actions included with a <em>fail2ban</em> installation, using the <em>fail2ban-client</em> commands above. However, I have not used the rules on an active installation.</p>
+<p>I have tested the two actions included with a <em>fail2ban</em> installation, using the <em>fail2ban-client</em> commands above. Initial results from the user that asked for this capability show that this is working as expected.</p>
 <h2 id="thanks">Thanks</h2>
 <p>Thanks to the <em>nftfw</em> user who asked me for assistance with <em>fail2ban</em>.</p>
 </body>

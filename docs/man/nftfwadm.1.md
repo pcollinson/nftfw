@@ -32,7 +32,7 @@ These are the available options to the program:
 
 :    List all the configuration names and settings
 
-**-O**, **-\-Optiono** OPTION
+**-O**, **-\-Option** OPTION
 
 :     OPTION is keyword=value and may be comma separated list of configuration options. The values override any settings in the configuration file.
 

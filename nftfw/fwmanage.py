@@ -307,7 +307,9 @@ def step6(cf):
         log.error('Backup failed, installation aborted')
 
     if backup_result == 'preserve':
-        log.error('Backup file exists, remove with nftfwadm if necessary')
+        log.error('*** Important: Backup file exists and probably should not. '
+                  'nftfw cannot safely test new installations and needs be able to. '
+                  "Use 'sudo nftfwadm clean' and reload nftfw with 'nftfw -f load' ***" )
         # provide argument for restoreBackup
         retain_backup = True
 
