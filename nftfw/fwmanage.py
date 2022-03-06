@@ -178,7 +178,7 @@ def step3(cf, buildpath):
         Path to build directory
     """
 
-    log.info('Test files using nft command')
+    log.info('Testing new nftables installation')
     cmdfile = 'nftfw_init.nft'
     if not nft.nft_load(cf, str(buildpath), cmdfile, test=True):
         log.info('Test failed using %s', cmdfile)

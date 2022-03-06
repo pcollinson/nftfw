@@ -1,9 +1,21 @@
+v0.9.9	Change interface to nftables to use the python3 bindings to
+	libnftables. The distributed version of the python module
+	doesn't have a full mapping of the library interfaces so I've
+	created an edited version to allow for rule testing. I did
+	first created an add-on that contained the bits I needed, but
+	that felt wrong.
+	The system now allows choosing between the original code
+	using /usr/sbin/nft to load information, and the new
+	python version.
+	Add nft_select to config.ini to allow use of old code
+	in case of need.
+
 v0.9.8	Update fail2ban document.
-	Other documentation changes and edits.
-	Make am_i_root() use the logging interface if running in the
-	background. Some commands are now running as part of system tasks.
-	Change warning message when nftfw backup file exists. It now tells
-	users what to do to allow backups to be taken.
+	Other documentation changes and edits. Make am_i_root() use the
+	logging interface if running in the background. Some commands are
+	now running as part of system tasks. Change warning message when
+	nftfw backup file exists. It now tells users what to do to allow
+	backups to be taken.
 
 v0.9.7  Change nftfwedit to allow service names in port lists (-p argument).
 	Changes to nftfwedit interface to assist external automatic editing:

@@ -57,12 +57,18 @@ fwmanage.py	       fw_manage manages creation and installation of nftables
  netreader.py          Class NetReader - reads files from blacknets directory
                        validates entries and creates lists that can be used
                        in listprocess to output the sets.
- nft.py		       Interface to nftables, calls the nft program
-                       to do its work, tested with Python 3.6
-
+ nft.py		       Interface for loading and reading nftables. Uses
+                       either nft_python.py or nft_shell.py depending on
+                       the setting of nft_select in config.ini.
+ nft_shell.py          Original interface to nftables using the shell to
+                       call /usr/sbin/nft to do the work.
+ nft_python.py         Interface to nftables using an extended version
+                       of the python nftables module.
+ nftables.py           Edited version of the standard python library to
+                       add in the missing calls that are needed for nftfw.
 
 'whitelist' function
-whitelist.py	       Reads information from wtmp looking for
+ whitelist.py	       Reads information from wtmp looking for
                        user logins, adds whitelist entries
                        to the directory when found.
                        Will automatically remove entries after
@@ -74,7 +80,7 @@ whitelist.py	       Reads information from wtmp looking for
  utmpconst.py	       Constants for the utmp interface
 
 'blacklist' function
-blacklist.py	       Controls blacklisting, reads patterns
+ blacklist.py	       Controls blacklisting, reads patterns
 		       from patterns.d to establish files to scan and
 		       how to scan them.
 		       Using this information is maintains the

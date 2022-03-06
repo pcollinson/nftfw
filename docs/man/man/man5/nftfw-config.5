@@ -174,25 +174,33 @@ To stop logging, just use the name.
 \f[R]
 .fi
 .PP
-Two variables control the type of sets automatically generated for
-blacklist and whitelist tables.
-When true, \f[I]nftfw\f[R] uses auto_merged, interval sets for the
-blacklist or whitelist sets it makes.
-This set type automatically create single entries containing an address
-range for adjacent IP addresses.
+The three variables below control the type of sets automatically
+generated for blacklist, blacknets and whitelist tables.
+When true, \f[I]nftfw\f[R] uses auto_merged, interval sets for the sets
+it makes.
+This type automatically creates entries containing an address range for
+adjacent IP addresses.
 The feature is desirable because it reduces the number of matches.
 .PP
-However, at present, the auto-merged, interval sets can cause the
-\f[I]nft\f[R] program to fail in some circumstances, flagging an error.
-There is a bug causing \f[I]nft\f[R] to succeed in loading the set when
-a full install is performed but failing when attempting a reload.
+However, the auto-merged, interval sets can cause the loading of
+\f[I]nftables\f[R] rules to fail, flagging an error.
+A load can succeed when a full install is performed but partial loads of
+sets can fail.
+The bug was reported to the \f[I]nftables\f[R] development team, based
+on problems with the Buster release and a fix was generated.
+However, it takes time for such fixes to be available in Debian
+releases.
 .PP
-The bug has been reported to the \f[I]nftables\f[R] development team,
-but no fix has been generated as of the current releases.
-\f[I]nftfw\f[R] will work around this bug, automatically generating a
-full install when an attempt at a set reload fails.
+\f[I]nftfw\f[R] works around this bug, automatically generating a full
+install when an attempt at a set reload fails.
 However, it seems a good idea to provide a way of turning this feature
 on and default to not using the feature.
+.PP
+It seems likely that this problem has been fixed for the Bullseye Debian
+release.
+It\[cq]s recommended to enable this feature, but monitor logs to check
+that updates are not failing and nftfw is managing to do installs of
+sets without reporting errors.
 .IP
 .nf
 \f[C]
@@ -301,6 +309,23 @@ Set this to zero to turn this feature off.
 .nf
 \f[C]
  sync_check = 50
+\f[R]
+.fi
+.PP
+\f[B][Nftables]\f[R]
+.PP
+\f[I]nft_select\f[R] Allow selection of the method used to load/unload
+nftables.
+Permissable values are: \f[I]shell\f[R] using the original interface
+which calls \f[I]/usr/sbin/nft\f[R], and \f[I]python\f[R] uses python
+\f[I]nftables\f[R] library to load and read \f[I]nftables\f[R].
+\f[I]python\f[R] is the default.
+This option may go away in future, it\[cq]s there in case the python
+code appears to cause problems.
+.IP
+.nf
+\f[C]
+  nft_select = python
 \f[R]
 .fi
 .PP

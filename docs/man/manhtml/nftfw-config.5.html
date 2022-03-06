@@ -69,9 +69,10 @@
   blacklist_logging = Blacklist
   whitelist_logging
   blacknets_logging</code></pre>
-<p>Two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, <em>nftfw</em> uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.</p>
-<p>However, at present, the auto-merged, interval sets can cause the <em>nft</em> program to fail in some circumstances, flagging an error. There is a bug causing <em>nft</em> to succeed in loading the set when a full install is performed but failing when attempting a reload.</p>
-<p>The bug has been reported to the <em>nftables</em> development team, but no fix has been generated as of the current releases. <em>nftfw</em> will work around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.</p>
+<p>The three variables below control the type of sets automatically generated for blacklist, blacknets and whitelist tables. When true, <em>nftfw</em> uses auto_merged, interval sets for the sets it makes. This type automatically creates entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.</p>
+<p>However, the auto-merged, interval sets can cause the loading of <em>nftables</em> rules to fail, flagging an error. A load can succeed when a full install is performed but partial loads of sets can fail. The bug was reported to the <em>nftables</em> development team, based on problems with the Buster release and a fix was generated. However, it takes time for such fixes to be available in Debian releases.</p>
+<p><em>nftfw</em> works around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.</p>
+<p>It seems likely that this problem has been fixed for the Bullseye Debian release. It’s recommended to enable this feature, but monitor logs to check that updates are not failing and nftfw is managing to do installs of sets without reporting errors.</p>
 <pre><code>  blacklist_set_auto_merge = False
   whitelist_set_auto_merge = False
   blacknets_set_auto_merge = False</code></pre>
@@ -93,6 +94,9 @@
 <pre><code> clean_before = 90</code></pre>
 <p><em>sync_check</em> <strong>nftfw blacklist</strong> will check whether the IP addresses in the database that should be active are actually present in the blacklist directory <em>blacklist.d</em>. ‘Should be active’ means that the addresses have not been automatically expired. <strong>nftfw</strong> is largely event driven, but events get missed. So on the basis that if stuff can happen, it will, this code will recover the correct state of the blacklist directory. It seems overkill to call this every time the blacklist scanner runs, so it is executed when number of runs of the scanner is greater than the value of this variable. The default is to run the blacklist scanner 96 times a day, so 50 seems are reasonable way to run the recovery code once a day. Set this to zero to turn this feature off.</p>
 <pre><code> sync_check = 50</code></pre>
+<p><strong>[Nftables]</strong></p>
+<p><em>nft_select</em> Allow selection of the method used to load/unload nftables. Permissable values are: <em>shell</em> using the original interface which calls <em>/usr/sbin/nft</em>, and <em>python</em> uses python <em>nftables</em> library to load and read <em>nftables</em>. <em>python</em> is the default. This option may go away in future, it’s there in case the python code appears to cause problems.</p>
+<pre><code>  nft_select = python</code></pre>
 <p><strong>[Nftfwls]</strong></p>
 <p><em>date_fmt</em> Allows change of date format for <em>nftfwls</em>. The default is DD-MM-YYYY HH:MM.</p>
 <pre><code>  date_fmt = %d-%m-%Y %H:%M</code></pre>

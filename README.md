@@ -18,6 +18,9 @@ Main changes:
 
 - Configure _fail2ban_ to drive _nftfw_ - see [Using fail2ban with nftfw](docs/Using-fail2ban-with-nftfw.md).
 
+- Use Python interface to directly load the _nftables_ statements into the system.
+
+
 ## Features
 
 - **Easy-to-use firewall admin**.  Five directories control the firewall. Placing files in the directories create firewall rules configured from the file names. Two directories, _incoming.d_ and _outgoing.d_, supply rules allowing access to ports for incoming and outgoing connections. These files are usually empty, but can contain IP addresses to make the rule more specific. Two more directories, _blacklist.d_ and _whitelist.d_, contain IP addresses, blocking or allowing access for named addresses. These files can contain ports, modifying the action of the rule. The final directory, _blacknets.d_ can contain files with lists of IP address ranges and makes rules that block access to all the addresses. Changing the firewall is simply a matter of making or removing a file in one of these directories. The directory contents are described in detail in the [User's Guide](docs/Users_Guide.md), while the [How do I... or Quick Users' Guide](docs/How_do_I.md) gives a more task oriented description.

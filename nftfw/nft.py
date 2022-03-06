@@ -1,15 +1,23 @@
 """ nftfw nft command API
 
 Provides various functions to access and change the installed
-nftables, uses shell to call the nft command
+nftables, uses libnftables to execute nft commands
 
-Uses the 3.6 version of subprocess to support 3.6 installations
+There are two possible implementations
+nft_shell.py - the original code using /usr/sbin/nft command
+	to talk to the nftables
+nft_python.py - uses extended nftables python module to
+        talk to libnftables
+
+This code uses the nft_select value in config to choose which
+of the implementations to use.
 
 """
 
-import subprocess
-from pathlib import Path
 import logging
+from . import nft_python
+from . import nft_shell
+
 log = logging.getLogger('nftfw')
 
 def nft_load(cf, dirname, filename, test=False):
@@ -20,14 +28,14 @@ def nft_load(cf, dirname, filename, test=False):
 
     Parameters
     ----------
-    cf : config object
+    cf : Config
     dirname : str
         where to find the files can be '',
-        when the -I flag is not given to nft
+        added to the search path for files
     filename : str
         filename to run
     test :  bool
-        f true run nft using -c
+        if true run nft dry_run set to True
 
     Returns
     -------
@@ -36,57 +44,18 @@ def nft_load(cf, dirname, filename, test=False):
         False if not
     """
 
-    # pylint: disable=unused-argument
-
-    doing = 'Loading'
-    if test:
-        doing = 'Testing'
-    log.info('%s nft rulesets from %s', doing, filename)
-
-    args = ['/usr/sbin/nft']
-
-    if dirname != '':
-        args += ['-I', dirname]
-        filename = Path(dirname) / Path(filename)
+    if cf.nft_select == 'python':
+        return nft_python.nft_load(cf, dirname, filename, test)
     else:
-        filename = Path(filename)
-
-    if not filename.exists():
-        log.error('Cannot find file: %s', str(filename))
-        return False
-
-    if test:
-        args += ['-c']
-
-    args += ['-f', str(filename)]
-    compl = subprocess.run(args,
-                           stderr=subprocess.PIPE,
-                           check=False)
-    if compl.stderr != b'':
-        errs = compl.stderr.decode()
-        log.error('nft using %s: failed', str(filename))
-        log.error(errs)
-        return False
-
-    return True
+        return nft_shell.nft_load(cf, dirname, filename, test)
 
 def nft_flush(cf):
     """ Flush rulesets """
 
-    # pylint: disable=unused-argument
-
-    log.info('Flushing nft rulesets')
-    args = ['/usr/sbin/nft', 'flush', 'ruleset']
-    compl = subprocess.run(args,
-                           stderr=subprocess.PIPE,
-                           check=False)
-    if compl.stderr != b'':
-        errs = compl.stderr.decode()
-        log.error('nft flush failed')
-        log.error(errs)
-        return False
-
-    return True
+    if cf.nft_select == 'python':
+        return nft_python.nft_flush(cf)
+    else:
+        return nft_shell.nft_flush(cf)
 
 def nft_ruleset(cf):
     """Read entire ruleset from nftables
@@ -94,18 +63,14 @@ def nft_ruleset(cf):
     Returns
     -------
     tuple
-        (decoded stdout, decoded stderr)
+        (rules, errors)
     """
-    # pylint: disable=unused-argument
 
-    args = ['/usr/sbin/nft', 'list', 'ruleset']
-    compl = subprocess.run(args,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           check=False)
-    rules = '' if compl.stdout == b'' else compl.stdout.decode()
-    errs = ''  if compl.stderr == b'' else compl.stderr.decode()
-    return (rules, errs)
+    if cf.nft_select == 'python':
+        return nft_python.nft_ruleset(cf)
+    else:
+        return nft_shell.nft_ruleset(cf)
+
 
 def nft_save_backup(cf, force=False):
     """Save current nftables settings to a the backup file
@@ -123,51 +88,25 @@ def nft_save_backup(cf, force=False):
         written   if the save is OK
     """
 
-    # check if file exists unless force is True
-    path = cf.varfilepath('backup')
-    if not force and path.exists():
-        return 'preserve'
-
-    # get the rules
-    (rules, errs) = nft_ruleset(cf)
-    if errs != '':
-        log.error('Error reading rulesets from nftables %s', errs)
-        return 'errors'
-
-    path.write_text(rules)
-    return 'written'
+    if cf.nft_select == 'python':
+        return nft_python.nft_save_backup(cf, force)
+    else:
+        return nft_shell.nft_save_backup(cf, force)
 
 def nft_restore_backup(cf, nodelete=False):
     """Restore backup and delete the backup file
     unless nodelete is True
     """
 
-    # check if file exists
-    path = cf.varfilepath('backup')
-    if not path.exists():
-        log.error('Backup file %s not found', str(path))
-        return False
-    # flush ruleset
-    if not nft_flush(cf):
-        # flush reports errors
-        log.error('Backup file %s not deleted', str(path))
-        return False
-    # load backup
-    log.info('Loading backup settings from %s', str(path))
-    res = nft_load(cf, '', str(path))
-    if not res:
-        # will be errors above
-        log.error('Backup file %s not deleted', str(path))
-        return False
-
-    if not nodelete:
-        path.unlink()
-    return True
+    if cf.nft_select == 'python':
+        return nft_python.nft_restore_backup(cf, nodelete)
+    else:
+        return nft_shell.nft_restore_backup(cf, nodelete)
 
 def nft_delete_backup(cf):
     """ Delete the backup file """
 
-    # check if file exists
-    path = cf.varfilepath('backup')
-    if path.exists():
-        path.unlink()
+    if cf.nft_select == 'python':
+        return nft_python.nft_delete_backup(cf)
+    else:
+        return nft_shell.nft_delete_backup(cf)

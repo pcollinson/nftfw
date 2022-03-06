@@ -32,7 +32,7 @@ class NormaliseAddress:
         self.cf = cf
         self.error_name = ''
         if error_name != '':
-            self.error_name = f'{error_name}: '
+            self.error_name = f'{error_name}:'
 
     # Functions for IP address checking
     addfn = {'ip':  ipaddress.IPv4Address,
@@ -101,11 +101,11 @@ class NormaliseAddress:
         if ipaddr.is_global:
             if is_white is not None \
                and is_white(proto, ipaddr):
-                log.info('%sWhitelisted address %s ignored', self.error_name, ipaddr)
+                log.info('%s Whitelisted address %s ignored', self.error_name, ipaddr)
                 return None
             # falls out
         else:
-            log.info('%sLocal address %s ignored', self.error_name, ipaddr)
+            log.info('%s Local address %s ignored', self.error_name, ipaddr)
             return None
 
         return ipaddr
@@ -118,7 +118,7 @@ class NormaliseAddress:
             return None
         if is_white is not None \
            and is_white(proto, ipaddr):
-            log.info('%sWhitelisted address %s ignored', self.error_name, ipaddr)
+            log.info('%s Whitelisted address %s ignored', self.error_name, ipaddr)
             return None
 
         return ipaddr
@@ -152,7 +152,7 @@ class NormaliseAddress:
                 if proto == 'ip6':
                     ipaddr = netfn((ipaddr, 64), strict=False)
         except ValueError as e:
-            log.error('%sProblem converting %s address %s - %s',
+            log.error('%s Problem converting %s address %s - %s',
                       self.error_name, ipname, ipstr, str(e))
             return None
         return ipaddr

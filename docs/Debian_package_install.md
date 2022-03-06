@@ -71,7 +71,7 @@ Check that it's running:
 $ sudo nftfw -x -v load
 nftfw[15264]: Loading data from /etc/nftfw
 nftfw[15264]: Creating reference files in /var/lib/nftfw/test.d
-nftfw[15264]: Test files using nft command
+nftfw[15264]: Testing new nftables installation
 nftfw[15264]: Testing nft rulesets from nftfw_init.nft
 nftfw[15264]: Determine required installation
 nftfw[15264]: No install needed

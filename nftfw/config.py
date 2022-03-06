@@ -173,6 +173,12 @@ class Config:
                             are reasonable way to run the recovery code once a day. Set
                             this to zero  to turn this feature off.
 
+    [Nftables]              Allow selection of script used to load/unload nftables
+                            Select from
+                            shell - the original interface that uses /usr/sbin/nft
+                            python - uses a python library
+    nft_select: shell | python
+
     [Nftfwls]
     Allow local selection for date formats in nftfwls
     Seconds are not that relevant
@@ -369,6 +375,13 @@ clean_before = 90
 # this to zero  to turn this feature off.
 sync_check = 50
 
+[Nftables]
+# Allow selection of method used to load/unload nftables
+#  Select from
+#     shell - the original interface that uses /usr/sbin/nft
+#     python - uses a python library
+nft_select = python
+
 [Nftfwls]
 # Allow local selection for date formats in nftfwls
 # and nftfwedit print option
@@ -442,6 +455,9 @@ pattern_split = No
     #   Used by firewallreader.py
     rulesreader = None
 
+    #   Value of nft_select
+    nft_select = None
+
     #   Used by nftfwedit.py to pass args through the scheduler
     editargs = {}
 
@@ -460,7 +476,8 @@ pattern_split = No
         'whitelist_logging', 'blacknets_logging',
         'whitelist_expiry', 'wtmp_file',
         'block_after', 'block_all_after',
-        'expire_after', 'clean_before', 'date_fmt')
+        'expire_after', 'clean_before', 'date_fmt',
+        'nft_select')
 
     ini_boolean_change = (
         'logprint', 'logsyslog',
@@ -643,6 +660,13 @@ pattern_split = No
         else:
             self.execuid = self.fileuid
             self.execgid = self.filegid
+
+        # check that nft_select is either 'python' or 'shell'
+        select = self.parser.get('Nftables', 'nft_select')
+        if select not in ('python', 'shell'):
+            log.critical("Problem in config.ini: nft_select should be 'python' or 'shell'.")
+            sys.exit(1)
+        self.nft_select = select
 
         # Finally check on the installation
         self._check_installation()

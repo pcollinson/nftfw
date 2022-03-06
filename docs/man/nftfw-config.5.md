@@ -96,11 +96,14 @@ Do we want nftables logging? By adding a different prefix for each of the tables
       whitelist_logging
 	  blacknets_logging
 
-Two variables control the type of sets automatically generated for blacklist and whitelist tables. When true, _nftfw_ uses auto_merged, interval sets for the blacklist or whitelist sets it makes. This set type automatically create single entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.
+The three variables below control the type of sets automatically generated for blacklist, blacknets and whitelist tables. When true, _nftfw_ uses auto_merged, interval sets for the sets it makes. This type automatically creates entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.
 
-However, at present, the auto-merged, interval sets can cause the _nft_ program to fail in some circumstances, flagging an error. There is a bug causing _nft_ to succeed in loading the set when a full install is performed but failing when attempting a reload.
+However, the auto-merged, interval sets can cause the loading of _nftables_ rules to fail, flagging an error. A load can succeed when a full install is performed but partial loads of sets can fail. The bug was reported to the _nftables_ development team, based on problems with the Buster release and a fix was generated. However, it takes time for such fixes to be available in Debian releases.
 
-The bug has been reported to the _nftables_ development team, but no fix has been generated as of the current releases. _nftfw_ will work around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.
+_nftfw_ works around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.
+
+It seems likely that this problem has been fixed for the Bullseye Debian release. It's recommended to enable this feature, but monitor logs to check that updates are not failing and nftfw is managing to do installs of sets without reporting errors.
+
 
       blacklist_set_auto_merge = False
       whitelist_set_auto_merge = False
@@ -148,6 +151,13 @@ _sync_check_
 **nftfw blacklist** will check whether the IP addresses in the database that should be active are actually present in the blacklist directory _blacklist.d_. 'Should be active' means that the addresses have not been automatically expired. **nftfw** is largely event driven, but events get missed.  So on the basis that if stuff can happen, it will, this code will recover the correct state of the blacklist directory. It seems overkill to call this every time the blacklist scanner runs, so it is executed when number of runs of the scanner is greater than the value of this variable. The default is to run the blacklist scanner 96 times a day, so 50 seems are reasonable way to run the recovery code once a day. Set this to zero  to turn this feature off.
 
      sync_check = 50
+
+**\[Nftables]**
+
+_nft_select_
+Allow selection of the method used to load/unload nftables. Permissable values are: _shell_ using the original interface which calls _/usr/sbin/nft_, and _python_  uses python _nftables_ library to load and read _nftables_. _python_ is the default. This option may go away in future, it's there in case the python code appears to cause problems.
+
+      nft_select = python
 
 **\[Nftfwls]**
 
