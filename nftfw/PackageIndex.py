@@ -66,6 +66,9 @@ fwmanage.py	       fw_manage manages creation and installation of nftables
                        of the python nftables module.
  nftables.py           Edited version of the standard python library to
                        add in the missing calls that are needed for nftfw.
+ schema.json           JSON Schema stolen from the python3-nftables package
+                       along with the original of nftables.py. This is to
+                       support json use which nftfw doesn't use.
 
 'whitelist' function
  whitelist.py	       Reads information from wtmp looking for

@@ -9,7 +9,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='nftfw',
-    version='0.9.9',
+    version='0.9.10',
     packages=find_packages(),
     include_package_data=True,
 

@@ -1,3 +1,7 @@
+v0.9.10	Missed json.schema which is part of the original python3-nftables
+	module and which isn't used by nftfw. However, it seems prudent
+	to include it here.
+
 v0.9.9	Change interface to nftables to use the python3 bindings to
 	libnftables. The distributed version of the python module
 	doesn't have a full mapping of the library interfaces so I've
