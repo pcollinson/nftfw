@@ -62,13 +62,13 @@ def nft_load(cf, dirname, filename, test=False):
     if test:
         nft.set_dry_run(False)
 
-    if rc != 0:
-        log.error('nft using %s: failed - unspecified error', str(filename))
-        return False
-
     if errors != '':
         log.error('nft using %s: failed', str(filename))
         log.error(errors)
+        return False
+
+    if rc != 0:
+        log.error('nft using %s: failed - unspecified error', str(filename))
         return False
 
     return True

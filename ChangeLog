@@ -1,3 +1,6 @@
+v0.9.12 Reorder failure tests in nft_python.py is if there is an error
+	it will be logged properly.
+
 v0.9.11 Files in incoming.d and outgoing.d can contain IP addresses
 	applying the action rule only to those addresses. Fix to
 	ensure that a rule contains addresses it is only applied
