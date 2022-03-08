@@ -66,9 +66,15 @@ class FirewallProcess:
         iplines = "flush chain ip filter "+self.direction+"\n"
         ip6lines = "flush chain ip6 filter "+self.direction+"\n"
 
+        # If we have ips, only run rules for a protocol
+        # if there is an ip for the appropriate protocol
         for r in self.records:
-            iplines += self.runforprotocol(r, 'ip')
-            ip6lines += self.runforprotocol(r, 'ip6')
+            # see if we have specific ips
+            haveips = 'ip' in r or 'ip6' in r
+            if not haveips or 'ip' in r:
+                iplines += self.runforprotocol(r, 'ip')
+            if not haveips or 'ip6' in r:
+                ip6lines += self.runforprotocol(r, 'ip6')
         return iplines + ip6lines
 
     def runforprotocol(self, r, proto):

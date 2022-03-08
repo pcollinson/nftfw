@@ -1,3 +1,9 @@
+v0.9.11 Files in incoming.d and outgoing.d can contain IP addresses
+	applying the action rule only to those addresses. Fix to
+	ensure that a rule contains addresses it is only applied
+	for a network protocol (IPv4 or IPv6) when an address of
+	the particular type appears in the list.
+
 v0.9.10	Missed json.schema which is part of the original python3-nftables
 	module and which isn't used by nftfw. However, it seems prudent
 	to include it here.
