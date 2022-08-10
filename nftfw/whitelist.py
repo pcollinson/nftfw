@@ -80,10 +80,12 @@ class WhiteList:
                     changes += self.fileinstall(i)
 
             for i in ip6:
-                # need to make this into a /64 network
+                # need to make this into a /112 network
+                # controlled by cf.default_ipv6_mask
                 i6 = ipaddress.IPv6Address(i)
                 if i6.is_global:
-                    i6 = ipaddress.IPv6Network((i6, 64), strict=False)
+                    msk = self.cf.default_ipv6_mask
+                    i6 = ipaddress.IPv6Network((i6, msk), strict=False)
                     changes += self.fileinstall(str(i6))
 
         # expiry old entries

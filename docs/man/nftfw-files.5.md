@@ -51,7 +51,7 @@ Files in these directories make nftables rules permitting access in the whitelis
 
 Filenames are simply IP addresses. The whitelist or blacklist scanners will create files in these directories, and will add a suffix of _.auto_.  Files added 'by hand' should just be the IP address.
 
-IPv6 addresses are added in /64 form, with the '/'  replaced by a vertical bar '|'.  Install  IPv4 address groups with network masking using the same convention.
+IPv6 addresses are added in /112 form, with the '/' replaced by a vertical bar '|'. Install IPv4 address groups with network masking using the same convention.
 
 Empty files mean that the rule applies to all ports. File contents are lists, one per line, with the following contents:
 

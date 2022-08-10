@@ -56,7 +56,7 @@
 <h2 id="blacklist-and-whitelist">blacklist and whitelist</h2>
 <p>Files in these directories make nftables rules permitting access in the whitelist or blocking access in the blacklist. Whitelisted rules appear before blacklisted ones in the firewall.</p>
 <p>Filenames are simply IP addresses. The whitelist or blacklist scanners will create files in these directories, and will add a suffix of <em>.auto</em>. Files added ‘by hand’ should just be the IP address.</p>
-<p>IPv6 addresses are added in /64 form, with the ‘/’ replaced by a vertical bar ‘|’. Install IPv4 address groups with network masking using the same convention.</p>
+<p>IPv6 addresses are added in /112 form, with the ‘/’ replaced by a vertical bar ‘|’. Install IPv4 address groups with network masking using the same convention.</p>
 <p>Empty files mean that the rule applies to all ports. File contents are lists, one per line, with the following contents:</p>
 <ul>
 <li>all - a ‘special’ keyword meaning that the rule applies to all ports.</li>

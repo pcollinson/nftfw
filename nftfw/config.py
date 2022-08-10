@@ -173,6 +173,12 @@ class Config:
                             are reasonable way to run the recovery code once a day. Set
                             this to zero  to turn this feature off.
 
+    default_ipv6_mask: int 112    Supply default ipv6 mask. IPv6 addresses are
+                            automatically masked to select a device. This was originally
+                            /64 which is very aggressive  and blocked too many addresses.
+                            Following the lead from a recent sympl update this is now
+                            changed to /112, and parameterised here.
+
     [Nftables]              Allow selection of script used to load/unload nftables
                             Select from
                             shell - the original interface that uses /usr/sbin/nft
@@ -375,6 +381,13 @@ clean_before = 90
 # this to zero  to turn this feature off.
 sync_check = 50
 
+# Supply default ipv6 mask. IPv6 addresses are
+# automatically masked to select a device. This was originally
+# /64 which is very aggressive and blocked too many addresses.
+# Following the lead from a recent sympl update this is now
+# changed to /112, and parameterised here.
+default_ipv6_mask = 112
+
 [Nftables]
 # Allow selection of method used to load/unload nftables
 #  Select from
@@ -476,7 +489,8 @@ pattern_split = No
         'whitelist_logging', 'blacknets_logging',
         'whitelist_expiry', 'wtmp_file',
         'block_after', 'block_all_after',
-        'expire_after', 'clean_before', 'date_fmt',
+        'expire_after', 'clean_before',
+        'default_ipv6_mask', 'date_fmt',
         'nft_select')
 
     ini_boolean_change = (
@@ -563,6 +577,10 @@ pattern_split = No
         # execution away from root
         self.execuid = 0
         self.execgid = 0
+
+        # default ipv6 mask
+        # used in normalise.pl
+        self.default_ipv6_mask = 112
 
         # now setup loggermanager
         self.logger_mgr = LoggerManager(self, log)
@@ -667,6 +685,10 @@ pattern_split = No
             log.critical("Problem in config.ini: nft_select should be 'python' or 'shell'.")
             sys.exit(1)
         self.nft_select = select
+
+        # set ipv6 mask
+        ma = self.parser.get('Blacklist', 'default_ipv6_mask')
+        self.default_ipv6_mask = int(ma)
 
         # Finally check on the installation
         self._check_installation()

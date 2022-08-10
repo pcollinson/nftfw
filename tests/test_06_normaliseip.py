@@ -33,7 +33,7 @@ def test_basic(norm):
     """ Test basic normalisation """
 
     iplist = ('192.0.2.5', '198.51.100.128',
-              '198.51.100.5', '2001:db8:fab::/64',
+              '198.51.100.5', '2001:db8:fab:11::1:0/112',
               '203.0.113.7')
     for ip in iplist:
         res = norm.normal(ip)
@@ -50,9 +50,9 @@ def test_white(cf, normwhite):
 def test_networknorm(norm):
     """ Test IP normalisation """
 
-    ip = '2001:db8:fab::677'
+    ip = '2001:db8:fab:11::1:234'
     res = norm.normal(ip)
-    assert res == '2001:db8:fab::/64'
+    assert res == '2001:db8:fab:11::1:0/112'
 
     ip = '198.51.100.30/24'
     res = norm.normal(ip)

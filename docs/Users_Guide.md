@@ -90,13 +90,14 @@ will block your machine from sending to an external _sshd_ server, and also to a
 To blacklist an address, create a file in _blacklist.d_  named by the IP address to add the address into the firewall. The _touch_ command is a simple way to make an empty file.
 
 ``` sh
-$ touch 198.51.100.40 '2001:db8::6|64'
+$ touch 198.51.100.40 '2001:db8:fab:11::1:0|112'
 $ ls blacklist.d
-198.51.100.40   2001:db8::6|64  203.0.113.204.auto
+198.51.100.40   2001:db8:fab:11:1:0|112  203.0.113.204.auto
 
 ```
 
-The first IP address is a version 4 address, and the second a version 6 address. It's usual to match only the top half of an IPv6 address, this is normally written ```2001:db8::6/64```  but we can't use '/' in a Linux file system, and the convention is to replace this by the vertical bar '|' symbol. Note we have to quote the address when used on the command line. The blacklist scanner (see below) creates files ending in _.auto_, you should leave these alone, the scanner will take care of them.
+The first IP address is a version 4 address, and the second a version
+6 address. It's usual to match all but the last character block of an IPv6 address, this is normally written ```2001:db8:fab:11::1:0/112``` but we can't use '/' in a Linux file system, and the convention is to replace this by the vertical bar '|' symbol. Note we have to quote the address when used on the command line. The blacklist scanner (see below) creates files ending in _.auto_, you should leave these alone, the scanner will take care of them.
 
 An empty blacklist file will block access to all ports to the IP address given by the name. Adding port numbers into the file, one per line, will restrict access to only those port numbers. The word 'all' can also be added, blocking all incoming ports. If a file contains 'all', other port numbers are ignored.
 

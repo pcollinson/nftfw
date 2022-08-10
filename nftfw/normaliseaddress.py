@@ -3,7 +3,8 @@
 Centralise ip checking in one place
 
 Ignore allow local IPs
-IPV6: make address into /64
+IPV6: make address into /112 (was /64 now controlled by
+config value default_ipv6_mask)
 is_white is address of fn to check if the ip is in the whitelist.
 When present and returning true ignore the address
 
@@ -127,7 +128,8 @@ class NormaliseAddress:
     def make_ipaddr(self, proto, ipstr):
         """Given a string, proto (ip|ip6) create an ipaddress object
 
-        All IPv6 addresses are made into /64 networks
+        All IPv6 addresses are made into /112 networks
+        controlled by default_ipv6_mask in config
 
         Parameters
         ----------
@@ -150,7 +152,8 @@ class NormaliseAddress:
             else:
                 ipaddr = addfn(ipstr)
                 if proto == 'ip6':
-                    ipaddr = netfn((ipaddr, 64), strict=False)
+                    ipaddr = netfn((ipaddr, self.cf.default_ipv6_mask),
+                                   strict=False)
         except ValueError as e:
             log.error('%s Problem converting %s address %s - %s',
                       self.error_name, ipname, ipstr, str(e))

@@ -12,14 +12,7 @@ For update information see the [Changelog](https://github.com/pcollinson/nftfw/b
 
 Main changes:
 
-- Fix for the _getgeocountry_ script in cidrlists, the format of the downloaded MaxMind zip file has changed.
-
-- Changes to _nftfwedit_ to provide full editing of the active _blacklist.d_ directory and the _nftfw_ database.
-
-- Configure _fail2ban_ to drive _nftfw_ - see [Using fail2ban with nftfw](docs/Using-fail2ban-with-nftfw.md).
-
-- Use Python interface to directly load the _nftables_ statements into the system.
-
+- Change the default mask used when automatically adding blacklisted IPv6 addresses from /64 to /112. The change mirrors a similar alteration in the Sympl firewall made because the /64 mask was found to be too aggressive. The /112 mask includes all the address apart from the last block in the IPv6 address. The value is parameterised and can be altered in config.ini.
 
 ## Features
 

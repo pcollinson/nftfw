@@ -18,6 +18,7 @@ if __name__ == '__main__':
     wf = ListReader(cf, 'whitelist', need_compiled_ix=False)
     print(wf.srcdict)
 
+    exit(0)
     w = ListReader(cf, 'whitelist')
 
     print('whitelist');

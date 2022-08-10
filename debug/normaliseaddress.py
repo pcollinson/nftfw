@@ -7,10 +7,10 @@ if __name__ == '__main__':
     from nftfw.normaliseaddress import NormaliseAddress
 
     cf = Config()
-    na = NormaliseAddress(cf, 'Testing')
+    na = NormaliseAddress(cf)
 
     list = ('192.0.2.5', '198.51.100.128',
-            '198.51.100.5', '2001:db8:fab::/64',
+            '198.51.100.5', '2001:db8:fab:11::1:1',
             '203.0.113.7')
 
 

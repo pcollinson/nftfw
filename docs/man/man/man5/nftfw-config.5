@@ -312,6 +312,18 @@ Set this to zero to turn this feature off.
 \f[R]
 .fi
 .PP
+Supply default ipv6 mask. Blacklisted IPv6 addresses are automatically
+masked to select a device. This was originally /64 which is very
+aggressive and blocked too many addresses. Following the lead from a
+recent Sympl update this is now changed to /112, and parameterised here.
+.IP
+.nf
+\f[C]
+ default_ipv6_mask = 112
+\f[R]
+.fi
+
+.PP
 \f[B][Nftables]\f[R]
 .PP
 \f[I]nft_select\f[R] Allow selection of the method used to load/unload

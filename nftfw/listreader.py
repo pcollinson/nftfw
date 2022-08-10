@@ -20,7 +20,7 @@ class ListReader:
 
     Each file in these directories is named by an ip or ip6 address,
     possibly followed by '.auto' Names can contain a vertical bar and
-    a mask number - ip6 addresses are usually /64.
+    a mask number - ip6 addresses are usually /112.
 
     Contents of the file is a set of ports, one per line
 
@@ -95,10 +95,10 @@ class ListReader:
         # re matches
         # sequence of 0-9a-f . or : as far as it can
         #     captured in match[1]
-        # followed optionally by | and one or two digits
+        # followed optionally by | and one, two or three digits
         #     captured in match[2]
         # followed optionally by .auto
-        strict = re.compile(r'([0-9a-f.:]*?)(\|[0-9]{1,2})?(?:\.auto)?$', re.I)
+        strict = re.compile(r'([0-9a-f.:]*?)(\|[0-9]{1,3})?(?:\.auto)?$', re.I)
         srcdict = {}
         for p in sorted(self.path.glob('[0-9a-z]*')):
             ma = strict.match(p.name)
