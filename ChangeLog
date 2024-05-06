@@ -1,3 +1,9 @@
+v0.9.14 Change Python packaging to use pyproject.toml
+	Minor documentation changes to bring things up-to-date for
+	bullseye and bookworm.
+	Changes to the Makefile creating Html files,
+	This version built on bookworm.
+
 v0.9.13 Change default mask for IPv6 addresses from /64 to /112
 	This now only masks the last block of 4 characters in an
 	IPv6 address. This follows a change in the Sympl firewall

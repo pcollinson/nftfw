@@ -64,6 +64,7 @@ rule.d/essential-icmpv6.sh
 rule.d/related.sh
 rule.d/icmpv6.sh
 rule.d/README
+rule.d/dryrundrop.sh
 rule.d/established.sh
 rule.d/collector.sh
 rule.d/syn-ack-flood-protection.sh

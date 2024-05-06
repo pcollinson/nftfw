@@ -2,7 +2,7 @@
 
 The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package and also for Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
 
-_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system or later. It should work on other Linux distributions. The package is written in Python 3 and needs at least the 3.6 release.
+_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system or later. It should also work on other Linux distributions derived from Debian. The package is written in Python 3 and needs at least the 3.6 release.
 
 _nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md) for a how-to guide.
 
@@ -12,7 +12,8 @@ For update information see the [Changelog](https://github.com/pcollinson/nftfw/b
 
 Main changes:
 
-- Change the default mask used when automatically adding blacklisted IPv6 addresses from /64 to /112. The change mirrors a similar alteration in the Sympl firewall made because the /64 mask was found to be too aggressive. The /112 mask includes all the address apart from the last block in the IPv6 address. The value is parameterised and can be altered in config.ini.
+The packaging system for building the debian package has been changed to use the more up-to-date _pyproject.toml_ configuration file.
+The documentation has been brought up-to-date with minor changes.
 
 ## Features
 
@@ -47,7 +48,7 @@ See documents in the _docs_ directory:
 - [Install _nftfw_ from Debian package](docs/Debian_package_install.md)
   - Installation from the Debian package found in the package directory.
 - [Installing _nftfw manually_](docs/Installation.md)
-  - Full installation of the system for Debian Buster.
+  - Full installation of the system for Debian Buster or later.
 - [Manual Installation Instructions](docs/Installation-Instructions.md)
   - For those who want a bare bones list of tasks.
 - [Installing Geolocation](docs/Installing-GeoLocation.md)
@@ -56,7 +57,7 @@ See documents in the _docs_ directory:
   - How to get CIDR files for use with the _blacknet_ feature.
 - [Using fail2ban with nftfw](docs/Using-fail2ban-with-nftfw.md)
   - How to configure _fail2ban_ to use nftfw as its firewall.
-- [sympl-email-changes - changes to Sympl buster email installation](https://github.com/pcollinson/sympl-email-changes)
+- [sympl-email-changes - changes to Sympl bullseye email installation](https://github.com/pcollinson/sympl-email-changes)
   - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
 - [Updating _nftfw_](docs/Updating-nftfw.md)
   - How to update a manual installation of _nftfw_.

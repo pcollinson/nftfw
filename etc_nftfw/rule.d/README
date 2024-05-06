@@ -27,6 +27,7 @@ Files:
 allowtcpreset.sh       - allow tcp resets
 accept.sh              - general default accept ruleset
 drop.sh                - use as a default reject rule to drop packets
+dryrundrop.sh	       - use as a testing rule for drop.sh
 essential-icmpv6.sh    - accept necessary IPv6 ICMP
 established.sh         - accept established connections - simply exits
                        - Symbiosis compatibility, rules to do this

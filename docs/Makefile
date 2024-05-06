@@ -12,7 +12,7 @@ all: $(HTML) $(PDF) make
 
 # change .md links to .html, remove any #links which don't work on files
 html/%.html : %.md
-	sed -e 's/md)/html)/' -e 's/md#[^)]*)/html)/' $< | pandoc --standalone --to html5 --css pandoc.css --css nftfw-doc.css -o $@
+	sed -e 's/md)/html)/' -e 's/md#[^)]*)/html)/' $< | pandoc --standalone --wrap=auto --to html5 --css pandoc.css --css nftfw-doc.css -o $@
 
 pdf/%.pdf: %.md
 	sed -e 's/md)/pdf)/' -e 's/md#[^)]*)/pdf)/' $< | pandoc --standalone --to ms -V fontfamily=H -V indent=0  | iconv -f UTF-8 -t ISO-8859-1//TRANSLIT | groff -dpaper=a4 -Tpdf -ms > $@ 2> /dev/null

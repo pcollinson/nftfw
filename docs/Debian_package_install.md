@@ -92,18 +92,29 @@ Load the rules into the kernel:
 ``` sh
 $ sudo nftfw -f -v load
 ```
-_nftfw_ will tell you what it's done.
+
+_nftfw_ will tell you what it's done. If you are moving from an _iptables_ system, the command may fail complaining that the tables are in use. In this case, run
+
+``` sh
+$ sudo iptables-nft -F
+$ sudo ip6tables-nft -F
+```
+
+and run the _load_ command again.
 
 ### Look at the nftables rules
 
 ``` sh
 $ sudo nft list ruleset ip | less
 ```
+
 for ipv4 and
+
 
 ``` sh
 $ sudo nft list ruleset ip6 | less
 ```
+
 for ipv6. Hint: this is a lot to type and you may want to use the commands again, so create and store shell aliases in your shell's _.rc_ file for them.
 
 ``` sh
@@ -209,7 +220,12 @@ $ sudo ip6tables-restore < ip6saved
 $ sudo iptables-legacy -F
 $ sudo ip6tables-legacy -F
 ```
-The last two commands are very important to clear out the old tables.
+The last two commands are very important to clear out the old tables. On Debian systems after Bullseye, there is better protection against having both _iptables_ and _nftables_ active in the same kernel. These commands are needed to flush tables, otherwise the _load_ command to _nftfw_ will fail.
+
+``` sh
+$ sudo iptables-nft -F
+$ sudo ip6tables-nft -F
+```
 
 [Back to Install the package](#install-the-package)
 

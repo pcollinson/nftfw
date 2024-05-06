@@ -15,7 +15,7 @@ endif
 .PHONY: lint
 
 all:
-	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye) or pylint3(buster)'; exit 1; fi
+	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye or later) or pylint3(buster)'; exit 1; fi
 	PYTHONPATH="../nftfw" pytest-3 -x
 
 # create reference files
@@ -25,7 +25,7 @@ init:
 lint: $(OUT)
 
 %.lint: %.py
-	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye) or pylint3(buster)'; exit 1; fi
+	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye or later) or pylint3(buster)'; exit 1; fi
 	cd ..; ${PYLINT} --exit-zero --rcfile tests/pylintrc -s n --disable=redefined-outer-name tests/$<
 
 clean:

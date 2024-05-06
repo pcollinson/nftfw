@@ -1,6 +1,8 @@
 % Installing Maxmind Geolocation
 # Installing Maxmind Geolocation
 
+This page was originally written for Debian buster, in the lines below replace 'buster' by the name of your system.
+
 ## Install the python modules
 
 ``` sh

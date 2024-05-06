@@ -98,7 +98,7 @@ Do we want nftables logging? By adding a different prefix for each of the tables
 
 The three variables below control the type of sets automatically generated for blacklist, blacknets and whitelist tables. When true, _nftfw_ uses auto_merged, interval sets for the sets it makes. This type automatically creates entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.
 
-However, the auto-merged, interval sets can cause the loading of _nftables_ rules to fail, flagging an error. A load can succeed when a full install is performed but partial loads of sets can fail. The bug was reported to the _nftables_ development team, based on problems with the Buster release and a fix was generated. However, it takes time for such fixes to be available in Debian releases.
+However, the auto-merged, interval sets can cause the loading of _nftables_ rules to fail, flagging an error. A load can succeed when a full install is performed but partial loads of sets can fail. The bug was reported to the _nftables_ development team, based on problems with the Buster release and a fix was generated. The fix is now widely deployed.
 
 _nftfw_ works around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.
 

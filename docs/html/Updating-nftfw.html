@@ -15,6 +15,7 @@
     pre > code.sourceCode { white-space: pre; position: relative; }
     pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
     div.sourceCode { margin: 1em 0; }
     pre.sourceCode { margin: 0; }
@@ -49,7 +50,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -62,7 +63,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -74,6 +75,7 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
@@ -82,79 +84,137 @@
 <header id="title-block-header">
 <h1 class="title">Updating nftfw manual installations</h1>
 </header>
-<h1 id="updating-nftfw-manual-installations">Updating nftfw manual installations</h1>
+<h1 id="updating-nftfw-manual-installations">Updating nftfw manual
+installations</h1>
 <h2 id="get-current-version">Get current version</h2>
-<p>If you’ve installed <em>nftfw</em> from a zip or tar file, then revisit the github pages and pull the current version. Unpack and install the files.</p>
-<p>If you used <em>git</em>, then change to the your <em>nftfw</em> source directory and</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>$ <span class="fu">git</span> pull</span></code></pre></div>
-<p>which will pull the files that have changed, and will also tell you if you are up-to-date.</p>
-<p>If you’ve run the <em>nftfw</em> system tests, <em>git</em> will complain about some new files. In the <em>nftfw</em> directory:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="bu">cd</span> tests</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>$ <span class="fu">make</span> clean</span></code></pre></div>
-<p>will remove the files created by the tests, and the <em>pull</em> should now work.</p>
+<p>If you’ve installed <em>nftfw</em> from a zip or tar file, then
+revisit the github pages and pull the current version. Unpack and
+install the files.</p>
+<p>If you used <em>git</em>, then change to the your <em>nftfw</em>
+source directory and</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git pull</span></code></pre></div>
+<p>which will pull the files that have changed, and will also tell you
+if you are up-to-date.</p>
+<p>If you’ve run the <em>nftfw</em> system tests, <em>git</em> will
+complain about some new files. In the <em>nftfw</em> directory:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd tests</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make clean</span></code></pre></div>
+<p>will remove the files created by the tests, and the <em>pull</em>
+should now work.</p>
 <p>To use <em>git</em> in future:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> apt install git</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="ex">..</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"># I put my copy in /usr/local/src, and need to be root to install</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>$ <span class="bu">cd</span> /usr/local/src</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>$ <span class="fu">sudo</span> git clone https://github.com/pcollinson/nftfw</span></code></pre></div>
-<h2 id="re-install-the-nftfw-python-modules-programs">Re-install the <em>nftfw</em> Python modules &amp; programs</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># cd into the installed nftfw directory</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>$ <span class="fu">sudo</span> pip3 install .</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># will uninstall the old version say</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt install git</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">..</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I put my copy in /usr/local/src, and need to be root to install</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd /usr/local/src</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo git clone https://github.com/pcollinson/nftfw</span></code></pre></div>
+<h2 id="re-install-the-nftfw-python-modules-programs">Re-install the
+<em>nftfw</em> Python modules &amp; programs</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cd into the installed nftfw directory</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo pip3 install .</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># will uninstall the old version say</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Successfully</span> installed nftfw-<span class="op">&lt;</span>version<span class="op">&gt;</span></span></code></pre></div>
 <h2 id="re-run-the-install.sh-script">Re-run the Install.sh script</h2>
-<p>Will update files in your <em>etc/nftfw</em> directory, but will not touch any working files. The <em>original</em> directory may contain changes that are useful to you. You can use <em>diff</em> to compare your working versions with files in the <em>original</em> directory.</p>
-<p>The [Incron] section in the <em>config.ini</em> file can be deleted as it’s no longer used.</p>
-<h2 id="changes-for-nftfw-version-0.8-and-onwards">Changes for <em>nftfw</em> version 0.8 and onwards</h2>
+<p>Will update files in your <em>etc/nftfw</em> directory, but will not
+touch any working files. The <em>original</em> directory may contain
+changes that are useful to you. You can use <em>diff</em> to compare
+your working versions with files in the <em>original</em> directory.</p>
+<p>The [Incron] section in the <em>config.ini</em> file can be deleted
+as it’s no longer used.</p>
+<h2 id="changes-for-nftfw-version-0.8-and-onwards">Changes for
+<em>nftfw</em> version 0.8 and onwards</h2>
 <p>Summary of changes from 0.7 requiring some reconfiguration:</p>
 <ul>
-<li>Edit config.ini to remove: [Owner] section - ownership of files created in etc/nftfw now taken from owner of that directory nftfw_base - nftfw now uses it’s own control files exclusively.</li>
-<li><em>etc/nftfw/original</em> renamed <em>etc/nftfw/etc_nftfw</em></li>
-<li>Change to nftfw_init.nft to include essential ipv6 icmp coding. Change to <em>rule.d/essential-icmpv6.sh</em>. Can remove reference to this rule in incoming.d and outgoing.d.</li>
-<li>Updated regular expressions in exim4.patterns - now find IP addresses correctly</li>
-<li>Local action rules should be placed in <em>/etc/nftfw/local.d</em>, so that <em>/rule.d</em> can be updated by distributions.</li>
+<li>Edit config.ini to remove: [Owner] section - ownership of files
+created in etc/nftfw now taken from owner of that directory nftfw_base -
+nftfw now uses it’s own control files exclusively.</li>
+<li><em>etc/nftfw/original</em> renamed
+<em>etc/nftfw/etc_nftfw</em></li>
+<li>Change to nftfw_init.nft to include essential ipv6 icmp coding.
+Change to <em>rule.d/essential-icmpv6.sh</em>. Can remove reference to
+this rule in incoming.d and outgoing.d.</li>
+<li>Updated regular expressions in exim4.patterns - now find IP
+addresses correctly</li>
+<li>Local action rules should be placed in <em>/etc/nftfw/local.d</em>,
+so that <em>/rule.d</em> can be updated by distributions.</li>
 </ul>
 <p>Other changes:</p>
 <ul>
 <li>New import_tool to import Symbiosis/Sympl configs</li>
 <li>New Uninstall.sh to remove manual installation</li>
-<li>Many documentation changes - example files now shown relative to filesystem root - e.g <em>/etc/nftfw</em> rather than <em>/usr/local/etc/nftfw</em>.</li>
+<li>Many documentation changes - example files now shown relative to
+filesystem root - e.g <em>/etc/nftfw</em> rather than
+<em>/usr/local/etc/nftfw</em>.</li>
 </ul>
-<h2 id="changes-for-nftfw-version-0.7-and-onwards">Changes for <em>nftfw</em> version 0.7 and onwards</h2>
-<p><em>nftfw</em> has gained a new control directory <em>etc/nftfw/blacknets.d</em> which allows you to install files of IP address ranges coded as using CIDR notation. The <em>blacknets</em> system provides blocking of a large number of IP networks based on lists of addresses. It can be used to keep whole countries out, or stop access from large organisations with complex address ranges. There’s a document <a href="Getting-cidr-lists.html">Getting CIDR lists</a> explaining how to get the country lists onto your system. There are other sources of bulk blacklists.</p>
-<p>To support the new category of blocking there are some changes to <em>etc/nftfw/nftfw_init.nft</em> that need to be installed, when updating - remember to run the <em>Install.sh</em> script and then copy <em>etc/nftfw/originals/nftfw_init.nft</em> to <em>etc/nftfw/nftfw_init.nft</em>. If you’ve made changes to the installed file, you’ll need to edit them in again. It’s wise then run</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> nftfw -f load</span></code></pre></div>
+<h2 id="changes-for-nftfw-version-0.7-and-onwards">Changes for
+<em>nftfw</em> version 0.7 and onwards</h2>
+<p><em>nftfw</em> has gained a new control directory
+<em>etc/nftfw/blacknets.d</em> which allows you to install files of IP
+address ranges coded as using CIDR notation. The <em>blacknets</em>
+system provides blocking of a large number of IP networks based on lists
+of addresses. It can be used to keep whole countries out, or stop access
+from large organisations with complex address ranges. There’s a document
+<a href="Getting-cidr-lists.html">Getting CIDR lists</a> explaining how
+to get the country lists onto your system. There are other sources of
+bulk blacklists.</p>
+<p>To support the new category of blocking there are some changes to
+<em>etc/nftfw/nftfw_init.nft</em> that need to be installed, when
+updating - remember to run the <em>Install.sh</em> script and then copy
+<em>etc/nftfw/originals/nftfw_init.nft</em> to
+<em>etc/nftfw/nftfw_init.nft</em>. If you’ve made changes to the
+installed file, you’ll need to edit them in again. It’s wise then
+run</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-f</span> load</span></code></pre></div>
 <p>to ensure that you have a clean installation.</p>
-<p>If you’ve installed the <em>systemd</em> based active file system, then you will need to update <em>/etc/systemd/system/nftfw.path</em> to include the new <em>blacknets.d</em> directory. Copy the <em>nftfw.path</em> from the <em>systemd</em> directory in the release to <em>/etc/systemd/system/nftfw.path</em>, the file contains the five lines that are needed. Then tell <em>systemd</em> to reload:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co"># sudo systemctl daemon-reload</span></span></code></pre></div>
-<h2 id="changes-for-nftfw-version-0.6-and-onwards">Changes for <em>nftfw</em> version 0.6 and onwards</h2>
-<p><em>ntftw</em> no longer recommends the use of <em>incron</em> to provide a ‘active’ directory so changes in directories in_/usr/local/nftfw_ cause automatic running of the <em>nftfw load</em> command. A <em>systemd</em> unit that watches directories and calls the command replaces <em>incron</em>. If you’ve installed a previous version then you need to unwind parts of the <em>incron</em> support system.</p>
-<p>Take these steps if you ran versions of <em>nftfw</em> before 0.6 and used <em>incron</em>. These steps are shown in other files, but it seems sensible to emphasise them here. These can be done before or after you install the new version. The <em>systemd</em> can run with version before 0.6, but 0.6 contains some coding changes to make it work a little better.</p>
-<p>First, move to the <em>nftfw</em> distribution and replace the <em>cron.d</em> file</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>$ <span class="bu">cd</span> cronfiles</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co"># check that the paths used in cron-nftfw are correct for you</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp cron-nftfw /etc/cron.d/nftfw</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>$ <span class="bu">cd</span> ..</span></code></pre></div>
+<p>If you’ve installed the <em>systemd</em> based active file system,
+then you will need to update <em>/etc/systemd/system/nftfw.path</em> to
+include the new <em>blacknets.d</em> directory. Copy the
+<em>nftfw.path</em> from the <em>systemd</em> directory in the release
+to <em>/etc/systemd/system/nftfw.path</em>, the file contains the five
+lines that are needed. Then tell <em>systemd</em> to reload:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sudo systemctl daemon-reload</span></span></code></pre></div>
+<h2 id="changes-for-nftfw-version-0.6-and-onwards">Changes for
+<em>nftfw</em> version 0.6 and onwards</h2>
+<p><em>ntftw</em> no longer recommends the use of <em>incron</em> to
+provide a ‘active’ directory so changes in directories
+in_/usr/local/nftfw_ cause automatic running of the <em>nftfw load</em>
+command. A <em>systemd</em> unit that watches directories and calls the
+command replaces <em>incron</em>. If you’ve installed a previous version
+then you need to unwind parts of the <em>incron</em> support system.</p>
+<p>Take these steps if you ran versions of <em>nftfw</em> before 0.6 and
+used <em>incron</em>. These steps are shown in other files, but it seems
+sensible to emphasise them here. These can be done before or after you
+install the new version. The <em>systemd</em> can run with version
+before 0.6, but 0.6 contains some coding changes to make it work a
+little better.</p>
+<p>First, move to the <em>nftfw</em> distribution and replace the
+<em>cron.d</em> file</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd cronfiles</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># check that the paths used in cron-nftfw are correct for you</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo cp cron-nftfw /etc/cron.d/nftfw</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd ..</span></code></pre></div>
 <p>then stop <em>incron</em> from running <em>nftfw</em>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> rm /etc/incron.d/nftfw</span></code></pre></div>
-<p>Install <em>systemd</em> control files from <em>systemd</em> in the <em>nftfw</em> distribution:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>$ <span class="bu">cd</span> systemd</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co"># check nftfw.path and nftfw.service have correct paths</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>$ <span class="fu">sudo</span> cp nftfw.* /etc/systemd/system</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>$ <span class="bu">cd</span> ..</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="co"># start the path unit only</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl enable nftfw.path</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl start nftfw.path</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl status</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a><span class="co"># DON&#39;T start or enable nftfw.service</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a><span class="co"># it will be started when needed by nftfw.path</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo rm /etc/incron.d/nftfw</span></code></pre></div>
+<p>Install <em>systemd</em> control files from <em>systemd</em> in the
+<em>nftfw</em> distribution:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd systemd</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># check nftfw.path and nftfw.service have correct paths</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo cp nftfw.<span class="pp">*</span> /etc/systemd/system</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd ..</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># start the path unit only</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl enable nftfw.path</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl start nftfw.path</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl status</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># DON&#39;T start or enable nftfw.service</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># it will be started when needed by nftfw.path</span></span></code></pre></div>
 <p>Stop incron if it’s running and you no longer need it</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl stop incron</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl disable incron</span></code></pre></div>
-<p>Finally a tip that’s hard to find: reload <em>systemd</em> if you change the <em>nftfw</em> files after installation and starting:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>$ <span class="fu">sudo</span> systemctl daemon-reload</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl stop incron</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl disable incron</span></code></pre></div>
+<p>Finally a tip that’s hard to find: reload <em>systemd</em> if you
+change the <em>nftfw</em> files after installation and starting:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl daemon-reload</span></code></pre></div>
 </body>
 </html>

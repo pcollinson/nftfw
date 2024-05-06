@@ -27,12 +27,10 @@ manhtml/%.css: %.css
 	cp $< $@
 
 manhtml/%.html : %.md
-	pandoc --standalone --to html5 --css pandoc.css --css nftfw.css $< -o $@
+	pandoc --standalone --wrap=auto --to html5 --css pandoc.css --css nftfw.css $< -o $@
 
 manhtml/index.html: index.md
 	sed -e 's/md)/html)/' $< | pandoc --standalone --to html5 --css pandoc.css --css nftfw.css -o $@
 
 clean:
 	rm -f *.man *.html manhtml/* man/man1/* man/man5/*
-
-

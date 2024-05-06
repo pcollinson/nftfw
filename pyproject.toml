@@ -1,3 +1,49 @@
 [build-system]
-# Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel"]  # PEP 508 specifications.
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nftfw"
+version='0.9.14'
+
+requires-python = '>=3.6'
+
+authors = [
+	{name = "Peter Collinson", email="support@nftfw.uk"},
+]
+maintainers = [
+	{name = "Peter Collinson", email="support@nftfw.uk"},
+]
+
+
+description = "Nftfw - nftables firewall generator for Debian"
+readme      = "README.md"
+license     = {file = "LICENSE.txt"}
+keywords    = ["firewall", "nftables", "symbiosis",  "sympl", "debian"]
+classifiers = [
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: System Administrators",
+        "Topic :: System :: Networking :: Firewalls",
+        "Topic :: System :: Systems Administration",
+        "Topic :: Security",
+        "License :: OSI Approved :: MIT License",
+]
+
+[project.scripts]
+nftfw = "nftfw.__main__:main"
+nftfwls = "nftfw.nftfwls:main"
+nftfwedit = "nftfw.nftfwedit:main"
+nftfwadm = "nftfw.nftfwadm:main"
+
+[project.urls]
+Homepage = "https://nftfw.uk"
+Documentation = "https://nftfw.uk"
+Repository = "https://github.com/pcollinson/nftfw"
+ChangeLog = "https://github.com/pcollinson/nftfw/blob/master/ChangeLog"
+
+[tool.setuptools]
+packages = ["nftfw"]
