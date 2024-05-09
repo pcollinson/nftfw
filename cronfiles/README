@@ -7,7 +7,7 @@ to reflect the locations on your system.
 
 2)    Install cron-nftfw in /etc/cron.d/nftfw as root
       Make sure that the file is owned by root and
-      read-only to root.
+      read-only to all others.
       sudo cp cron-nftfw /etc/cron.d/nftfw
       sudo chmod 644 /etc/cron.d/nftfw
 

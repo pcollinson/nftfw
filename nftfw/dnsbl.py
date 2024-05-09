@@ -1,6 +1,9 @@
 """Lookup ip addresses in DNS Blacklists for nftfwedit -p
 
 Blacklists and their lookup domains are in config.ini
+Beware Spamhaus lookups will not work with some public DNS servers
+that offer public resolvers. They will return an error value and not
+NXDOMAIN.
 
 [Nftfwedit]
 # Supply DNSBL lookup names and lookup addresses
@@ -35,10 +38,16 @@ class Dnsbl:
         self.cf = cf
         self.lists = {}
 
+        # match codes from DNSBLs
+        self.default_match = ('127.0.0.2', )
+        # Zen values
+        self.special_match = {'spamhaus': ('127.0.0.2', '127.0.0.3', '127.0.0.4', '127.0.0.9', '127.0.0.10', '127.0.0.11'),}
+        self.match_values = self.default_match
+
         # get possible lookups
         #self.lists = {k:v for k, v in cf.parser['Nftfwedit'].items()}
         for k, v in cf.parser['Nftfwedit'].items():
-            self.lists[k] = v
+            self.lists[k.lower()] = v
 
         try:
             # Import here because the module may not be installed on the system
@@ -89,16 +98,18 @@ class Dnsbl:
         my_ip = my_ip.replace('|', '/')
 
         for name, domain in self.lists.items():
-            (status, verbose) = self.dnslookup(domain, my_ip)
+            (status, verbose) = self.dnslookup(name, domain, my_ip)
             app = (name, status, verbose)
             result.append(app)
         return result
 
-    def dnslookup(self, domain, my_ip):
+    def dnslookup(self, name, domain, my_ip):
         """Lookup single ip in blacklist
 
         Parameters
         ----------
+        name : str
+            Lower case DNSBL name
         domain : str
             Domain used for lookup
         my_ip : str
@@ -126,10 +137,22 @@ class Dnsbl:
         if ma is None:
             return False, ""
         query = ma.group(1) + domain
+
+        # set up found result set
+        match_value = self.default_match
+        if name in self.special_match:
+            match_value = self.special_match[name]
+
         try:
             #perform a record lookup. A failure will trigger the NXDOMAIN exception
             answers = self.resolver.query(query, "A")
-            #No exception was triggered, IP is listed in bl. Now get TXT record
+            #No exception was triggered, IP is listed in bl.
+            # Check we have a valid value
+            if len(answers) == 1 and \
+               answers[0].address not in match_value:
+                return False, f'{my_ip} lookup fail for {domain}'
+
+            #Now get TXT record
             answer_txt = self.resolver.query(query, "TXT")
             result = f'{my_ip} in {domain} ({answers[0]}: {answer_txt[0]})'
             return True, result

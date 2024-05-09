@@ -1,3 +1,5 @@
+v0.9.15 Sort out DNSBL lookups to use correct return values
+
 v0.9.14 Change Python packaging to use pyproject.toml
 	Minor documentation changes to bring things up-to-date for
 	bullseye and bookworm.
