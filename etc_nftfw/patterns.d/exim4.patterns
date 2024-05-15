@@ -20,7 +20,7 @@ authenticator failed for .*\) \[__IP__\]: 535 Incorrect authentication data
 
 # returning bad guys being blocked - here to generate an entry in the database
 # requires change to exim to read information from the nftfw sqlite3 database
-\[__IP__\] \(:?rejected|I=\).*Blacklisted: Denied access - history of unwanted activity.*$
+\[__IP__\] .*I=.*Blacklisted: Denied access - history of unwanted activity.*$
 
 # bad guys whose robots keep coming trying to login when it's not allowed
 # this needs +smtp_protocol_error added to log_selector
@@ -30,7 +30,8 @@ authenticator failed for .*\) \[__IP__\]: 535 Incorrect authentication data
 \[__IP__\] I=.*temporarily rejected.* Sender deferred.*$
 
 # Unrouteable addresses
-# This seems to be a source of spam and is worth uncommenting
+# Catching these didn't help
+# no longer using
 #\[__IP__\] I=.* RCPT .*Unrouteable address$
 
 # TLS connection problems

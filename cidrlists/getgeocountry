@@ -119,7 +119,8 @@ makesql() {
 	       registered_country_geoname_id INTEGER NOT NULL,
 	       represented_country_geoname_id INTEGER NOT NULL,
 	       is_anonymous_proxy INTEGER NOT NULL,
-	       is_satellite_provider INTEGER NOT NULL
+	       is_satellite_provider INTEGER NOT NULL,
+	       is_anycast INTEGER NOT NULL
 	);
 	CREATE TABLE ip6 (
 	       network TEXT NOT NULL,
@@ -127,7 +128,8 @@ makesql() {
 	       registered_country_geoname_id INTEGER NOT NULL,
 	       represented_country_geoname_id INTEGER NOT NULL,
 	       is_anonymous_proxy INTEGER NOT NULL,
-	       is_satellite_provider INTEGER NOT NULL
+	       is_satellite_provider INTEGER NOT NULL,
+	       is_anycast INTEGER NOT NULL
 	);
 	CREATE TABLE locations (
 	       geoname_id INTEGER NOT NULL,
