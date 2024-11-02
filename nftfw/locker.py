@@ -41,6 +41,7 @@ class Locker:
         returns False if cannot open file or lock error
         """
 
+        # pylint: disable=consider-using-with
         try:
             self.fd = open(self.filename, 'w+')
         except IOError as e:
@@ -61,6 +62,7 @@ class Locker:
         returns True if it's obtained
         """
 
+        # pylint: disable=consider-using-with
         try:
             self.fd = open(self.filename, 'w+')
         except IOError as e:

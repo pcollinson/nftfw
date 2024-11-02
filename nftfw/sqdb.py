@@ -169,44 +169,68 @@ class SqDb:
         self.conn.commit()
         cur.close()
 
-    def delete(self, table, key, predicate, val):
-        """Delete from table
+    # added November 2024 to handle more complex
+    # tests on deletes
+    @staticmethod
+    def compile_where(exprlist, andor='AND'):
+        """ Compile a where clause from list of
+            [key predicate value] in exprlist
+            andor is the function to combine expressions
 
-        key is name of key for test
-        predicate is test to use
-        val is value to match
+        returns (where, vals)
+        where is a single string with the sql clause
+        vals is a list of values that replace the ?
+        in the expressions
+        """
+
+        pred = []
+        vals = []
+        for key, predicate, pval in exprlist:
+            opr = f'{key} {predicate} ?'
+            pred.append(opr)
+            vals.append(pval)
+        where = f' {andor} '.join(pred)
+        return (where, vals)
+
+    # was called delete, renamed because of different api
+    # using exprlist
+    def remove(self, table, exprlist):
+        """ Delete from table using exprlost to create a
+        complex where expression - see complile_where above
 
         returns rows affected
         """
 
         cur = self.conn.cursor()
-        cur.execute(f'DELETE FROM {table} WHERE {key} {predicate} ?', (val,))
+        where, vals = self.compile_where(exprlist)
+        query = f'DELETE FROM {table} WHERE {where}'
+        cur.execute(query, tuple(vals))
         affected = cur.rowcount
         self.conn.commit()
         cur.close()
         return affected
 
-    def delete_not_in(self, table, key, predicate, val, in_key, not_in_list):
-        """ Delete from table based on a predicate, where the
-        value of inkey is not in the list
+    def remove_not_in(self, table, exprlist, in_key, not_in_list):
+        """ Delete from table based on an expression, where the
+        value of in_key is not in the list
 
-        assume not_in_list is a list of strings, or None
+        assume not_in_list is a list of strings, not called when
+        possibly empty
         """
-        # pylint: disable=too-many-arguments
 
-        args = [val] + not_in_list
+        where, vals = self.compile_where(exprlist)
+        args = vals + not_in_list
         inq = ["?" for n in range(len(not_in_list))]
         inqs = ",".join(inq)
 
         cur = self.conn.cursor()
-        query = f'DELETE FROM {table} WHERE {key} {predicate} ? ' \
+        query = f'DELETE FROM {table} WHERE {where} ' \
                 + f'AND {in_key} NOT IN ({inqs})'
         cur.execute(query, tuple(args))
         affected = cur.rowcount
         self.conn.commit()
         cur.close()
         return affected
-
 
     def vacuum(self):
         """Clean unused space in the sqlite3 database """

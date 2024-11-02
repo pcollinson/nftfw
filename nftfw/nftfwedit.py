@@ -116,8 +116,7 @@ config.ini.
     try:
         cf = Config(dosetup=False)
     except AssertionError as e:
-        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
-        print(emsg)
+        print(f'Aborted: Configuration problem: {str(e)}')
         sys.exit(1)
 
     # Load the ini file if there is one
@@ -127,8 +126,7 @@ config.ini.
         cf.readini()
     except AssertionError as e:
         cf.set_logger(logprint=False)
-        emsg = 'Aborted: {0}'.format(str(e))
-        log.critical(emsg)
+        log.critical('Aborted: %s', str(e))
         sys.exit(1)
 
     if args.quiet:
@@ -142,8 +140,7 @@ config.ini.
         cf.setup()
     except AssertionError as e:
         cf.set_logger(logprint=False)
-        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
-        log.critical(emsg)
+        log.critical('Aborted: Configuration problem: %s', str(e))
         sys.exit(1)
 
     if args.delete:

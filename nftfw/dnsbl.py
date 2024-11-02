@@ -41,7 +41,8 @@ class Dnsbl:
         # match codes from DNSBLs
         self.default_match = ('127.0.0.2', )
         # Zen values
-        self.special_match = {'spamhaus': ('127.0.0.2', '127.0.0.3', '127.0.0.4', '127.0.0.9', '127.0.0.10', '127.0.0.11'),}
+        self.special_match = {'spamhaus': ('127.0.0.2', '127.0.0.3', '127.0.0.4',
+                                           '127.0.0.9', '127.0.0.10', '127.0.0.11'),}
         self.match_values = self.default_match
 
         # get possible lookups
@@ -51,9 +52,8 @@ class Dnsbl:
 
         try:
             # Import here because the module may not be installed on the system
-            # but pylint will complain on bullseye with import-outside-toplevel
-            # if the disable code is installed, pylint will complain on buster
-            # about the disable code below (now deactivated)
+            # but pylint will complain on bookworm with import-outside-toplevel
+            # pylint: disable=import-outside-toplevel
             import dns.resolver
             self.resolver = dns.resolver.Resolver()
             self.NXDOMAIN = dns.resolver.NXDOMAIN

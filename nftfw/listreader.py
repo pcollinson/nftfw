@@ -138,6 +138,8 @@ class ListReader:
         # now deal with names for the entries§
         # initialise the name generator
         setname = SetName(self.listname)
+        # pylint: disable=consider-using-dict-items
+        # duely considered
         for ports in master:
             name = setname.name(ports)
             master[ports]['name'] = name
@@ -269,6 +271,9 @@ class SetName:
         if mainlen > 14:
             body = body[:14-mainlen]
         trial = self.namefmt(seq, body)
+
+        # pylint: disable=consider-iterating-dictionary
+        # I am looking up not iterating
         if trial in self.checkdict.keys():
             # we've had this before
             seqno = self.checkdict[trial]

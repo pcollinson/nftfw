@@ -27,7 +27,7 @@ database</p>
 <h1 id="synopsis">SYNOPSIS</h1>
 <div class="line-block"><strong>nftfwls</strong> [<strong>-h</strong>]
 [<strong>-c</strong> <em>config</em>] [<strong>-p</strong> yes|no ]
-[<strong>-a |-r | -m | -i | -n | -w | -q | -v </strong>]</div>
+[<strong>-a |-r | -m | -i | -n | -w | -q | -v | -g </strong>]</div>
 <h1 id="description">DESCRIPTION</h1>
 <p><strong>nftfwls</strong> displays the status of the database storing
 the state of the <strong>nftfw</strong> firewall. The default output
@@ -87,6 +87,11 @@ page.</p>
 <dd>
 <p>Prints all the informarion in the database, ignoring entries in
 <em>blacklist.d</em></p>
+</dd>
+<dt><strong>-g </strong>, <strong>--nogeo</strong></dt>
+<dd>
+<p>Suppresses the display of countries from GeoIP which will be shown if
+the geoip library is installed on the system.</p>
 </dd>
 <dt><strong>-p </strong>, <strong>--pattern_split</strong> yes|no</dt>
 <dd>

@@ -8,7 +8,7 @@ NAME
 SYNOPSIS
 ======
 
-| **nftfwls** \[**-h**\] \[**-c** _config_]  \[**-p** yes|no \] \[**-a |-r | -m | -i | -n | -w | -q | -v **\]
+| **nftfwls** \[**-h**\] \[**-c** _config_]  \[**-p** yes|no \] \[**-a |-r | -m | -i | -n | -w | -q | -v | -g **\]
 
 
 DESCRIPTION
@@ -58,6 +58,10 @@ Options
 **-a **, **-\-all**
 
 :   Prints all the informarion in the database, ignoring entries in _blacklist.d_
+
+**-g **, **-\-nogeo**
+
+:  Suppresses the display of countries from GeoIP which will be shown if the geoip library is installed on the system.
 
 **-p **, **-\-pattern_split** yes|no
 

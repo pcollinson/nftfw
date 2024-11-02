@@ -28,10 +28,10 @@ class GeoIPCountry:
         """
 
         # geoip2 may not be installed
-        # but pylint will complain on bullseye with import-outside-toplevel
+        # but pylint will complain on bullseye and later with import-outside-toplevel
         # if the disable code is installed, pylint will complain on buster
         # about the disable code below (now deactivated)
-        # pylint argument disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
 
         # All this is to allow the system to run when geoip2 is not installed
         # so we don't insist on it

@@ -62,8 +62,7 @@ def main():
     try:
         cf = Config(dosetup=False)
     except AssertionError as e:
-        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
-        print(emsg)
+        print(f'Aborted: Configuration problem: {str(e)}')
         sys.exit(1)
 
     # allow change of config file
@@ -80,8 +79,7 @@ def main():
     try:
         cf.readini()
     except AssertionError as e:
-        emsg = 'Aborted: {0}'.format(str(e))
-        print(emsg)
+        print(f'Aborted: {str(e)}')
         sys.exit(1)
 
     # decode and action standard args
@@ -101,8 +99,7 @@ def main():
     try:
         cf.setup()
     except AssertionError as e:
-        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
-        print(emsg)
+        print(f'Aborted: Configuration problem: {str(e)}')
         sys.exit(1)
 
     # no return if not true

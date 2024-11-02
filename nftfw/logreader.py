@@ -144,36 +144,34 @@ def one_log_reader(cf, filename, patinfo, update_position=True):
     db.close()
 
     # Ignore any coding errors
-    fhandle = open(filename, 'r', errors='ignore')
+    with open(filename, 'r', errors='ignore') as fhandle:
+        # See if this file is new
+        line1 = fhandle.readline(2048)
+        newsig = md5(line1.encode()).hexdigest()
 
-    # See if this file is new
-    line1 = fhandle.readline(2048)
-    newsig = md5(line1.encode()).hexdigest()
+        # start at zero
+        # if unknown before now, or sigs are different
+        # or we have a pattern name
+        if not linesig \
+           or linesig != newsig \
+           or is_test:
+            # put the file cursor back
+            fhandle.seek(0, 0)
+        elif lastseek > 0:
+            # likely to be common situation
+            # has file got shorter
+            if fsize < lastseek:
+                lastseek = fsize
+            fhandle.seek(lastseek, 0)
 
-    # start at zero
-    # if unknown before now, or sigs are different
-    # or we have a pattern name
-    if not linesig \
-       or linesig != newsig \
-       or is_test:
-        # put the file cursor back
-        fhandle.seek(0, 0)
-    elif lastseek > 0:
-        # likely to be common situation
-        # has file got shorter
-        if fsize < lastseek:
-            lastseek = fsize
-        fhandle.seek(lastseek, 0)
+        out = scanlog(patinfo, fhandle)
 
-    out = scanlog(patinfo, fhandle)
+        if update_position:
+            offset = fhandle.tell()
+            db = FileposDb(cf)
+            db.setfileinfo(filename, offset, newsig)
+            db.close()
 
-    if update_position:
-        offset = fhandle.tell()
-        db = FileposDb(cf)
-        db.setfileinfo(filename, offset, newsig)
-        db.close()
-
-    fhandle.close()
     return out
 
 def scanlog(allpatinfo, lines):
@@ -210,7 +208,7 @@ def scanlog(allpatinfo, lines):
     for ip, patinfo in active:
         # need to evaluate ports
         ports = normaliseports(patinfo['ports'])
-        if ip not in out.keys():
+        if ip not in out:
             out[ip] = {'ports': ports,
                        'pattern': patinfo['pattern'],
                        'matchcount': 1}

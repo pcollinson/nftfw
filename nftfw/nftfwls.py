@@ -116,7 +116,7 @@ def formatline(date_fmt, pattern_split, line, geoip, is_html=False):
 
     # Add countrycode to IP if exists
     ip = line['ip']
-    if geoip.isinstalled():
+    if geoip is not None and geoip.isinstalled():
         country, iso = geoip.lookup(ip)
         if iso is None:
             iso = "  "
@@ -132,8 +132,10 @@ def formatline(date_fmt, pattern_split, line, geoip, is_html=False):
         dstring = '-'
     else:
         estring = datefmt(date_fmt, line['first'])
-        dstring = "%8s" % (duration(line['first'], line['last']),)
-
+        # pylint objects to and suggests an f string
+        # dstring = "%8s" % (duration(line['first'], line['last']),)
+        dur = duration(line['first'], line['last'])
+        dstring = f'{str(dur):8s}'
     # deal with the useall flag
     pstring = line['ports']
     if line['useall']:
@@ -153,7 +155,7 @@ def formatline(date_fmt, pattern_split, line, geoip, is_html=False):
             dstring,
             pats]
 
-def displaytable(cf, dt, noborder=False):
+def displaytable(cf, dt, nogeo, noborder=False):
     """Display the data to terminal
 
     Parameters
@@ -171,7 +173,9 @@ def displaytable(cf, dt, noborder=False):
     # cf values loaded in __main__
     fmt = cf.date_fmt
     pattern_split = cf.pattern_split
-    geoip = GeoIPCountry()
+    geoip = None
+    if not nogeo:
+        geoip = GeoIPCountry()
 
     pt = PrettyTable()
 
@@ -190,7 +194,7 @@ def displaytable(cf, dt, noborder=False):
     pt.align['Ct/Incd'] = 'c'
     print(pt)
 
-def displayhtml(cf, dt):
+def displayhtml(cf, dt, nogeo):
     """Display the data as HTML table
 
     Parameters
@@ -202,7 +206,9 @@ def displayhtml(cf, dt):
 
     fmt = cf.date_fmt
     pattern_split = cf.pattern_split
-    geoip = GeoIPCountry()
+    geoip = None
+    if not nogeo:
+        geoip = GeoIPCountry()
 
     tdata = []
     for line in dt:
@@ -277,6 +283,9 @@ time of last incident (in descending order)
     ap.add_argument('-r', '--reverse',
                     help='Reverse sense of sorting',
                     action='store_true')
+    ap.add_argument('-g', '--nogeo',
+                    help='Suppress Geoip information, shown if GeoIp is installed',
+                    action='store_true')
     ap.add_argument('-m', '--matchcount',
                     help='Sort by counts - largest first',
                     action='store_true')
@@ -303,8 +312,7 @@ time of last incident (in descending order)
         cf = Config(dosetup=False)
     except AssertionError as e:
         cf.set_logger(logprint=False)
-        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
-        log.critical(emsg)
+        log.critical('Aborted: Configuration problem: %s', str(e))
         sys.exit(1)
 
     # allow change of config file
@@ -324,8 +332,7 @@ time of last incident (in descending order)
         cf.readini()
     except AssertionError as e:
         cf.set_logger(logprint=False)
-        emsg = 'Aborted: {0}'.format(str(e))
-        log.critical(emsg)
+        log.critical('Aborted: %s', str(e))
         sys.exit(1)
 
     if args.quiet:
@@ -337,8 +344,7 @@ time of last incident (in descending order)
     try:
         cf.setup()
     except AssertionError as e:
-        emsg = 'Aborted: Configuration problem: {0}'.format(str(e))
-        log.critical(emsg)
+        log.critical('Aborted: Configuration problem: %s', str(e))
         sys.exit(1)
 
     orderby = 'last DESC'
@@ -372,9 +378,9 @@ time of last incident (in descending order)
         db = activedb(db, fw)
 
     if args.web:
-        displayhtml(cf, db)
+        displayhtml(cf, db, args.nogeo)
     else:
-        displaytable(cf, db, args.noborder)
+        displaytable(cf, db, args.nogeo, args.noborder)
 
 if __name__ == '__main__':
     main()

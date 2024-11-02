@@ -93,6 +93,7 @@ class Utmp:
     def wrap_function(self, funcname, restype, argtypes):
         """Simplify wrapping ctypes functions"""
 
+        # pylint: disable=unnecessary-dunder-call
         func = self.libc.__getattr__(funcname)
         func.restype = restype
         func.argtypes = argtypes

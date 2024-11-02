@@ -292,18 +292,6 @@ patterns that support feedback.
 .PP
 Symbiosis used 2 for this value.
 .PP
-\f[I]clean_before\f[R] \f[B]nftfw blacklist\f[R] will remove ip from the
-database where there has been no error posted for more than these number
-of day, the intention is to keep the database from growing to huge
-proportions.
-A zero value will inhibit this action.
-.IP
-.nf
-\f[C]
- clean_before = 90
-\f[R]
-.fi
-.PP
 \f[I]sync_check\f[R] \f[B]nftfw blacklist\f[R] will check whether the IP
 addresses in the database that should be active are actually present in
 the blacklist directory \f[I]blacklist.d\f[R].
@@ -322,6 +310,44 @@ Set this to zero to turn this feature off.
 .nf
 \f[C]
  sync_check = 50
+\f[R]
+.fi
+.PP
+\f[I]clean_before\f[R] \f[B]nftfw tidy\f[R] uses part of the blacklist
+code to remove ips from the database for which there has been no error
+posted for more than these number of days, the intention is to keep the
+database from growing to huge proportions.
+The value specifies the number of days that should elapse before these
+addresses are deleted.
+A zero value will inhibit this action.
+.IP
+.nf
+\f[C]
+ clean_before = 90
+\f[R]
+.fi
+.PP
+\f[I]clean_by_count\f[R] \f[B]nftfw tidy\f[R] uses part of the blacklist
+code to remove ips from the database for which there has been no error
+posted for more than a number of days, and the ip does not represent
+very agressive offenders.
+Perhaps appearing in a log file only once or twice.
+The clean_by_count here is set to zero on installation because the
+action is new, and system admins may want time to decide on the
+settings.
+The count is accompanied by two numbers which are tested against the
+incident and matchcounts.
+Either of these values may be zero to disable the appropriate test.
+The entry will only be deleted if the counts recorded for it are less
+than or equal to the settings.
+This setting targets attempted access from botnets, cloud addresses and
+from hosting providers who don\[cq]t police their customers.
+.IP
+.nf
+\f[C]
+ clean_by_count = 0
+ incidents_le = 1
+ matchct_le = 1
 \f[R]
 .fi
 .PP

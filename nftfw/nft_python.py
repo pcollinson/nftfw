@@ -2,12 +2,13 @@
 
 Provides various functions to access and change the installed
 nftables, uses libnftables to execute nft commands
+Now uses system installed nftables library
 
 """
 
 from pathlib import Path
 import logging
-from . nftables import Nftables
+from nftables import Nftables
 
 log = logging.getLogger('nftfw')
 

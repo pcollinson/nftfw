@@ -74,7 +74,10 @@ If the scanner makes any changes, **blacklist** invokes the **load** command aut
 
 **tidy**
 
-The **tidy** command removes old entries from the blacklist database stopping it from growing to immense proportions. **tidy** removes IP's that haven't appeared for a set number of days. The configuration file (see nftfw-config(5)) supplies the number of days.
+The **tidy** command removes old entries from the blacklist database stopping it from growing to immense proportions. There are two possible tests. First, **tidy** will check and remove IPs that have been idle for some number of days, but who have been logged a small number of times. Second, **tidy** removes IPs that haven't appeared for a set number of days, this eliminates sites that may have been busy but which haven't returned for the period which is usally quite long, around 90 days is recommended. The configuration file (see nftfw-config(5)) supplies the settings for this feature.
+
+**Options**
+
 
 These are the available options to the program:
 

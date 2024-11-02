@@ -163,11 +163,6 @@ firewall door. The system allows for this, see nftfw_files(5) for
 information on patterns that support feedback.</p>
 <pre><code>  expire_after = 10</code></pre>
 <p>Symbiosis used 2 for this value.</p>
-<p><em>clean_before</em> <strong>nftfw blacklist</strong> will remove ip
-from the database where there has been no error posted for more than
-these number of day, the intention is to keep the database from growing
-to huge proportions. A zero value will inhibit this action.</p>
-<pre><code> clean_before = 90</code></pre>
 <p><em>sync_check</em> <strong>nftfw blacklist</strong> will check
 whether the IP addresses in the database that should be active are
 actually present in the blacklist directory <em>blacklist.d</em>.
@@ -181,6 +176,28 @@ this variable. The default is to run the blacklist scanner 96 times a
 day, so 50 seems are reasonable way to run the recovery code once a day.
 Set this to zero to turn this feature off.</p>
 <pre><code> sync_check = 50</code></pre>
+<p><em>clean_before</em> <strong>nftfw tidy</strong> uses part of the
+blacklist code to remove ips from the database for which there has been
+no error posted for more than these number of days, the intention is to
+keep the database from growing to huge proportions. The value specifies
+the number of days that should elapse before these addresses are
+deleted. A zero value will inhibit this action.</p>
+<pre><code> clean_before = 90</code></pre>
+<p><em>clean_by_count</em> <strong>nftfw tidy</strong> uses part of the
+blacklist code to remove ips from the database for which there has been
+no error posted for more than a number of days, and the ip does not
+represent very agressive offenders. Perhaps appearing in a log file only
+once or twice. The clean_by_count here is set to zero on installation
+because the action is new, and system admins may want time to decide on
+the settings. The count is accompanied by two numbers which are tested
+against the incident and matchcounts. Either of these values may be zero
+to disable the appropriate test. The entry will only be deleted if the
+counts recorded for it are less than or equal to the settings. This
+setting targets attempted access from botnets, cloud addresses and from
+hosting providers who don’t police their customers.</p>
+<pre><code> clean_by_count = 0
+ incidents_le = 1
+ matchct_le = 1</code></pre>
 <p><strong>[Nftables]</strong></p>
 <p><em>nft_select</em> Allow selection of the method used to load/unload
 nftables. Permissable values are: <em>shell</em> using the original

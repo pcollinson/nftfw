@@ -31,7 +31,7 @@ def cache(func):
     saved = {}
     @wraps(func)
     def newfunc(*arg):
-        if arg[1] in saved.keys():
+        if arg[1] in saved:
             return saved[arg[1]]
         result = func(*arg)
         saved[arg[1]] = result
@@ -158,6 +158,26 @@ class Config:
     clean_before:int 90     Database clean
                             remove ip from the database where there has been
                             no error posted for more than these number of days
+
+    clean_by_count: int 0   Database clean designed to remove singleton records. These
+                            days I'm getting loads of single incidents that trigger
+                            records in the database. The incident may include
+                            a very small number of actions, but the site doesn't
+                            return. The idea of this action is to clear the database
+                            of these records, perhaps retaining them for 30 days.
+                            The default value is set to zero, which is is off, and
+                            is a backwards compatible value for previous versions
+                            of nftfw.
+
+    incidents_le: int 1     Support values for the clean_by_count clean. Entries with
+                            incident counts less than or equal to this value will be
+                            considered for deletion. A zero value will turn off this
+                            lookup value in the database lookup.
+
+    matchct_le: int 1       Support values for the clean_by_count clean. Entries with
+                            matchcount counts less than or equal to this value will be
+                            considered for deletion. A zero value will turn off this
+                            lookup value in the database lookup.
 
     sync_check:int 50       'nftfw blacklist' will check whether the IP addresses
                             in the database that should be active are actually present
@@ -314,13 +334,8 @@ blacknets_logging
 # nft to succeed in loading the set when a full install is performed
 # but failing when attempting a reload.
 #
-# The bug has been reported to the nftables development team, but no
-# fix has been generated as of the current releases. nftfw will work
-# around this bug, automatically generating a full install when an
-# attempt at a set reload fails. However, it seems a good idea to
-# provide a way of turning this feature on and default to not using
-# the feature.
-#
+# This bug has been fixed in recent nftables coding. I've had no
+# problem usinf this feature, and it's often a win for all these tables.
 blacklist_set_auto_merge = False
 whitelist_set_auto_merge = False
 blacknets_set_auto_merge = False
@@ -365,6 +380,23 @@ expire_after = 10
 # remove ip from the database where there has been
 # no error posted for more than these number of days
 clean_before = 90
+#
+# Database clean
+# remove ip from the database when there has been no
+# error posted for more than thses number of days.
+# The database will include values for incident count
+# and matchcount depending on the settings of the variables
+# below. These are likely to be low numbers.
+# The clean can be turned off by setting this value to zero.
+# It's being distributed as zero, for backwards compatibility.
+clean_by_count = 0
+# numbers included in the database lookup for the clean_by_count
+# editing method. The test is that the particular stored value
+# must be less than or equal to the value supplied here.
+# Either of these values may be zero, and if so, this test is
+# not included in the database lookup
+incidents_le = 1
+matchct_le = 3
 
 # 'nftfw blacklist' will check whether the IP addresses
 # in the database that should be active are actually present
@@ -490,6 +522,8 @@ pattern_split = No
         'whitelist_expiry', 'wtmp_file',
         'block_after', 'block_all_after',
         'expire_after', 'clean_before',
+        'clean_by_count',
+        'incidents_le','matchct_le',
         'default_ipv6_mask', 'date_fmt',
         'nft_select')
 
@@ -630,7 +664,7 @@ pattern_split = No
         except ConfigParserError as e:
             errors.append(str(e).replace("\n", '; '))
 
-        assert not errors, 'config.ini syntax errors: {0}'.format(' '.join(errors))
+        assert not errors, f'config.ini syntax errors: {" ".join(errors)}'
 
         # turn off printing by default unless talking to a terminal
         # but can be overridden from config files and arguments
@@ -718,13 +752,13 @@ pattern_split = No
         if not sysvar.is_dir():
             missing.append(str(sysvar))
         else:
-            for name in self.var_dir:
-                dir_path = sysvar / self.var_dir[name]
+            for name,dirname in self.var_dir.items():
+                dir_path = sysvar / dirname
                 if not dir_path.is_dir():
                     missing.append(str(dir_path))
 
         # log list is not empty
-        assert not missing, 'Missing configuration directories/files: {0}'.format(" ".join(missing))
+        assert not missing, f'Missing configuration directories/files: {" ".join(missing)}'
 
     def set_logger(self, logprint=None,
                    logsyslog=None, loglevel=None):
@@ -794,7 +828,7 @@ pattern_split = No
 
         if not any(self.inireverse):
             self._make_inireverse()
-        if option in self.inireverse.keys():
+        if option in self.inireverse:
             self.set_ini_value_with_section(self.inireverse[option], option, value)
         else:
             log.error('Cannot find option %s to set', option)
@@ -818,7 +852,7 @@ pattern_split = No
 
         value = self.parser.get(section, option)
         if option in self.ini_boolean_change:
-            value = (value == 'True')
+            value = value == 'True'
         return value
 
     def get_ini_values_by_section(self, section):
@@ -839,7 +873,7 @@ pattern_split = No
         out = {}
         for k, v in self.parser[section].items():
             if k in self.ini_boolean_change:
-                v = (v == 'True')
+                v = v == 'True'
             out[k] = v
         return out
 

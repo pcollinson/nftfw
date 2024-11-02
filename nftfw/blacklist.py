@@ -37,7 +37,7 @@ class BlackList:
     """
 
     # pylint: disable=too-many-instance-attributes
-    # Eight is reasonable in this case.
+    # but we need them here
 
     def __init__(self, cf):
         """Blacklist init
@@ -63,6 +63,9 @@ class BlackList:
         self.expire_after = int(logvars['expire_after'])
         self.clean_before = int(logvars['clean_before'])
         self.sync_check = int(logvars['sync_check'])
+        self.clean_by_count = int(logvars['clean_by_count'])
+        self.incidents_le = int(logvars['incidents_le'])
+        self.matchct_le = int(logvars['matchct_le'])
 
     def blacklist(self):
         """Black list entry point from scheduler
@@ -113,10 +116,8 @@ class BlackList:
         -x entry point from scheduler
         """
         # Dynamic load, pretty table is not always needed
-        # but pylint will complain on bullseye with import-outside-toplevel
-        # if the disable code is installed, pylint will complain on buster
-        # about the disable code below (now deactivated)
-        # pylint argument disable=import-outside-toplevel
+        # but pylint may complain on bullseye with import-outside-toplevel
+        # pylint: disable=import-outside-toplevel
         from prettytable import PrettyTable
 
         work = log_reader(self.cf, update_position=False)
@@ -562,24 +563,78 @@ class BlackList:
                 changes += 1
         return changes
 
+
+    # This code replaced in November 2024
+    # now copes with two phases of delete
     def clean_database(self):
+        """ Clean entries from database
+
+        Two phases:
+        1)  Remove based on incidents and matchcounts with
+            time of clean_by_count
+        2)  Remove based on overall time of clean_before
+
+        """
+
+        log.info('Blacklist database clean started')
+
+        # Phase 1
+        deleted = 0
+        # do clean by counts if timeout is not zero
+        # and incidents_le and in
+        if self.clean_by_count != 0:
+            # don't bother if both counts are zero
+            if self.incidents_le + self.matchct_le != 0:
+                log.info(
+                    'Process entries: older than %d days & incidents <= %d, matchct <= %d',
+                    self.clean_by_count,
+                    self.incidents_le,
+                    self.matchct_le)
+
+                deleted = self.do_clean_db(self.clean_by_count,
+                                           incidents=self.incidents_le,
+                                           matchcount=self.matchct_le)
+
+        # Phase 2
+        # do clean with clean_before
+        if self.clean_before != 0:
+            log.info(
+                'Process entries older than %d days',
+                self.clean_before)
+            deleted = deleted + self.do_clean_db(self.clean_before)
+
+        # Finally
+        if deleted > 0:
+            # optimise the database
+            fwdb = FwDb(self.cf)
+            fwdb.vacuum()
+            log.info("Blacklist database clean ends - total deleted %d",
+                     deleted)
+        else:
+            log.info("Blacklist database clean ends")
+
+
+    def do_clean_db(self, days, incidents=0, matchcount=0):
         """Clean entries from database
 
         But not if they are active in the firewall which makes things
         somewhat more complicated. Actually this is unlikely, but let's
         cope with it anyway
 
-        Delete when last action is before cf.clean_before days
+
+        Delete when last action is before cf.clean_by_count and
+           incidents <= incidents.le AND matchcount <= matchct_le
+        OR when last action is before cf.clean_before days
+
+        return number of deletions
+
         """
 
-        cf = self.cf
-
-        log.info('Blacklist database clean - remove entries older than %d days',
-                 self.clean_before)
+        # returned value
+        deleted = 0
 
         # before we start messing around, let's see if we have any work
         # get a list of candidates for deletion
-        days = self.clean_before
         before = int(time.time()) - days*24*60*60
         # the timestamp stored is seconds from epoch
         # it's a bit less confusing for people looking at deletions
@@ -590,16 +645,17 @@ class BlackList:
         if time.daylight:
             before = before - time.altzone
 
-        fwdb = FwDb(cf)
-        poss = fwdb.lookup_ips_for_deletion(before)
+        fwdb = FwDb(self.cf)
+        poss = fwdb.lookup_ips_for_deletion(before,
+                                            incidents=incidents,
+                                            matchcount=matchcount)
         if any(poss):
-
             # get list of ips from db output
             possibles = [keys['ip'] for keys in poss]
 
             # Get the current files in the blacklist directory
             # we can use ListReader for this
-            lr = ListReader(cf, 'blacklist', need_compiled_ix=False)
+            lr = ListReader(self.cf, 'blacklist', need_compiled_ix=False)
 
             # srcdict contains list of IP addresses and the ports that
             # they use  We just need the keys
@@ -612,17 +668,23 @@ class BlackList:
 
             # if nothing in the intersection then we can delete all
             if not any(cannotdelete):
-                deleted = fwdb.clean(before)
+                dels = fwdb.clean(before,
+                                     incidents=incidents,
+                                     matchcount=matchcount)
             else:
                 # life is more complicated
-                deleted = fwdb.clean_not_in(before, list(cannotdelete))
+                dels = fwdb.clean_not_in(before, list(cannotdelete),
+                                            incidents=incidents,
+                                            matchcount=matchcount)
+
             fwdb.close()
 
-            if deleted is not None \
-               and deleted != 0:
+            if dels is not None \
+               and dels != 0:
+                deleted = dels
                 log.info('%d records removed from the database', deleted)
 
-        log.info("Blacklist database clean ends")
+        return deleted
 
     def write(self, path, contents):
         """ Write file contents and ensure ownership """

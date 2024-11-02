@@ -84,7 +84,7 @@ class FwDb(SqDb):
         ip : str
             IP address to lookup
 
-        Returns
+       Returns
         -------
         List[Dict[database schema]]
         or
@@ -93,13 +93,16 @@ class FwDb(SqDb):
 
         return self.lookup('blacklist', where='ip = ?', vals=(ip,))
 
-    def lookup_ips_for_deletion(self, before):
+    def lookup_ips_for_deletion(self, before, incidents=0, matchcount=0):
         """Lookup the ips suitable for deletion before timestamp
 
         Parameters
         ----------
         before : int
-            Timestamp to use as a reference
+           Timestamp to use as a reference
+        and optional
+        incidents >= 0
+        matchcount >= 0
 
         Returns
         -------
@@ -110,8 +113,14 @@ class FwDb(SqDb):
         or [] if none
         """
 
+        exprlist = [['last', '<', before]]
+        if incidents != 0:
+            exprlist.append(['incidents', '<=', incidents])
+            if matchcount != 0:
+                exprlist.append(['matchcount', '<=', matchcount])
+        expr, vals = self.compile_where(exprlist)
         return self.lookup('blacklist', what='ip',
-                           where='last < ?', vals=(before,))
+                           where=expr, vals=tuple(vals))
 
     def insert_ip(self, argdict):
         """Insert args into the table
@@ -152,19 +161,29 @@ class FwDb(SqDb):
             Number of deletions
         """
 
-        deleted = self.delete('blacklist', 'ip', '=', ip)
+        deleted = self.remove('blacklist', [['ip', '=', ip]])
         return deleted
 
-    def clean(self, lasttime):
+    # November 2024 - interfaces changed to allow more
+    # complex tests
+
+    def clean(self, lasttime, incidents=0, matchcount=0):
         """Clean database
 
         Delete items from the database where
         last is less than lasttime
+        and optional
+        incidents >= 0
+        matchcount >= 0
 
         Parameters
         ----------
         lasttime : int
             Timestamp of deletion threshold
+        incidents : int
+            Count of incidents, ignored if 0
+        matchcount : int
+            Count of total matches, ignored if 0
 
         Returns
         -------
@@ -172,16 +191,18 @@ class FwDb(SqDb):
             Number of deletions
         """
 
-        deleted = self.delete('blacklist', 'last', '<', lasttime)
-        if deleted is not None \
-           and deleted != 0:
-            self.vacuum()
+        exprlist = [['last', '<', lasttime]]
+        if incidents != 0:
+            exprlist.append(['incidents', '<=', incidents])
+        if matchcount != 0:
+            exprlist.append(['matchcount', '<=', matchcount])
+        deleted = self.remove('blacklist', exprlist)
+        if deleted is None:
+            deleted = 0
         return deleted
 
-    def clean_not_in(self, lasttime, not_in_list):
+    def clean_not_in(self, lasttime, not_in_list, incidents=0, matchcount=0):
         """Clean database leaving ips in list
-
-        If anything changes, use VACUUM on the database
 
         Parameters
         ----------
@@ -189,6 +210,10 @@ class FwDb(SqDb):
             Timestamp of deletion threshold
         not_in_list: List[str]
             List of ips not to delete
+        incidents : int
+            Count of incidents, ignored if 0
+        matchcount : int
+            Count of total matches, ignored if 0
 
         Returns
         -------
@@ -196,10 +221,14 @@ class FwDb(SqDb):
             Number of deletions
         """
 
-        deleted = self.delete_not_in('blacklist',
-                                     'last', '<', lasttime,
+        exprlist = [['last', '<', lasttime]]
+        if incidents != 0:
+            exprlist.append(['incidents', '<=', incidents])
+        if matchcount != 0:
+            exprlist.append(['matchcount', '<=', matchcount])
+        deleted = self.remove_not_in('blacklist',
+                                     exprlist,
                                      'ip', not_in_list)
-        if deleted is not None \
-           and deleted != 0:
-            self.vacuum()
+        if deleted is None:
+            deleted = 0
         return deleted

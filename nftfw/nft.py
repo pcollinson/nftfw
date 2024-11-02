@@ -46,16 +46,14 @@ def nft_load(cf, dirname, filename, test=False):
 
     if cf.nft_select == 'python':
         return nft_python.nft_load(cf, dirname, filename, test)
-    else:
-        return nft_shell.nft_load(cf, dirname, filename, test)
+    return nft_shell.nft_load(cf, dirname, filename, test)
 
 def nft_flush(cf):
     """ Flush rulesets """
 
     if cf.nft_select == 'python':
         return nft_python.nft_flush(cf)
-    else:
-        return nft_shell.nft_flush(cf)
+    return nft_shell.nft_flush(cf)
 
 def nft_ruleset(cf):
     """Read entire ruleset from nftables
@@ -68,8 +66,7 @@ def nft_ruleset(cf):
 
     if cf.nft_select == 'python':
         return nft_python.nft_ruleset(cf)
-    else:
-        return nft_shell.nft_ruleset(cf)
+    return nft_shell.nft_ruleset(cf)
 
 
 def nft_save_backup(cf, force=False):
@@ -90,8 +87,7 @@ def nft_save_backup(cf, force=False):
 
     if cf.nft_select == 'python':
         return nft_python.nft_save_backup(cf, force)
-    else:
-        return nft_shell.nft_save_backup(cf, force)
+    return nft_shell.nft_save_backup(cf, force)
 
 def nft_restore_backup(cf, nodelete=False):
     """Restore backup and delete the backup file
@@ -100,13 +96,11 @@ def nft_restore_backup(cf, nodelete=False):
 
     if cf.nft_select == 'python':
         return nft_python.nft_restore_backup(cf, nodelete)
-    else:
-        return nft_shell.nft_restore_backup(cf, nodelete)
+    return nft_shell.nft_restore_backup(cf, nodelete)
 
 def nft_delete_backup(cf):
     """ Delete the backup file """
 
     if cf.nft_select == 'python':
         return nft_python.nft_delete_backup(cf)
-    else:
-        return nft_shell.nft_delete_backup(cf)
+    return nft_shell.nft_delete_backup(cf)

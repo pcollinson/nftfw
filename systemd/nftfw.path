@@ -10,6 +10,8 @@
 
 [Unit]
 Description="Monitor nftfw directories for changes"
+# Don't limit calls, nftfw will deal with locking
+StartLimitIntervalSec=0
 
 [Path]
 PathModified=/usr/local/etc/nftfw/incoming.d

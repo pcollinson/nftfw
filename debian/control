@@ -13,7 +13,7 @@ Standards-Version: 4.5.1
 Homepage: https://nftfw.uk
 Vcs-Browser: https://github.com/pcollinson/nftfw
 Vcs-Git: https://github.com/pcollinson/nftfw.git
-X-Python-Version: >= 3.6
+X-Python-Version: >= 3.9
 Rules-Requires-Root: binary-targets
 
 Package: nftfw
@@ -25,6 +25,7 @@ Depends: nftables,
 	 python3-all,
 	 python3-dnspython,
          python3-prettytable,
+	 python3-nftables,
 	 ${python3:Depends},
 	 ${misc:Depends}
 Recommends: python3-geoip2, geoipupdate, sqlite3
@@ -54,4 +55,5 @@ Description: nftables firewall builder for Debian
  After installation, some configuration is needed to make the system active,
  see /usr/share/doc/nftfw/README.Debian
  .
- The package is written and developed in Python 3.7.
+ The package was written in Python 3.6/3.7. It's now being maintained in
+ 3.11, so it seems safer to require at least 3.9.

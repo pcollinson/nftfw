@@ -6,6 +6,8 @@
 # see note in nftfw.path
 [Unit]
 Description="nftfw systemd trigger"
+# Don't limit calls, nftfw will deal with locking
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple

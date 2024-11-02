@@ -1,3 +1,22 @@
+v0.9.19 Add additional technique for cleaning firewall database
+	of old values. To activate, requires new values to
+	be added to /etc/nftfw/config.inc. See comments in
+	default config.inc under [Blacklist].
+	As installed, the new technique is off.
+	Remove my version of nftables.py from the distribution.
+	The version supplied with python3-nftables
+	now does what was missing.
+	Do a pylint sweep using pylint for python 3.11.2
+
+v0.9.18 Add flag to nftfwls to remove geoip output. The information
+	is displayed if geoip is installed. The new flag (-g)
+	will suppress this.
+
+v0.9.17 Systemd path and service told not to worry about
+	ratelimiting starts. This can happen if nftfwedit is used
+	in a loop to remove or add several ips. nftfw will manage
+	and delay multiple starts.
+
 v0.9.16 Fix sample pattern in patterns.d for exim4
  	Change to GeoIP CSV files
 

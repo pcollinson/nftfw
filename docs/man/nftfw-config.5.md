@@ -142,15 +142,22 @@ _expire_after_
 
 Symbiosis used 2 for this value.
 
-_clean_before_
-**nftfw blacklist** will remove ip from the database where there has been no error posted for more than these number of day, the intention is to keep the database from growing to huge proportions. A zero value will inhibit this action.
-
-     clean_before = 90
-
 _sync_check_
 **nftfw blacklist** will check whether the IP addresses in the database that should be active are actually present in the blacklist directory _blacklist.d_. 'Should be active' means that the addresses have not been automatically expired. **nftfw** is largely event driven, but events get missed.  So on the basis that if stuff can happen, it will, this code will recover the correct state of the blacklist directory. It seems overkill to call this every time the blacklist scanner runs, so it is executed when number of runs of the scanner is greater than the value of this variable. The default is to run the blacklist scanner 96 times a day, so 50 seems are reasonable way to run the recovery code once a day. Set this to zero  to turn this feature off.
 
      sync_check = 50
+
+_clean_before_
+**nftfw tidy** uses part of the blacklist code to remove ips from the database for which there has been no error posted for more than these number of days, the intention is to keep the database from growing to huge proportions. The value specifies the number of days that should elapse before these addresses are deleted. A zero value will inhibit this action.
+
+     clean_before = 90
+
+_clean_by_count_
+**nftfw tidy** uses part of the blacklist code to remove ips from the database for which there has been no error posted for more than a number of days, and the ip does not represent very agressive offenders. Perhaps appearing in a log file only once or twice. The clean_by_count here is set to zero on installation because the action is new, and system admins may want time to decide on the settings. The count is accompanied by two numbers which are tested against the incident and matchcounts. Either of these values may be zero to disable the appropriate test. The entry will only be deleted if the counts recorded for it are less than or equal to the settings. This setting targets attempted access from botnets, cloud addresses and from hosting providers who don't police their customers.
+
+     clean_by_count = 0
+     incidents_le = 1
+     matchct_le = 1
 
 **\[Nftables]**
 

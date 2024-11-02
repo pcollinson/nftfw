@@ -2,18 +2,31 @@
 
 The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package and also for Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
 
-_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system or later. It should also work on other Linux distributions derived from Debian. The package is written in Python 3 and needs at least the 3.6 release.
+_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system or later. It should also work on other Linux distributions derived from Debian. The package is written in Python 3 (version 3.6). These days it's being maintained using Python 3.11, and it now requires at least Python 3.9.
 
 _nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md) for a how-to guide.
 
 ## New in current release
 
-For update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog).
+For full update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog). The current release moves from v0.9.16 to v0.9.19.
 
 Main changes:
 
+v0.9.17: The _systemd_ path and service have been told not to worry about ratelimiting starts and restarts. This can happen if _nftfwedit_ is used in a loop to remove or add several ips. _nftfw_ will manage and delay multiple starts.
+
+v0.9.18: Add a flag (-g) to _nftfwls_ to remove GeoIP output. Previously GeoIP information was always shown if the geoip package was installed.
+
 The packaging system for building the debian package has been changed to use the more up-to-date _pyproject.toml_ configuration file.
-The documentation has been brought up-to-date with minor changes.
+
+v0.9.19: Add additional technique for cleaning firewall database of old values. The existing system expires IP addresses after some longish period if they haven't been back to annoy the system. The idea here is to continue to block active sites, but slowly delete ones that have stopped. This system is retained.
+
+However, we now have the rise of botnets, cloud computing and the presence of many hosting companies who simply don't care about what their customers do. The firewall database can get filled with IP addresses that have triggered a pattern match a few times but have never been back to do it again. _nftfw_ counts 'incidents' and 'matchcounts'. Incidents are the number of times an ipaddress has triggered a match in one scan of the log files, and matchcounts record how many abuse patterns have appeared during that scan. It seems sensible to delete these addresses rather sooner than the normal long timeout period.
+
+The new feature is run before the extant removal system. By default, it's not activated and can be turned on from _config.ini_. The new default settings can be found in the default _config.ini_ file under the [Blacklist] section.
+
+v0.9.19: I've removed my version of nftables.py from the distribution. When I started _nftfw_ the standard library was unable to access the full capabilities of _nftables_ so I added some code and included it in the distribution.  The version supplied with python3-nftables now does what was missing and more. I've included this as a requirement for the package, but you may need to use ```apt install python3-nftables```.
+
+v0.9.19: Finally, I've updated documentation and done a pylint sweep using pylint for python 3.11.2, which has changed some minor bits of coding.
 
 ## Features
 

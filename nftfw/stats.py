@@ -29,12 +29,14 @@ def duration(first, last):
     hh, mm = divmod(mm, 60)
     if hh > 24:
         dd, hh = divmod(hh, 24)
-        ret = "%2dd %02dh" % (dd, hh)
+        #ret = "%2dd %02dh" % (dd, hh)
+        ret = f"{dd:2d}d {hh:02d}h"
     elif hh > 0:
-        ret = "%2dh %02dm" % (hh, mm)
+        #ret = "%2dh %02dm" % (hh, mm)
+        ret = f"{hh:2d}h {mm:02d}m"
     else:
-        ret = "%02dm" % (mm)
-
+        #ret = "%02dm" % (mm)
+        ret = f"{mm:02d}m"
     return ret
 
 def frequency(first, last, count):

@@ -18,6 +18,8 @@ from .locker import Locker
 from .fwmanage import fw_manage
 from .blacklist import BlackList
 
+#pylint: disable=import-outside-toplevel
+
 class Scheduler:
     """ Scheduler Class """
 
