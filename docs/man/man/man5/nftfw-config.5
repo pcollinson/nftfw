@@ -196,8 +196,8 @@ This type automatically creates entries containing an address range for
 adjacent IP addresses.
 The feature is desirable because it reduces the number of matches.
 .PP
-However, the auto-merged, interval sets can cause the loading of
-\f[I]nftables\f[R] rules to fail, flagging an error.
+However, in the past, some auto-merged interval sets caused the loading
+of \f[I]nftables\f[R] rules to fail, flagging an error.
 A load can succeed when a full install is performed but partial loads of
 sets can fail.
 The bug was reported to the \f[I]nftables\f[R] development team, based
@@ -209,11 +209,11 @@ install when an attempt at a set reload fails.
 However, it seems a good idea to provide a way of turning this feature
 on and default to not using the feature.
 .PP
-It seems likely that this problem has been fixed for the Bullseye Debian
-release.
+It seems likely that this problem has been fixed for the Bullseye and
+later Debian releases.
 It\[cq]s recommended to enable this feature, but monitor logs to check
-that updates are not failing and nftfw is managing to do installs of
-sets without reporting errors.
+that updates are not failing and \f[I]nftfw\f[R] is managing to do
+installs of sets without reporting errors.
 .IP
 .nf
 \f[C]
@@ -277,7 +277,7 @@ used 2).
 \f[I]expire_after\f[R] \f[B]nftfw\f[R] removes blocked IPs from the
 \f[I]blacklist.d\f[R] directory after the number of days in this value
 have passed since the last incident.
-Bad guys keep coming back, and sometimes re-appear several months after
+Bad guys keep coming back, and can re-appear several months after
 expiry.
 It\[cq]s useful to have feedback from the firewall to keep them in play
 while they batter at the firewall door.
@@ -314,7 +314,7 @@ Set this to zero to turn this feature off.
 .fi
 .PP
 \f[I]clean_before\f[R] \f[B]nftfw tidy\f[R] uses part of the blacklist
-code to remove ips from the database for which there has been no error
+code to remove IPs from the database for which there has been no update
 posted for more than these number of days, the intention is to keep the
 database from growing to huge proportions.
 The value specifies the number of days that should elapse before these
@@ -327,21 +327,23 @@ A zero value will inhibit this action.
 \f[R]
 .fi
 .PP
-\f[I]clean_by_count\f[R] \f[B]nftfw tidy\f[R] uses part of the blacklist
-code to remove ips from the database for which there has been no error
-posted for more than a number of days, and the ip does not represent
-very agressive offenders.
-Perhaps appearing in a log file only once or twice.
-The clean_by_count here is set to zero on installation because the
-action is new, and system admins may want time to decide on the
-settings.
-The count is accompanied by two numbers which are tested against the
-incident and matchcounts.
+\f[I]clean_by_count\f[R] \f[B]nftfw tidy\f[R] also uses part of the
+blacklist code to remove IPs from the database who are infrequent
+visitors.
+The addresses are deleted when no update is posted for more than a
+number of days, and the counts that \f[B]nftfw\f[R] maintains are low.
+The \f[I]clean_by_count\f[R] is set to zero on installation, disabling
+the check.
+System admins may want time to decide on the settings.
+.PP
+The \f[I]clean_by_count\f[R] is accompanied by two numbers which are
+tested against the incident and matchcounts (see nftfwls(1)).
 Either of these values may be zero to disable the appropriate test.
 The entry will only be deleted if the counts recorded for it are less
-than or equal to the settings.
-This setting targets attempted access from botnets, cloud addresses and
-from hosting providers who don\[cq]t police their customers.
+than or equal to the values of the settings.
+The \f[I]clean_by_count\f[R] test targets access from botnets, cloud
+addresses and from hosting providers who don\[cq]t police their
+customers, but where the IP visited briefly and hasn\[cq]t been back.
 .IP
 .nf
 \f[C]
@@ -430,5 +432,5 @@ Peter Collinson (huge credit to the ideas from Patrick Cherry\[cq]s work
 for the firewall for the Symbiosis hosting system).
 .SH SEE ALSO
 .PP
-\f[B]nft(1)\f[R], \f[B]nftfw(1)\f[R], \f[B]nftfwls(1)\f[R],
-\f[B]nftfwedit(1)\f[R], \f[B]nftfwadm(1)\f[R], \f[B]nftfw-files(5)\f[R]
+\f[B]nft(1)\f[R], \f[B]nftfwls(1)\f[R], \f[B]nftfwedit(1)\f[R],
+\f[B]nftnetchk(1)\f[R], \f[B]nftfwadm(1)\f[R], \f[B]nftfw-files(5)\f[R]

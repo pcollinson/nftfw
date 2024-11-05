@@ -211,6 +211,10 @@ class NetReaderFromFiles:
     # This is where data ends up
     lists = {'ip': [], 'ip6': []}
 
+    # Identify the file that specifies an address
+    # key is sourcefile, argument is a list of footprints
+    source = {}
+
     def __init__(self, cf, listname, files=None):
         """Initialise the lists from files in blacknets.d
 
@@ -275,7 +279,8 @@ class NetReaderFromFiles:
         if '/' not in line:
             try:
                 ipt = ipaddress.ip_address(line)
-                self.store_addr(ipt)
+                footp = self.store_addr(ipt)
+                self.store_source(filename, footp)
             except ValueError as e:
                 log.error('blacknets file %s, line %d: failed on %s - %s',
                           str(filename),
@@ -299,7 +304,8 @@ class NetReaderFromFiles:
 
         # Ipv4 networks are ready to go, so store them
         if isinstance(ipt, ipaddress.IPv4Network):
-            self.store_net(ipt)
+            footp = self.store_net(ipt)
+            self.store_source(filename, footp)
             return
 
         # Now for ipv6 addresses we have the possibility that they
@@ -307,14 +313,16 @@ class NetReaderFromFiles:
         # ip4 addresses in ipv6 ie starting with ::FFFF::
         ipcheck = self.convert_to_ipv4(ipt)
         if ipcheck is None:
-            self.store_net(ipt)
+            footp = self.store_net(ipt)
+            self.store_source(filename, footp)
         elif ipcheck == 'error':
             log.error('blacknets file %s, line %d: could not convert ipv6 to ipv4 - %s',
                       str(filename),
                       lineno,
                       str(ipt))
         else:
-            self.store_net(ipcheck)
+            footp = self.store_net(ipcheck)
+            self.store_source(filename, footp)
 
     @staticmethod
     def convert_to_ipv4(ipt):
@@ -381,6 +389,11 @@ class NetReaderFromFiles:
         Parameters
         ----------
         ipt ipnetwork object
+
+        Returns
+        -------
+        Footprint key - int
+
         """
         if ipt.version == 4:
             ix = 'ip'
@@ -398,6 +411,7 @@ class NetReaderFromFiles:
         # prevent duplicates
         footp = self.get_footprint(ipt)
         self.nets[ix][footp] = ipt
+        return footp
 
     def store_addr(self, ipt):
         """Store addresses as networks
@@ -405,6 +419,11 @@ class NetReaderFromFiles:
         Parameters
         ----------
         ipt ipnetwork object
+
+        Returns
+        -------
+        Footprint key - int
+
         """
 
         # attempt to remove erronous addresses
@@ -413,8 +432,16 @@ class NetReaderFromFiles:
         prelen = "/32" if ipt.version == 4 else "/128"
         newip = ipaddress.ip_network(str(ipt) + prelen,
                                      strict=False)
-        self.store_net(newip)
+        return self.store_net(newip)
 
+    def store_source(self, filename, footp):
+        """ Store source information
+        """
+
+        fname = filename.name
+        if fname not in self.source:
+            self.source[fname] = []
+        self.source[fname].append(footp)
 
     @staticmethod
     def get_footprint(ipt):

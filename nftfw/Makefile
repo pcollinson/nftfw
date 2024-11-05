@@ -1,4 +1,5 @@
-# Makefile for pylint
+
+41;2500;0c# Makefile for pylint
 # NB Now needs gnumake
 SRC = $(sort $(filter-out PackageIndex.py,$(wildcard *.py)))
 OUT = $(sort $(SRC:.py=.lint))
@@ -24,7 +25,7 @@ lint: ${OUT}
 	cd ..; ${PYLINT} --rcfile nftfw/pylintrc --exit-zero -s n nftfw/$<
 
 # pylintrc now ignores 'import-outside-toplevel'. Some nftfw modules selectively import code depending on use.
-# and will trigger this on bullseye
+# and will trigger this on bullseye and later
 # However, the error is not present in buster's pylint3 and it complains about the disable code because it
 # doesn't understand it. So the solution is to remove the inline disable code and make a global option.
 #

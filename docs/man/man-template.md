@@ -3,7 +3,7 @@
 NAME
 ====
 
-**nftfwedit** — command line tool to 
+**nftfwedit** — command line tool to
 
 SYNOPSIS
 ======
@@ -40,4 +40,4 @@ Peter Collinson
 SEE ALSO
 ========
 
-**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftfwadm(1)**,  **nftfw-config(5)**, **nftfw-files(5)**
+**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftnetchk(1)**, **nftfwadm(1)**, **nftfw-config(5)**, **nftfw-files(5)**

@@ -677,13 +677,12 @@ class BlackList:
                                             incidents=incidents,
                                             matchcount=matchcount)
 
-            fwdb.close()
-
             if dels is not None \
                and dels != 0:
                 deleted = dels
                 log.info('%d records removed from the database', deleted)
 
+        fwdb.close()
         return deleted
 
     def write(self, path, contents):

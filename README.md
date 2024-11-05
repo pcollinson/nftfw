@@ -8,7 +8,15 @@ _nftfw_ can be installed from a Debian binary package, there is a zip file calle
 
 ## New in current release
 
-For full update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog). The current release moves from v0.9.16 to v0.9.19.
+For full update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog). The current release moves from v0.9.16 to v0.9.20.
+
+The v0.9.20 release depends on the Debian version of the Python _nftables_ module. Before running ```dpkg -i``` on the package, do execute:
+``` sh
+apt install python3-nftables
+```
+to make the update of _nftfw_ painless. If you don't, dpkg will stop, and you will need to take remedial action to install things. See above (and below) for a link to the Installation document that explains how to extract yourself from this problem.
+
+In addition, there is a change to the default settings for the _nftfw_ file in _cron.d_. When installing _dpkg_ will query whether you want to keep your value or take the released one - use the 'D' option to see the differences. You probably want to keep your version, but make the suggested change by hand.
 
 Main changes:
 
@@ -27,6 +35,10 @@ The new feature is run before the extant removal system. By default, it's not ac
 v0.9.19: I've removed my version of nftables.py from the distribution. When I started _nftfw_ the standard library was unable to access the full capabilities of _nftables_ so I added some code and included it in the distribution.  The version supplied with python3-nftables now does what was missing and more. I've included this as a requirement for the package, but you may need to use ```apt install python3-nftables```.
 
 v0.9.19: Finally, I've updated documentation and done a pylint sweep using pylint for python 3.11.2, which has changed some minor bits of coding.
+
+v0.9.20: The default time to run the database tidy code in _/etc/cron.d/nftfw_ was incorrectly specified. It was always the intention to run it overnight. The 'doh' moment was to put the time into cron as hh mm, when it should be mm hh. This is now changed.
+
+Add a new tool _nftnetchk_ that compares the current firewall database IPs with the networks found in _blacknets.d_. If any of the IPs are part of a network that's blocked in _blacknets.d_ , then they are not needed in the database. The manual page for _nftnetchk_ supplies a recipe for deleting the IPs.
 
 ## Features
 

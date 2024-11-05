@@ -12,6 +12,8 @@ Manual Section 1
 
 [**nftfwedit** — command line to add, delete and blacklist IPs and IP information print](./nftfwedit.1.md)
 
+[**nftchkbin** — command line to check if ips in the firewall database are present in blacknets.d files](./nftfwedit.1.md)
+
 [**nftfwadm** — support for installation of **nftfw**](./nftfwadm.1.md)
 
 Manual Section 5

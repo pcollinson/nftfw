@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFTCHKNET(1) | Nftfw documentation</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">NFTCHKNET(1) | Nftfw documentation</h1>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>nftnetchk</strong> — command line tool to check if IPs in the
+firewall database are present in blacknets.d files</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<div class="line-block"><strong>nftnetchk</strong> [<strong>-h |
+-l</strong>]</div>
+<h1 id="description">DESCRIPTION</h1>
+<p><em>nftnetchk</em> is a command line tool that checks if the IP
+addresses in the files in <em>blacknets.d</em> are legal. In addition,
+it will determine if the IP addresses present in the firewall database
+are unnecessary because they are part of any network contained in files
+in <em>blacknets.d</em>. Entries in <em>blacknets.d</em> are usually
+network ranges expressed using CIDR format and are added into
+<em>blacknets.d</em> by hand. This tool will list entries in the
+firewall database that are no longer needed because they are covered by
+the <em>blacknets.d</em> values.</p>
+<p>If <em>nftnetchk</em> has nothing to report, it won’t output
+anything.</p>
+<p>Output is normally a ‘pretty printed’ table with these headings:</p>
+<ul>
+<li>IP: The IP found IP address that can be removed.</li>
+<li>Found in: The name of the file in <em>blacknets.d</em> of which the
+network IP is part.</li>
+<li>Net: The network entry that contains the IP</li>
+<li>Latest: The date and time of last recorded activity for this
+address</li>
+<li>First: The date and time of first recorded activity for this address
+(‘-’ if same as Latest)</li>
+<li>Duration: How long between the Latest and First</li>
+</ul>
+<p>The <strong>-l</strong> (or <strong>–list</strong>) option just
+outputs IP addresses as a list. The output can be used to remove the IPs
+from the database:</p>
+<pre><code>sudo nftnetchk -l | while read ip; do sudo nftfwedit -d $ip; done</code></pre>
+<h1 id="files">FILES</h1>
+<dl>
+<dt><em>/etc/nftfw</em> or <em>/usr/local/etc/nftfw</em></dt>
+<dd>
+<p>Location of control files</p>
+</dd>
+<dt><em>/var/lib/nftfw/</em> or <em>/usr/local/var/lib/nftfw</em></dt>
+<dd>
+<p>Location of <em>build</em>, <em>install</em>, lock file and sqlite3
+database storing file positions and blacklist information</p>
+</dd>
+</dl>
+<h1 id="bugs">BUGS</h1>
+<p>See GitHub Issues: <a
+href="https://github.com/pcollinson/nftfw/issues"
+class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<h1 id="author">AUTHOR</h1>
+<p>Peter Collinson</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p><strong>nft(1)</strong>, <strong>nftfwls(1)</strong>,
+<strong>nftfwedit(1)</strong>, <strong>nftfwadm(1)</strong>,
+<strong>nftfw-config(5)</strong>, <strong>nftfw-files(5)</strong></p>
+</body>
+</html>

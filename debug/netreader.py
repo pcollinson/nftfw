@@ -43,6 +43,6 @@ if __name__ == '__main__':
             print(r)
 
         print('IP6');
-        print('Number of ip6', len(nr.records['all']['ip']))
-        for r in nr.records['all']['ip']:
+        print('Number of ip6', len(nr.records['all']['ip6']))
+        for r in nr.records['all']['ip6']:
             print(r)

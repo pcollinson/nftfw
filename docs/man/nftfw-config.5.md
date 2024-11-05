@@ -98,11 +98,12 @@ Do we want nftables logging? By adding a different prefix for each of the tables
 
 The three variables below control the type of sets automatically generated for blacklist, blacknets and whitelist tables. When true, _nftfw_ uses auto_merged, interval sets for the sets it makes. This type automatically creates entries containing an address range for adjacent IP addresses. The feature is desirable because it reduces the number of matches.
 
-However, the auto-merged, interval sets can cause the loading of _nftables_ rules to fail, flagging an error. A load can succeed when a full install is performed but partial loads of sets can fail. The bug was reported to the _nftables_ development team, based on problems with the Buster release and a fix was generated. The fix is now widely deployed.
+However, in the past, some auto-merged interval sets caused the loading of _nftables_ rules to fail, flagging an error. A load can succeed when a full install is performed but partial loads of sets can fail. The bug was reported to the _nftables_ development team, based on problems with the Buster release and a fix was generated. The fix is now widely deployed.
 
 _nftfw_ works around this bug, automatically generating a full install when an attempt at a set reload fails. However, it seems a good idea to provide a way of turning this feature on and default to not using the feature.
 
-It seems likely that this problem has been fixed for the Bullseye Debian release. It's recommended to enable this feature, but monitor logs to check that updates are not failing and nftfw is managing to do installs of sets without reporting errors.
+It seems likely that this problem has been fixed for the Bullseye and later Debian releases. It's recommended to enable this feature, but monitor logs to check that updates are not failing and _nftfw_
+is managing to do installs of sets without reporting errors.
 
 
       blacklist_set_auto_merge = False
@@ -136,7 +137,7 @@ When the matchcount goes over this level, **nftfw** blocks the ip using all port
       block_all_after = 100
 
 _expire_after_
-**nftfw** removes blocked IPs from the _blacklist.d_ directory after the number of days in this value have passed since the last incident. Bad guys keep coming back, and sometimes re-appear several months after expiry. It's useful to have feedback from the firewall to keep them in play while they batter at the firewall door. The system allows for this, see nftfw_files(5) for information on patterns that support feedback.
+**nftfw** removes blocked IPs from the _blacklist.d_ directory after the number of days in this value have passed since the last incident. Bad guys keep coming back, and can re-appear several months after expiry. It's useful to have feedback from the firewall to keep them in play while they batter at the firewall door. The system allows for this, see nftfw_files(5) for information on patterns that support feedback.
 
       expire_after = 10
 
@@ -148,12 +149,14 @@ _sync_check_
      sync_check = 50
 
 _clean_before_
-**nftfw tidy** uses part of the blacklist code to remove ips from the database for which there has been no error posted for more than these number of days, the intention is to keep the database from growing to huge proportions. The value specifies the number of days that should elapse before these addresses are deleted. A zero value will inhibit this action.
+**nftfw tidy** uses part of the blacklist code to remove IPs from the database for which there has been no update posted for more than these number of days, the intention is to keep the database from growing to huge proportions. The value specifies the number of days that should elapse before these addresses are deleted. A zero value will inhibit this action.
 
      clean_before = 90
 
 _clean_by_count_
-**nftfw tidy** uses part of the blacklist code to remove ips from the database for which there has been no error posted for more than a number of days, and the ip does not represent very agressive offenders. Perhaps appearing in a log file only once or twice. The clean_by_count here is set to zero on installation because the action is new, and system admins may want time to decide on the settings. The count is accompanied by two numbers which are tested against the incident and matchcounts. Either of these values may be zero to disable the appropriate test. The entry will only be deleted if the counts recorded for it are less than or equal to the settings. This setting targets attempted access from botnets, cloud addresses and from hosting providers who don't police their customers.
+**nftfw tidy** also uses part of the blacklist code to remove IPs from the database who are infrequent visitors. The addresses are deleted when no update is posted for more than a number of days, and the counts that **nftfw** maintains are low. The _clean_by_count_ is set to zero on installation, disabling the check. System admins may want time to decide on the settings.
+
+The _clean_by_count_ is accompanied by two numbers which are tested against the incident and matchcounts (see nftfwls(1)). Either of these values may be zero to disable the appropriate test. The entry will only be deleted if the counts recorded for it are less than or equal to the values of the settings. The _clean_by_count_ test targets access from botnets, cloud addresses and from hosting providers who don't police their customers, but where the IP visited briefly and hasn't been back.
 
      clean_by_count = 0
      incidents_le = 1
@@ -215,4 +218,4 @@ Peter Collinson (huge credit to the ideas from Patrick Cherry's work for the fir
 SEE ALSO
 ========
 
-**nft(1)**,  **nftfw(1)**, **nftfwls(1)**, **nftfwedit(1)**, **nftfwadm(1)**, **nftfw-files(5)**
+**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftnetchk(1)**, **nftfwadm(1)**, **nftfw-files(5)**

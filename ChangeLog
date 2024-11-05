@@ -1,3 +1,13 @@
+v0.9.20 The default time to run the database tidy code in
+	/etc/cron.d/nftfw_ was incorrectly specified. It was always
+	the intention to run it overnight. The 'doh' moment was to
+	put the time into cron as hh mm, when it should be mm hh.
+	Add a new tool 'nftnetchk' that compares the current firewall
+	database IPs with the networks found in blacknets.d. If any
+	of the IPs are part of a network that's blocked in blacknets.d ,
+	then they are not needed in the database. The manual page
+	for nftnetchk supplies a recipe for deleting the IPs.
+
 v0.9.19 Add additional technique for cleaning firewall database
 	of old values. To activate, requires new values to
 	be added to /etc/nftfw/config.inc. See comments in
@@ -36,7 +46,6 @@ v0.9.13 Change default mask for IPv6 addresses from /64 to /112
 
 v0.9.12 Reorder failure tests in nft_python.py is if there is an error
 	it will be logged properly.
-
 v0.9.11 Files in incoming.d and outgoing.d can contain IP addresses
 	applying the action rule only to those addresses. Fix to
 	ensure that a rule contains addresses it is only applied

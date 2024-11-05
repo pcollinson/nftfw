@@ -18,7 +18,7 @@ DESCRIPTION
 
 **nftfwls** 'pretty prints' a table with these headings:
 
--  IPs:   The blocked IP address
+- IPs:   The blocked IP address
 - Port: The port list used in the firewall for the IP
 - Ct/Incd: The number of matches in log files triggered by this IP; a / and the number of reported distinct incidents
 - Latest: The date and time of the latest incident. The _date_fmt_ key in _config.ini_ can alter  date formats from the default.
@@ -95,7 +95,7 @@ Options
 
 :   Change the default logging settings to INFO to show all errors and information messages.
 
- FILES
+FILES
 =====
 
 Files can be located in _/_ or  _/usr/local_.
@@ -121,4 +121,4 @@ Peter Collinson (huge credit to the ideas from Patrick Cherry's work for the fir
 SEE ALSO
 ========
 
-**nft(1)**, **nftfw(1)**, **nftfwedit(1)**, **nftfwadm(1)**, **nftfw-config(5)**, **nftfw-files(5)**
+**nft(1)**, **nftfwedit(1)**, **nftnetchk(1)**, **nftfwadm(1)**, **nftfw-config(5)**, **nftfw-files(5)**

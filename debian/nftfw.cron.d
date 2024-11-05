@@ -17,4 +17,4 @@
 #@hourly root /usr/bin/nftfw -q load
 
 # Keep firewall database under control
-#02 10 * * * root /usr/bin/nftfw -q tidy
+#15 02 * * * root /usr/bin/nftfw -q tidy
