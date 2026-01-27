@@ -158,4 +158,4 @@ Peter Collinson (huge credit to the ideas from Patrick Cherry's work for the fir
 SEE ALSO
 ========
 
-**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftfwadm(1)**,  **nftfw-config(5)**, **nftfw-files(5)**
+**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftfwan(1)**, **nftfwadm(1)**,  **nftfw-config(5)**, **nftfw-files(5)**

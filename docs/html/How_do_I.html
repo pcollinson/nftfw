@@ -8,12 +8,22 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -24,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -75,7 +85,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
@@ -144,12 +153,15 @@ Allow access to a service on my machine?</h2>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">07-ssh</span>         21-ftp-passive  40-pop3s  60-sieve</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">10-http</span>        30-imap         50-smtp   99-drop</span></code></pre></div>
 <p>Some of the filenames in the directory access ‘rules’ in the
-<em>rule.d</em> directory. There’s more information on the manual page
-in <a href="man/nftfw-files.5.html"><em>nftfw_files</em></a> in man
-section 5.</p>
-<p>Each file makes a rule for the firewall, and starts with a two digit
-number that supplies the ordering of the rules. A new entry needs to be
-adding before the <em>99-reject</em> rule. So let’s pick ‘70’ for
+<em>rule.d</em> directory. For example, <em>99_drop</em> uses a shell
+script called <em>drop.sh</em> in the <em>rule.d</em> directory that
+generate the <em>nftables</em> text that’s needed at this point in the
+firewall. There’s more information on the manual page in <a
+href="man/nftfw-files.5.html"><em>nftfw_files</em></a> in man section
+5.</p>
+<p>Each filename makes a rule for the firewall, and starts with a two
+digit number that supplies the ordering of the rules. A new entry needs
+to be adding before the <em>99-drop</em> rule. So let’s pick ‘70’ for
 that.</p>
 <p>The rest of the filename can be a port number or the service name,
 but that must be in <em>/etc/services</em>. Let’s say we want to add
@@ -159,7 +171,8 @@ in <em>/etc/services</em>. We can either add <em>70-domain</em> or
 command (you may have to use <em>sudo</em>):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> touch 70-domain</span></code></pre></div>
 <p>because the file is empty, connections from any IP address may access
-this service.</p>
+this service. These service rules use the <em>accept.sh</em> script in
+<em>rule.d</em> to generate the necessary content.</p>
 <p>The command:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo netstat <span class="at">-pat</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
@@ -206,10 +219,10 @@ use / in a filename, so replace it by the vertical bar symbol:</p>
 <p>If you put the full address from the <em>host</em> command into the
 directory, <em>nftfw</em> will ‘normalise’ the address to replace the
 134 by zero.</p>
-<p>For IPv6 addresses we always match the first 64 bits of the address.
+<p>For IPv6 addresses we always match the first 112 bits of the address.
 IPv6 addresses are abbreviated by writing ‘::’ for any sequences of
 zeros in the address, so to allow their IPv6 address you can write:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> touch <span class="st">&#39;2001:db8::|64&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> touch <span class="st">&#39;2001:db8::|112&#39;</span></span></code></pre></div>
 <p>You may find some files ending with <em>.auto</em> in the directory,
 the whitelist scanner has installed these when it’s found that a user
 has logged in from the address. The scanner will look after these, and
@@ -231,7 +244,21 @@ the directory.</p>
 directory ending in <em>.auto</em> when it finds sites that are
 misbehaving. The scanner uses files in the <em>patterns.d</em> directory
 to find log files to scan, and how to interpret lines in the log files
-as bad.</p>
+as bad. By default, <em>nftfw</em> will log repeated accesses from a
+blocked site by writing a line in the <em>syslog</em> file. In this
+case, a pattern <em>blacklist_update.patterns</em> is used to detect the
+event and will update the internal database, so this particular address
+does not time out and eventually be removed from the firewall.</p>
+<p>If you want to make your known bad address behave as if it had been
+detected and installed by the blacklist scanner then you should use the
+<em>nftfwedit</em> command to add it to the database and the
+<em>blacklist.d</em> directory. For example:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfwedit <span class="at">-b</span> <span class="at">-p</span> 80,443 <span class="at">-n</span> local BAD.IP.AD.DR</span></code></pre></div>
+<p>you need to give a port that should be blocked, in this case a set of
+ports; a name that’s used when displaying the record in
+<em>nftfwls</em>, in this case ‘local’; and the IP address to block.
+This also allows <em>nftfw</em> to time out the address if it doesn’t
+re-appear.</p>
 <h2 id="how-do-i-block-access-to-countries">How do I: Block access to
 countries?</h2>
 <p>The <em>blacknets.d</em> directory can contain a set of files each
@@ -244,16 +271,17 @@ install them.</p>
 firewall is doing?</h2>
 <p>The <em>nft</em> command prints the contents of the firewall with the
 command:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset</span></code></pre></div>
-<p>You can print just the IPv4 and IPv6 sets separately with</p>
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset ip</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset ip6</span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset</span></code></pre></div>
+<p>You can print just the IPv4 and IPv6 sets separately with</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset ip</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset ip6</span></code></pre></div>
 <p>This is too much typing, so I alias these commands in my shell
 startup files:</p>
-<div class="sourceCode" id="cb11"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> nfl=<span class="st">&#39;sudo nft list ruleset ip|less&#39;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> nfl6=<span class="st">&#39;sudo nft list ruleset ip6|less&#39;</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> nfl=<span class="st">&#39;sudo nft list ruleset ip|less&#39;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> nfl6=<span class="st">&#39;sudo nft list ruleset ip6|less&#39;</span></span></code></pre></div>
 <p>You’ll see that most rules have counters, so you can see what has
 happened in the past, what’s busy and what’s in use.</p>
 <h2 id="how-do-i-check-what-the-blacklist-scanner-is-doing">How do I:
@@ -264,8 +292,8 @@ scanner, a port number (or a comma-separated list) used for blocking and
 a set of regular expressions that match the lines in the log files
 indicating bad behaviour.</p>
 <p>You can find out what’s blocked on your system by using:</p>
-<div class="sourceCode" id="cb12"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> nftfwls</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> nftfwls</span></code></pre></div>
 <p>This will print a table of the IP addresses the scanner has found,
 the number of matches, the number of ‘incidents’ - each incident is a
 separate run of the scanner, when it happened first, the last time a
@@ -290,8 +318,8 @@ address is in selected DNS blacklist sites.</p>
 Remove a good IP address from the blacklist?</h2>
 <p>If an IP address has found its way into the blacklist in error, then
 you can delete it using</p>
-<div class="sourceCode" id="cb13"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfwedit <span class="at">-d</span> IP.ADD.RE.SS</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfwedit <span class="at">-d</span> IP.ADD.RE.SS</span></code></pre></div>
 <p>this will remove the address from the blacklist database and also
 delete the entry in the <em>blacklist.d</em> directory. If you just
 remove the address from the directory, <em>nftfw</em> will reinstate it
@@ -314,15 +342,15 @@ also a section in the <a href="Users_Guide.html">User’s Guide</a>.</p>
 my new blacklisting expression?</h2>
 <p>You can use the <em>nftfw</em> command to see if your expression
 works. Create a new pattern file and set</p>
-<div class="sourceCode" id="cb14"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ports</span> = test</span></code></pre></div>
-<p>and add your regular expression. Now say:</p>
 <div class="sourceCode" id="cb15"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-x</span> <span class="at">-p</span> PATTERN blacklist</span></code></pre></div>
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ports</span> = test</span></code></pre></div>
+<p>and add your regular expression. Now say:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-x</span> <span class="at">-p</span> PATTERN blacklist</span></code></pre></div>
 <p>and this will print a table showing the number of matches that the
 expression has detected. The PATTERN is the name of your file but
-without the <em>.pattern</em> appended. The <em>-x</em> option makes the
-program print a table, and also starts scanning the file from the
+without the <em>.patterns</em> appended. The <em>-x</em> option makes
+the program print a table, and also starts scanning the file from the
 beginning and doesn’t record where it found the end of the file, so
 using this command will not interfere with normal processing.</p>
 <p>The blacklist scanner normally ignores pattern files with
@@ -349,8 +377,8 @@ adds a <em>nat</em> table and uses the <em>forward</em> table.</p>
 When deciding what to add or change, the best strategy is to add your
 new rules to the system using the <em>nft</em> command line interface to
 check that they work and use:</p>
-<div class="sourceCode" id="cb16"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset</span></code></pre></div>
 <p>to see how <em>nft</em> ‘sees’ the rules. Rules expressed on the
 command line can contain syntax that <em>nft</em> thinks is unnessary,
 and can also use some assumptions about defaults that <em>nft</em> will

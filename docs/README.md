@@ -12,5 +12,3 @@
   - How to get CIDR files for use with the _blacknet_ feature.
 - [Using fail2ban with nftfw](Using-fail2ban-with-nftfw.md)
   - How to get CIDR files for use with the _blacknet_ feature.
-- [Updating _nftfw_](Updating-nftfw.md)
-  - How to update a manual installation of_nftfw_.

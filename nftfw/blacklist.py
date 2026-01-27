@@ -1,20 +1,78 @@
-"""nftfw Blacklist class
+"""Blacklist management system for automated IP blocking based on log analysis.
 
-Use files in patterns.d to specify patterns. Patterns are files that
-contain logfile names, ports and regular expressions to match lines in
-the files. Scan logfiles for the regexes and if ips are found create
-entries in sqlite3 database.
+This module provides the BlackList class which orchestrates the entire blacklist
+process: scanning logs for malicious activity, maintaining an SQLite database of
+offenders, creating blacklist files for the firewall, and cleaning up expired entries.
 
-Use thresholds to create blacklist files in blacklist.d.
+The blacklist system is event-driven and integrates with:
+- Pattern-based log scanning (patternreader, logreader)
+- SQLite database for tracking IP addresses and incidents (fwdb)
+- Whitelist checking to prevent false positives (whitelistcheck)
+- Firewall file management (blacklist.d directory)
 
-Expire files in blacklist.d depending on times
+Key Features
+------------
+- Automated log scanning with pattern matching
+- Threshold-based IP blocking (block_after, block_all_after)
+- Incident and match count tracking
+- Port-specific or full blocking
+- Automatic expiry of old blacklist entries
+- Database cleaning with preservation of active entries
+- Missing file detection and recovery
+- Test mode for pattern validation
+- Whitelist integration to prevent blocking legitimate IPs
 
-Provide scan-only entry
+Workflow
+--------
+1. **Log Scanning**: Uses logreader to scan logs with patterns from patterns.d
+2. **Database Updates**: Stores/updates IP information in SQLite database
+3. **File Creation**: Creates .auto files in blacklist.d for IPs meeting thresholds
+4. **Expiry**: Removes old .auto files based on expire_after setting
+5. **Cleaning**: Removes old database entries while preserving active entries
 
-Clean the entries in the sqlite3 database
+Configuration (from [Blacklist] section in config.ini)
+------------------------------------------------------
+- **block_after**: Minimum matchcount to create blacklist file
+- **block_all_after**: Matchcount threshold to block all ports
+- **expire_after**: Days before blacklist file expires
+- **clean_before**: Days before database entry can be cleaned
+- **clean_by_count**: Days for count-based cleaning phase
+- **sync_check**: Frequency (in runs) for missing file check
+- **incidents_le**: Max incidents for count-based cleaning
+- **matchct_le**: Max matchcount for count-based cleaning
 
+Usage Example
+-------------
+    from .config import Config
+    from .blacklist import BlackList
+
+    # Initialize configuration
+    cf = Config()
+    cf.readini()
+    cf.setup()
+
+    # Run blacklist scan
+    bl = BlackList(cf)
+    changes = bl.blacklist()
+    print(f"Blacklist scan complete: {changes} files changed")
+
+    # Test mode: scan logs without updating
+    bl.blacklist_scan()
+
+    # Clean old database entries
+    bl.clean_database()
+
+See Also
+--------
+logreader : Log scanning with pattern matching
+patternreader : Pattern file parsing
+fwdb.FwDb : Database for tracking blacklisted IPs
+whitelistcheck : Whitelist validation
 """
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+from pathlib import Path
 import time
 import logging
 from .logreader import log_reader
@@ -22,35 +80,81 @@ from .listreader import ListReader
 from .fwdb import FwDb
 from .whitelistcheck import WhiteListCheck
 from .stats import duration, frequency
+
+if TYPE_CHECKING:
+    from .config import Config
+
 log = logging.getLogger('nftfw')
 
-class BlackList:
-    """Blacklist class
 
-    Steps:
-    1. Load pattern files
-    2. Scan log files using logreader, maintain database.
-       Store actions to create any files in blacklist.d
-    3. Check for files in blacklist.d that need expiry
-    4. Update files
-    5. Clean database
+class BlackList:
+    """Manages IP blacklisting based on log analysis and pattern matching.
+
+    This class coordinates the entire blacklist workflow: scanning logs for
+    malicious activity, maintaining a database of offending IPs, creating
+    firewall blacklist files, expiring old entries, and cleaning the database.
+
+    The system uses thresholds to determine when to block IPs and supports
+    both port-specific and full blocking. It integrates with whitelist checking
+    to prevent blocking legitimate IPs.
+
+    Attributes:
+        cf: Config instance with all settings
+        blacklistpath: Path to blacklist.d directory
+        file_create: If True, create blacklist files (False for nftfwedit)
+        report_whitelisting: If True, log errors for whitelisted IPs
+        block_after: Minimum matchcount to create blacklist file
+        block_all_after: Matchcount threshold to block all ports
+        expire_after: Days before blacklist file expires
+        clean_before: Days before database entry can be cleaned
+        sync_check: Frequency (in runs) for missing file check
+        clean_by_count: Days for count-based cleaning phase
+        incidents_le: Max incidents for count-based cleaning
+        matchct_le: Max matchcount for count-based cleaning
+
+    Example:
+        Basic usage for blacklist scanning::
+
+            from .config import Config
+            from .blacklist import BlackList
+
+            cf = Config()
+            cf.readini()
+            cf.setup()
+
+            bl = BlackList(cf)
+
+            # Run full blacklist scan
+            changes = bl.blacklist()
+
+            # Or scan without updating (test mode)
+            bl.blacklist_scan()
+
+            # Clean database periodically
+            bl.clean_database()
+
+    See Also:
+        logreader: Log scanning module
+        fwdb.FwDb: Database management
+        whitelistcheck: Whitelist validation
     """
 
     # pylint: disable=too-many-instance-attributes
     # but we need them here
 
-    def __init__(self, cf):
-        """Blacklist init
+    def __init__(self, cf: Config) -> None:
+        """Initialize the BlackList instance with configuration.
 
-        Parameters
-        ----------
-        cf : Config
+        Args:
+            cf: Config instance containing all blacklist settings
 
+        Note:
+            Loads configuration values from [Blacklist] section including
+            thresholds for blocking, expiry, and cleaning parameters.
         """
-
         self.cf = cf
         # Path to blacklist.d
-        self.blacklistpath = cf.etcpath('blacklist')
+        self.blacklistpath: Path = cf.etcpath('blacklist')
         # Ini values used
         logvars = cf.get_ini_values_by_section('Blacklist')
         # set to false in nftfwedit
@@ -67,15 +171,28 @@ class BlackList:
         self.incidents_le = int(logvars['incidents_le'])
         self.matchct_le = int(logvars['matchct_le'])
 
-    def blacklist(self):
-        """Black list entry point from scheduler
+    def blacklist(self) -> int:
+        """Main entry point for blacklist scanning from scheduler.
 
-        Returns
-        -------
-        int
-            Number of changed files
+        Performs the complete blacklist workflow:
+        1. Scan logs for malicious activity (log_reader)
+        2. Install IPs meeting thresholds
+        3. Check for missing blacklist files (if sync_check enabled)
+        4. Expire old blacklist files
+
+        Returns:
+            Number of files changed (created, updated, or deleted)
+
+        Example:
+            >>> bl = BlackList(cf)
+            >>> changes = bl.blacklist()
+            >>> print(f"Files changed: {changes}")
+
+        Note:
+            - Can be disabled by creating 'disabled' file in blacklist.d
+            - Logs info messages for scan start/end and match counts
+            - All file operations are batched for performance
         """
-
         # symbiosis allows a file called disabled
         # in the blacklist directory to stop things happening
         disabled = self.blacklistpath / 'disabled'
@@ -110,10 +227,27 @@ class BlackList:
 
         return changes
 
-    def blacklist_scan(self):
-        """Scan files for matches, don't update anything
+    def blacklist_scan(self) -> None:
+        """Scan logs and display matches without updating anything.
 
-        -x entry point from scheduler
+        Test mode entry point (invoked with -x flag) that scans logs with
+        patterns but doesn't update file positions, database, or create
+        blacklist files. Results are displayed in a formatted table.
+
+        Example:
+            >>> bl = BlackList(cf)
+            >>> bl.blacklist_scan()
+            +----------------+------------+-------+--------+
+            | IP             | Pattern    | Count | Ports  |
+            +----------------+------------+-------+--------+
+            | 192.0.2.1      | ssh-brute  | 15    | 22     |
+            | 192.0.2.2      | http-scan  | 5     | 80,443 |
+            +----------------+------------+-------+--------+
+
+        Note:
+            - Uses prettytable for output formatting
+            - Doesn't update log file positions
+            - Useful for testing pattern files before deployment
         """
         # Dynamic load, pretty table is not always needed
         # but pylint may complain on bullseye with import-outside-toplevel
@@ -141,35 +275,41 @@ class BlackList:
         pt.align = 'l'
         print(pt)
 
-    def install_ips(self, work):
-        """Install IPs that have triggered matches
+    def install_ips(self, work: dict[str, dict[str, Any]]) -> tuple[int, int]:
+        """Install IPs that have triggered pattern matches.
 
-        Parameters
-        ----------
-        work : Dict[key: Dict[]]
-            key: str
-               ip address
-            Dict[
-                ports : str
-                    'all', 'test', 'update',
-                    List[ports]
-                pattern : str
-                     pattern name that was matched
-                matchcount : int
-                     number of matches for this events
-                incidents : int
-                     number of different incident sets
-                ]
+        Processes log scan results, validates IPs (whitelist check), updates
+        database, and creates blacklist files for IPs meeting thresholds.
 
-        Returns
-        -------
-        tuple
-            filesinstalled : int
-                Number of files installed
-            ipsmatched : int
-                Number of matches found
+        Args:
+            work: Dictionary mapping IP addresses to match information::
+
+                {
+                    'ip_address': {
+                        'ports': 'all' | 'test' | 'update' | [22, 80, ...],
+                        'pattern': 'pattern_name',
+                        'matchcount': 5,
+                        'incidents': 2
+                    }
+                }
+
+        Returns:
+            Tuple of (filesinstalled, ipsmatched)::
+
+                filesinstalled: Number of blacklist files created/updated
+                ipsmatched: Number of valid IPs processed
+
+        Example:
+            >>> work = log_reader(cf)
+            >>> files_created, ips_processed = bl.install_ips(work)
+            >>> print(f"Created {files_created} files for {ips_processed} IPs")
+
+        Note:
+            - Skips whitelisted and invalid IPs
+            - Skips IPs with ports='test' (test mode only)
+            - Updates database for all valid IPs
+            - Only creates files if self.file_create is True
         """
-
         fwdb = FwDb(self.cf)
         filesinstalled = 0
         ipsmatched = 0
@@ -214,34 +354,45 @@ class BlackList:
         fwdb.close()
         return filesinstalled, ipsmatched
 
-    def db_store(self, fwdb, ip, patinfo):
-        """Update the database with info from ip and patinfo
+    def db_store(self, fwdb: FwDb, ip: str,
+                 patinfo: dict[str, Any]) -> tuple[dict[str, Any] | None, bool]:
+        """Update database with IP and pattern match information.
 
-        Parameters
-        ----------
-        fwdb : class
-            database class
-        ip : str
-            ip address
-        patinfo : Dict[
-            ports : {'all', 'test', 'update',
-                      List[ports]}
-            pattern : str
-                 pattern name that was matched
-            matchcount : int
-                 number of matches for this events
-            incidents : int
-                 number of different incident sets
-            ]
+        Creates new database entry for first-time offenders or updates existing
+        entries with new match counts, patterns, and ports. Handles port
+        aggregation across multiple pattern matches.
 
-        Returns
-        -------
-        tuple : (Dict[], bool)
-            Database record for update (see db_update)
-            ports_have_changed : bool
-                Flag to tell install_file to force update
+        Args:
+            fwdb: FwDb database instance
+            ip: IP address (already validated and normalised)
+            patinfo: Pattern match information::
+
+                {
+                    'ports': 'all' | 'test' | 'update' | [22, 80, ...],
+                    'pattern': 'pattern_name',
+                    'matchcount': 5,
+                    'incidents': 2
+                }
+
+        Returns:
+            Tuple of (current, ports_have_changed)::
+
+                current: Database record dict or None if update-only and not in DB
+                ports_have_changed: True if ports were modified
+
+        Example:
+            >>> fwdb = FwDb(cf)
+            >>> patinfo = {'ports': [22], 'pattern': 'ssh', 'matchcount': 5, ...}
+            >>> record, changed = bl.db_store(fwdb, '192.0.2.1', patinfo)
+            >>> if changed:
+            ...     print("Ports were updated")
+
+        Note:
+            - Returns (None, None) for update-only IPs not in database
+            - Logs frequency information for existing entries
+            - Aggregates ports across multiple matches
+            - Maintains comma-separated pattern list
         """
-
         # pylint: disable=too-many-locals,too-many-branches
 
         # Flag used for file update
@@ -251,7 +402,7 @@ class BlackList:
         if not any(lookup):
             # not found cannot update
             if patinfo['ports'] == 'update':
-                return None, None
+                return None, False
 
             # make ports into a single string
             # ports will now be 'all' or numeric list
@@ -261,16 +412,16 @@ class BlackList:
 
             # need a new record
             tnow = fwdb.db_timestamp()
-            current = {'ip': ip,
-                       'pattern': patinfo['pattern'],
-                       'incidents': patinfo['incidents'],
-                       'matchcount': patinfo['matchcount'],
-                       'first': tnow,
-                       'last': tnow,
-                       'ports': ports,
-                       'useall': False,
-                       'multiple': False,
-                       'isdnsbl':False}
+            current: dict[str, Any] = {'ip': ip,
+                                       'pattern': patinfo['pattern'],
+                                       'incidents': patinfo['incidents'],
+                                       'matchcount': patinfo['matchcount'],
+                                       'first': tnow,
+                                       'last': tnow,
+                                       'ports': ports,
+                                       'useall': False,
+                                       'multiple': False,
+                                       'isdnsbl': False}
             fwdb.insert_ip(current)
         else:
             # we have a record
@@ -278,7 +429,7 @@ class BlackList:
             # we have a constraint in sqlite to ensure that
             current = lookup[0]
             tnow = fwdb.db_timestamp()
-            update = {}
+            update: dict[str, Any] = {}
 
             # Log an idea of frequency since last report
             self.log_frequency(ip, patinfo['matchcount'],
@@ -348,21 +499,27 @@ class BlackList:
         return current, ports_have_changed
 
     @staticmethod
-    def log_frequency(ip, matchcount, first, last):
-        """ Log an indication of frequency of matches
+    def log_frequency(ip: str, matchcount: int, first: int, last: int) -> None:
+        """Log frequency information for repeated matches.
 
-        Parameters
-        ----------
-        ip : str
-            ip address
-        matchcount : int
-            matchcount
-        first : int
-            earliest timestamp
-        last : int
-            last timestamp
+        Calculates and logs the duration and frequency of matches for an IP
+        to help understand attack patterns.
+
+        Args:
+            ip: IP address
+            matchcount: Number of new matches
+            first: Unix timestamp of last recorded incident
+            last: Unix timestamp of current incident
+
+        Example:
+            >>> bl.log_frequency('192.0.2.1', 10, 1699564800, 1699568400)
+            # Logs: "192.0.2.1 count 10 in 1 hour - 10 per hour"
+
+        Note:
+            - Uses stats.duration() and stats.frequency() for formatting
+            - Only logs if time difference is meaningful
+            - Logs count only if frequency calculation not possible
         """
-
         if first >= last:
             return
 
@@ -377,45 +534,49 @@ class BlackList:
         else:
             log.info('%s count %d in %s - %s', ip, matchcount, dur, freq)
 
-    def install_file(self, fwdb, current, ports_have_changed):
-        """Install file in blacklist directory
+    def install_file(self, fwdb: FwDb, current: dict[str, Any],
+                     ports_have_changed: bool) -> int:
+        """Create or update blacklist file for an IP address.
 
-        Parameters
-        ----------
-        fwdb : class
-            Database class instance
-        current : Dict[
-            ip : str
-                IP address - main key
-            pattern : str
-                Pattern name or comma separated list of patterns
-            incidents : int
-                Number of incidents
-            matchcount : int
-                Number of pattern matches
-            first : int
-                Timestamp (UNIX time) of first incident
-            last : int
-                Timestamp (UNIX time) of last incident
-            ports : str
-                Comma separated list of ports
-            useall: bool
-                Flag to force 'all' in port setting for
-                the blacklist file
-            multiple : bool
-                Unused
-            isdnsbl : bool
-                Unused
-            ]
-        ports_have_changed : bool
-            Force write of file if true
+        Checks thresholds and creates .auto file in blacklist.d if IP meets
+        blocking criteria. Handles port specification and useall flag for
+        high-frequency offenders.
 
-        Returns
-        -------
-        int
-           1 if file has changed, zero otherwise
+        Args:
+            fwdb: Database instance for timestamp and updates
+            current: Database record for the IP::
+
+                {
+                    'ip': '192.0.2.1',
+                    'pattern': 'ssh-brute',
+                    'incidents': 2,
+                    'matchcount': 15,
+                    'first': 1699564800,
+                    'last': 1699568400,
+                    'ports': '22' or 'all',
+                    'useall': False,
+                    'multiple': False,
+                    'isdnsbl': False
+                }
+
+            ports_have_changed: Force file rewrite if True
+
+        Returns:
+            1 if file was created/modified, 0 otherwise
+
+        Example:
+            >>> record = fwdb.lookup_by_ip('192.0.2.1')[0]
+            >>> changed = bl.install_file(fwdb, record, False)
+            >>> if changed:
+            ...     print("Blacklist file created/updated")
+
+        Note:
+            - Returns 0 if matchcount < block_after threshold
+            - Sets useall flag if matchcount >= block_all_after
+            - Skips if raw (non-.auto) file exists
+            - Touches file to update mtime if no changes needed
+            - Replaces '/' with '|' in filenames for CIDR notation
         """
-
         # force types - values from the db may be strings
         if current['matchcount'] < self.block_after:
             return 0
@@ -423,7 +584,7 @@ class BlackList:
         if current['matchcount'] >= self.block_all_after:
             # need to block all for this ip
             if not current['useall']:
-                args = {'useall': True}
+                args: dict[str, Any] = {'useall': True}
                 args['last'] = fwdb.db_timestamp()
                 fwdb.update_ip(args, current['ip'])
                 # force useall on for later
@@ -471,22 +632,28 @@ class BlackList:
         log.info("%s updated from %s", fname, current['pattern'])
         return 0
 
-    def scan_for_missing(self):
-        """ Check database for current entries and match with blacklist.d
+    def scan_for_missing(self) -> int:
+        """Check for missing blacklist files and recreate them.
 
-        The system is event driven, and needs to be checked that an
-        event has not been missed, meaning a file that should be in
-        blacklist.d simply isn't.
+        Event-driven systems can miss events, so this periodically scans the
+        database for IPs that should have blacklist files but don't. Uses
+        sync_check frequency to avoid checking on every run.
 
-        use number of days in cf.expire_after
-        but we'll subtract a day in case the entry has been expired
+        Returns:
+            Number of files created
 
-        Returns
-        -------
-        int :
-            Number of files installed
+        Example:
+            >>> installed = bl.scan_for_missing()
+            >>> if installed:
+            ...     print(f"Recreated {installed} missing blacklist files")
+
+        Note:
+            - Only runs every sync_check runs (tracked in missingsync file)
+            - Checks IPs active within expire_after - 1 days
+            - Only checks IPs with matchcount >= block_after
+            - Skips raw files, only creates .auto files
+            - Uses threshold one day less than expiry to catch edge cases
         """
-
         # calculate threshold time
         included = self.expire_after - 1
         threshold = int(time.time()) - included*86400
@@ -510,12 +677,12 @@ class BlackList:
             syncval = 0
             checkdata = True
         else:
-            syncval = int(missingsync.read_text())
+            syncval = int(missingsync.read_text(encoding='utf-8'))
             if syncval > self.sync_check:
                 checkdata = True
                 syncval = 0
         syncval += 1
-        missingsync.write_text(str(syncval))
+        missingsync.write_text(str(syncval), encoding='utf-8')
 
         if not checkdata:
             fwdb.close()
@@ -541,17 +708,25 @@ class BlackList:
         fwdb.close()
         return installed
 
-    def scan_for_expires(self):
-        """Expire files in the blacklist directory
+    def scan_for_expires(self) -> int:
+        """Expire and remove old blacklist files.
 
-        use number of days in cf.expire_after
+        Scans blacklist.d for .auto files older than expire_after days and
+        removes them. This allows IPs to "age out" of the blacklist.
 
-        Returns
-        -------
-        int
-            number of changes
+        Returns:
+            Number of files removed
+
+        Example:
+            >>> expired = bl.scan_for_expires()
+            >>> print(f"Expired {expired} old blacklist files")
+
+        Note:
+            - Only removes .auto files (preserves manual entries)
+            - Uses file mtime for age determination
+            - Logs each expired file
+            - Glob pattern '[0-9a-z]*.auto' matches IP address files
         """
-
         bld = self.blacklistpath
 
         threshold = int(time.time()) - self.expire_after * 86400
@@ -563,19 +738,26 @@ class BlackList:
                 changes += 1
         return changes
 
+    def clean_database(self) -> None:
+        """Clean old entries from the database in two phases.
 
-    # This code replaced in November 2024
-    # now copes with two phases of delete
-    def clean_database(self):
-        """ Clean entries from database
+        Phase 1: Remove entries with low activity (clean_by_count days old
+                 with incidents <= incidents_le AND matchcount <= matchct_le)
+        Phase 2: Remove all entries older than clean_before days
 
-        Two phases:
-        1)  Remove based on incidents and matchcounts with
-            time of clean_by_count
-        2)  Remove based on overall time of clean_before
+        Preserves database entries for IPs currently in the firewall.
+        Runs VACUUM after deletion to optimise database.
 
+        Example:
+            >>> bl.clean_database()
+            # Logs: "Blacklist database clean ends - total deleted 42"
+
+        Note:
+            - Phase 1 is skipped if clean_by_count is 0
+            - Phase 2 is skipped if clean_before is 0
+            - Only vacuums if deletions occurred
+            - Protects active firewall entries from deletion
         """
-
         log.info('Blacklist database clean started')
 
         # Phase 1
@@ -613,23 +795,34 @@ class BlackList:
         else:
             log.info("Blacklist database clean ends")
 
+    def do_clean_db(self, days: int, incidents: int = 0,
+                    matchcount: int = 0) -> int:
+        """Perform database cleaning with optional threshold filters.
 
-    def do_clean_db(self, days, incidents=0, matchcount=0):
-        """Clean entries from database
+        Deletes database entries older than specified days, optionally
+        filtering by incident and matchcount thresholds. Preserves entries
+        for IPs currently active in the firewall.
 
-        But not if they are active in the firewall which makes things
-        somewhat more complicated. Actually this is unlikely, but let's
-        cope with it anyway
+        Args:
+            days: Delete entries with last activity older than this many days
+            incidents: If > 0, only delete if incidents <= this value
+            matchcount: If > 0, only delete if matchcount <= this value
 
+        Returns:
+            Number of database records deleted
 
-        Delete when last action is before cf.clean_by_count and
-           incidents <= incidents.le AND matchcount <= matchct_le
-        OR when last action is before cf.clean_before days
+        Example:
+            >>> # Delete low-activity entries older than 30 days
+            >>> deleted = bl.do_clean_db(30, incidents=1, matchcount=5)
+            >>> print(f"Deleted {deleted} records")
 
-        return number of deletions
-
+        Note:
+            - Adjusts timestamp for local timezone (uses time.altzone)
+            - Gets active IPs from blacklist.d via ListReader
+            - Uses clean() if no active IPs need preservation
+            - Uses clean_not_in() to preserve active IPs
+            - Returns 0 if no candidates for deletion
         """
-
         # returned value
         deleted = 0
 
@@ -669,13 +862,13 @@ class BlackList:
             # if nothing in the intersection then we can delete all
             if not any(cannotdelete):
                 dels = fwdb.clean(before,
-                                     incidents=incidents,
-                                     matchcount=matchcount)
+                                  incidents=incidents,
+                                  matchcount=matchcount)
             else:
                 # life is more complicated
                 dels = fwdb.clean_not_in(before, list(cannotdelete),
-                                            incidents=incidents,
-                                            matchcount=matchcount)
+                                         incidents=incidents,
+                                         matchcount=matchcount)
 
             if dels is not None \
                and dels != 0:
@@ -685,14 +878,27 @@ class BlackList:
         fwdb.close()
         return deleted
 
-    def write(self, path, contents):
-        """ Write file contents and ensure ownership """
+    def write(self, path: Path, contents: str) -> None:
+        """Write file contents and ensure correct ownership.
 
-        path.write_text(contents)
+        Args:
+            path: Path to file to write
+            contents: Content to write to file
+
+        Note:
+            Sets ownership based on cf.fileuid/filegid after writing.
+        """
+        path.write_text(contents, encoding='utf-8')
         self.cf.chownpath(path)
 
-    def touch(self, path):
-        """ Touch file and ensure ownership """
+    def touch(self, path: Path) -> None:
+        """Touch file to update mtime and ensure correct ownership.
 
+        Args:
+            path: Path to file to touch
+
+        Note:
+            Sets ownership based on cf.fileuid/filegid after touching.
+        """
         path.touch()
         self.cf.chownpath(path)

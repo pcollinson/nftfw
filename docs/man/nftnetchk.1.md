@@ -29,7 +29,7 @@ Output is normally a 'pretty printed' table with these headings:
 
 The **-l** (or **--list**) option just outputs  IP addresses as a list. The output can be used to remove the IPs from the database:
 
-	sudo nftnetchk -l | while read ip; do sudo nftfwedit -d $ip; done
+> sudo nftnetchk -l | while read ip; do sudo nftfwedit -d $ip; done
 
 FILES
 =====
@@ -56,4 +56,4 @@ Peter Collinson
 SEE ALSO
 ========
 
-**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftfwadm(1)**,  **nftfw-config(5)**, **nftfw-files(5)**
+**nft(1)**, **nftfwls(1)**,  **nftfwedit(1)**, **nftfwan(1)**, **nftfwadm(1)**,  **nftfw-config(5)**, **nftfw-files(5)**

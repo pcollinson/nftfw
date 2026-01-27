@@ -8,12 +8,22 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -24,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -75,7 +85,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
@@ -86,55 +95,54 @@
 </header>
 <h1 id="install-nftfw-from-the-debian-package">Install <em>nftfw</em>
 from the Debian Package</h1>
-<p><em>nftfw</em> can be installed from a Debian binary package, there
-is a zip file called <em>nftfw_current.zip</em> in the <a
+<p><em>nftfw</em> is installed from a Debian binary package, there is a
+zip file called <em>nftfw_current.zip</em> in the <a
 href="https://github.com/pcollinson/nftfw/blob/master/package">package
 directory</a> containing the most recent version. For safety,
-<em>nftfw</em> needs some configuration after installation. See the
-installation document <a href="Debian_package_install.html">Install
-<em>nftfw</em> from Debian package</a> for a how-to guide.</p>
+<em>nftfw</em> needs some configuration after installation. This
+document provides a step-by-step guide for installation.</p>
 <p>Following Debian practice, the system is installed in the root of the
 file system, so the control files will be in <em>/etc/nftfw</em> with
 the library files in <em>/var/lib/nftfw</em>.</p>
 <h2 id="getting-started">Getting started</h2>
 <p>This section presents the bare bones of installing the <em>nftfw</em>
 package on a vanilla system. To cope with some special circumstances,
-links in this document jump to sets of instructions which start after
-the main installation documentation.</p>
+links in this document jump to sets of instructions later in the text,
+with the expectation that the reader will jump there and then return to
+just after the jump.</p>
 <h3 id="iptables-check">Iptables check</h3>
 <p>First check that you can upgrade your system to run
 <em>nftables</em>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo iptables <span class="at">-V</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">iptables</span> v1.8.2 <span class="er">(</span><span class="ex">nf_tables</span><span class="kw">)</span></span></code></pre></div>
+<pre><code>$ sudo iptables -V
+iptables v1.8.2 (nf_tables)</code></pre>
 <p>If the output doesn’t say <em>nf_tables</em>, then you need to swap
 your <em>iptables</em> version. See <a
 href="#switching-iptables">Switching iptables</a> below, then come back
 here when you’ve done that.</p>
 <h3 id="download-the-package">Download the package</h3>
-<p>Download the zipfile containing the most recent debian binary package
-from <a
-href="https://github.com/pcollinson/nftfw/package/nftfw_current_deb.zip">nftfw
-github site</a>. This will download a file
-(<em>nftfw_current_deb.zip</em>) used to hide the version number and
+<p>Github links and behaviour has changed since these documents were
+first crafted. To download the zipfile, visit <a
+href="https://github.com/pcollinson/nftfw/blob/master/package/README.html">the
+package directory README page</a> and click on
+<em>nftfw_current.zip</em> on the page, the file should download
+automatically. The <em>zip</em> file is used to hide the version number,
 running <em>unzip</em> on the file will yield the package. The filename
 of the package contains a version number and ends in <em>.deb</em>, for
 example <em>nftfw_1.0.0-1_all.deb</em>.</p>
-<h3
-id="what-to-do-if-you-are-running-a-manually-installed-nftfw-version">What
-to do if you are running a manually installed <em>nftfw</em>
-version</h3>
-<p>See <a href="#manually-installed-nftfw">Manually installed nftfw</a>
-below, and return here when done.</p>
+<p>Older versions of the code can be found on the same <em>README</em>
+page, if your system doesn’t support Python 3.9, then the last version
+that should run on it is <em>nftfw_0.9.20-1_all.deb</em>, Clicking on
+the package name should automatically download the file.</p>
 <h3 id="install-the-package">Install the package</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo dpkg <span class="at">-i</span> nftfw_XXXXX_all.deb</span></code></pre></div>
 <p>where XXXXX is the version number of the file you downloaded.
 <em>dpkg</em> doesn’t install dependencies and may complain and stop. If
 this happens run:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt-get <span class="at">--fix-broken</span> install</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt <span class="at">--fix-broken</span> install</span></code></pre></div>
 <p>which will install the dependencies and then install
 <em>nftfw</em>.</p>
-<p>The <code>dkpg -i</code> command can also be used to update a
-previously installed package to a new version.</p>
+<p>The <code>dkpg -i</code> command is also used to update a previously
+installed package to a new version.</p>
 <p>When installing <em>nftfw</em>, you will be asked if you want to
 change the ownership of the <em>/etc/nftfw</em> directory to allow
 configuration by a non-root user. When <em>nftfw</em> writes files under
@@ -147,7 +155,8 @@ installation using:</p>
 <p>The package will install:</p>
 <ul>
 <li>the Python commands in <em>/usr/bin</em>: <em>nftfw</em>,
-<em>nftfwls</em>, <em>nftfwedit</em> and <em>nftfwadm</em>.</li>
+<em>nftfwls</em>, <em>nftfwedit</em>, <em>nftfwadm</em>,
+<em>nftnetchk</em> and <em>nftfwan</em>.a</li>
 <li>Control files in <em>/etc/nftfw</em>, unless they exist. The
 <em>rule.d</em> directory will be updated. The firewall is populated to
 permit access to commonly used services.</li>
@@ -185,14 +194,19 @@ href="#migrating-a-sympl-or-symbiosis-firewall">Migrating a Sympl or
 Symbiosis firewall</a> below. It’s a good idea to do this now, before
 starting systems that run <em>nftfw</em> automatically.</p>
 <h3 id="loading-the-rules">Loading the rules</h3>
-<p>Load the rules into the kernel:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-f</span> <span class="at">-v</span> load</span></code></pre></div>
-<p><em>nftfw</em> will tell you what it’s done. If you are moving from
-an <em>iptables</em> system, the command may fail complaining that the
-tables are in use. In this case, run</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo iptables-nft <span class="at">-F</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo ip6tables-nft <span class="at">-F</span></span></code></pre></div>
-<p>and run the <em>load</em> command again.</p>
+<p>If you are moving from an <em>iptables</em> system, it’s important to
+flush the <em>iptables</em> system, use</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo iptables-nft <span class="at">-F</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo ip6tables-nft <span class="at">-F</span></span></code></pre></div>
+<p>it is possible to have both live <em>iptables</em> and
+<em>nftables</em> on the system, and you may get confusing results.
+Alternatively, the kernel may complain when <em>nftfw</em> tries to load
+its tables.</p>
+<p>Load the <em>nftfw</em> rules into the kernel:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-f</span> <span class="at">-v</span> load</span></code></pre></div>
+<p><em>nftfw</em> will tell you what it’s done. If the kernel complains,
+ensure that the <em>iptables</em> rules are flushed, and run the
+<em>load</em> command again.</p>
 <h3 id="look-at-the-nftables-rules">Look at the nftables rules</h3>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft list ruleset ip <span class="kw">|</span> <span class="fu">less</span></span></code></pre></div>
 <p>for ipv4 and</p>
@@ -207,12 +221,15 @@ class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#
 <div class="sourceCode" id="cb11"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft flush ruleset</span></code></pre></div>
 <h3 id="changing-config.ini">Changing <em>config.ini</em></h3>
-<p>The <em>nftables.conf</em> file is the input file for the
-<em>nftables</em> system and is what <em>nftfw</em> creates. For safety,
-the distributed version writes the file in
+<p>The <em>nftables.conf</em> file is the input configuration file for
+the <em>nftables</em> system and is the output of <em>nftfw</em>. For
+safety, the distributed version writes the file in
 <em>/etc/nftfw/nftables.conf</em>. The file here can be deleted. You
 need to tell <em>nftfw</em> to write the file in the correct place - in
-<em>/etc</em>.</p>
+<em>/etc/nftables.conf</em>. With the <em>nftables.conf</em> file
+installed in /etc, the <em>nftables</em> system will load from it on
+system boot. Once the system is running, <em>nftfw</em> will reload the
+kernel from this file when a new version is created.</p>
 <p>Edit <em>/etc/nftfw/config.ini</em> to correctly site the
 <em>nftables.conf</em> file:</p>
 <pre class="text"><code>#  Location of system nftables.conf
@@ -256,8 +273,8 @@ system.</p>
 <div class="sourceCode" id="cb17"><pre
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd /etc/network</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># put into a safe place - in case you want to revert</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mv if-up.d/symbiosis-firewall ~/up-symbiosis-firewall</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mv if-down.d/symbiosis-firewall ~/down-symbiosis-firewall</span></code></pre></div>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mv if-up.d/sympl-firewall ~/up-sympl-firewall</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mv if-down.d/sympl-firewall ~/down-sympl-firewall</span></code></pre></div>
 <p>Symbiosis has similar files prefixed by <em>symbiosis</em> that
 should be removed or saved.</p>
 <h3 id="you-are-done">You are done</h3>
@@ -362,107 +379,6 @@ settings:</p>
 class="sourceCode sh"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-f</span> <span class="at">-v</span> load</span></code></pre></div>
 <p>you can check the rules using the <em>nft</em> commands</p>
 <p>If are are here from the text above, <a
-href="#loading-the-rules">return to Loading the rules</a>. Otherwise, if
-you are upgrading a manually installed firewall, complete the end of
-Section 3 below.</p>
-<h3 id="manually-installed-nftfw">Manually installed <em>nftfw</em></h3>
-<p>There have been some small changes in the way that <em>nftfw</em>
-works that have been developed to make things simpler for users, and
-also to remove some of the lesser used features. Mostly, the package
-installs and expects its control files in <em>/etc/nftfw</em> and will
-use working files in <em>/var/lib/nftfw</em>.</p>
-<p>There are a small number of steps that are needed to switch to the
-package version, the idea here is to retain a working firewall while you
-are upgrading.</p>
-<h4 id="stop-cron-and-systemd">1. Stop cron and systemd</h4>
-<p>The first thing to do is to stop the background processes that will
-fire up <em>nftfw</em> in the background.</p>
-<p>First cron:</p>
-<div class="sourceCode" id="cb28"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo rm /etc/cron.d/nftfw</span></code></pre></div>
-<p>and then if you’ve loaded the <em>systemd</em> files as per the
-installation instructions:</p>
-<div class="sourceCode" id="cb29"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo rm /etc/systemd/system/nftfw.path /etc/systemd/system/nftfw.service</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl daemon-reload</span></code></pre></div>
-<h4 id="update-your-source-distribution">2. Update your source
-distribution</h4>
-<p>You are going to need some scripts to help you to migrate and also
-later to remove the installed source distribution. You don’t need (and
-shouldn’t) install or update anything.</p>
-<h4 id="are-you-using-part-of-the-symplsymbiosis-firewall">3. Are you
-using part of the Sympl/Symbiosis firewall?</h4>
-<p>The latest version of <em>nftfw</em> does not support
-<em>nftfw_base</em> in <em>config.ini</em> that used to point to
-<em>/etc/{sympl,symbiosis}/firewall</em>. If you are not using this
-feature, then skip to section 4.</p>
-<p>Otherwise you need to unwind the linkage and ensure that all the
-<em>nftfw</em> information is derived from files in
-<em>/usr/local/etc/nftfw</em>. This can be done with the
-<em>import_to_nftfw.py</em> tool. The command will work to move the
-current settings from <em>firewall</em> into the directories in
-<em>/usr/local/etc/nftfw</em>. The help information in the tool talks
-about moving files into <em>/etc/nftfw</em>, but the tool will work to
-install files in <em>/usr/local/etc/nftfw</em> as long as
-<em>/etc/nftfw</em> doesn’t exist. When using the tool, you won’t need
-to update the database. See <a
-href="#migrating-a-sympl-or-symbiosis-firewall">Migrating a Sympl or
-Symbiosis firewall</a> above, then return to complete the para
-below.</p>
-<p>Copy the new version of <em>nftfw_init.nft</em> from
-<em>etc_nftfw</em> in the source directory to
-<em>/usr/local/etc/nftfw</em>. There are some recent changes in this
-file. Having updated <em>/usr/local/etc/nftfw</em>, you can edit
-<em>config.ini</em> to remove or comment out the definition for
-<em>nftfw_base</em> and your current version of <em>nftfw</em> can be
-used to update the firewall. If you want to check that it’s all working
-as expected:</p>
-<div class="sourceCode" id="cb30"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw <span class="at">-x</span> <span class="at">-f</span> load</span></code></pre></div>
-<p>can be used to test loading from the source files without affecting
-the firewall.</p>
-<h4 id="delete-the-nftfw_-installation">4. Delete the nftfw_
-installation</h4>
-<p>Return to the source distribution and run:</p>
-<div class="sourceCode" id="cb31"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd _your source_</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo ./Uninstall.sh</span></code></pre></div>
-<p>It will search for what’s installed and where on your system, and ask
-if you want to delete it.</p>
-<ul>
-<li>On the first run, say ‘y’ to the dry-run question, it will print the
-commands that it intends to run.</li>
-<li>To retain the control directories, answer ‘no’ to ‘Remove nftfw
-controls’. Cautious people may like to backup the two control
-directories to say <em>/tmp</em> before running the script.</li>
-<li>Say ‘yes’ to all the other questions.</li>
-</ul>
-<p>The script will ask you to confirm your selection before actually
-doing the deletion deed.</p>
-<h4 id="move-your-directories">5. Move your directories</h4>
-<div class="sourceCode" id="cb32"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mv /usr/local/etc/nftfw /etc</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo mv /usr/local/var/lib/nftfw /var/lib</span></code></pre></div>
-<p><em>nftfw</em> will find the files the next time it’s run.</p>
-<h4 id="ready-for-package-installation-now">6. Ready for package
-installation now</h4>
-<p>The package will install several new and amended rules in
-<em>/etc/nftfw/rule.d</em>. It’s also a good idea to remove
-<em>/etc/nftfw/config.ini</em> and <em>/etc/nftfw/nftfw_init.ini</em>
-before installing the package. They will be reinstalled from up-to-date
-versions.</p>
-<p>The new versions ensure that the rules match the
-<em>nftfw_init.nft</em> template. Also, importantly, the installed
-<em>config.ini</em> will not make <em>nftfw</em> write into
-<em>/etc/nftables.conf</em> until you edit the value. The installation
-will write its versions in <em>/etc/nftfw/nftables.conf</em>, which can
-be deleted later. The <em>config.ini</em> file will need editing as part
-on the commissioning process to make <em>nftfw</em> install the file in
-<em>/etc</em>.</p>
-<p>If things go wrong, you can always load the firewall settings from
-<em>/etc/nftables.conf</em> using:</p>
-<div class="sourceCode" id="cb33"><pre
-class="sourceCode sh"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nft <span class="at">-f</span> /etc/nftfables.conf</span></code></pre></div>
-<p>Return to <a href="#install-the-package">Install the package</a>.</p>
+href="#loading-the-rules">return to Loading the rules</a>.</p>
 </body>
 </html>

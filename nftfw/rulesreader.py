@@ -1,48 +1,153 @@
-"""nftfw RulesReader class
+"""Shell script rule execution system for nftfw firewall generation.
 
-Rules are small shell scripts which are accessed from the firewall
-directory, they are used to generate nft commands. They live in rule.d
-with local variations installed in local.d
+This module provides the RulesReader class for managing and executing small
+shell scripts that generate nftables commands. Rules are stored in rule.d with
+optional local overrides in local.d.
 
+Key Features:
+    - Lazy loading and caching of rule scripts (singleton pattern)
+    - Local override support (local.d overrides rule.d)
+    - Syntax validation on first instantiation
+    - Secure execution with user/group demotion
+    - Environment variable support for rule scripts
+    - Comprehensive error handling and reporting
+
+Architecture:
+    Rules are small shell scripts that generate nftables commands when executed
+    with specific environment variables. The class uses a singleton pattern to
+    load rules once and share them across all instances.
+
+    Directory structure:
+        - rule.d/: System-provided rule scripts (*.sh files)
+        - local.d/: Local overrides and custom rules (*.sh files)
+
+    Loading priority:
+        local.d files override rule.d files with the same name (stem)
+
+Usage Example:
+    from .config import Config
+    from .rulesreader import RulesReader
+
+    cf = Config()
+    reader = RulesReader(cf)  # Loads and validates all rules
+
+    # Check if a rule exists
+    if reader.exists('ssh'):
+        # Execute rule with environment variables
+        env = {'PROTO': 'tcp', 'PORT': '22'}
+        result = reader.execute('ssh', env)
+        print(result)  # nftables commands
+
+    # Iterate over all rules
+    for name, content in reader.items():
+        print(f"Rule {name}: {len(content)} bytes")
+
+Security:
+    - Shell scripts are executed with demoted privileges (cf.execuid/execgid)
+    - Scripts run in new session (start_new_session=True)
+    - Empty environment unless explicitly provided
+    - Syntax validation prevents loading broken scripts
+
+See Also:
+    - fwmanage.py: Main consumer of RulesReader for firewall generation
+    - ruleserr.py: Defines RulesReaderError exception
+    - firewallreader.py: Reads firewall rule definitions that reference rules
 """
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Iterator
+from pathlib import Path
 import os
 import subprocess
 import logging
+
 from .ruleserr import RulesReaderError
+
+if TYPE_CHECKING:
+    from .config import Config
+
 log = logging.getLogger('nftfw')
 
 class RulesReader:
-    """ RulesReader class
+    """Shell script rule loader and executor with singleton caching.
 
-    Parameter: config class
+    This class loads shell script rules from rule.d and local.d directories,
+    validates their syntax, and provides methods to execute them with
+    environment variables. Rules are loaded once and cached at class level,
+    so all instances share the same rule set.
 
-    when initialised reads rules and creates a dict of rule names and
-    content
+    The class performs these operations on first instantiation:
+        1. Scans rule.d for *.sh files
+        2. Scans local.d for *.sh files (overrides rule.d)
+        3. Reads all file contents into memory
+        4. Validates syntax by executing each rule with empty environment
+        5. Raises RulesReaderError if any validation fails
 
-    Also syntax checks all the files on first instantiation
+    Attributes:
+        cf: Config instance for accessing paths and execution credentials
+        rules_store: Class-level cache of rule content (name → content)
+        rules_dir: Class-level cache of rule file paths (name → Path)
 
-    Provides method to execute the rule using a known enviroment
+    Example:
+        # First instantiation loads and validates all rules
+        cf = Config()
+        reader = RulesReader(cf)  # May raise RulesReaderError
 
-    Can raise RulesReaderError exception placed in a separate file to
-    allow external access without this file having to be imported
+        # Check and execute a rule
+        if reader.exists('webserver'):
+            env = {'PROTO': 'tcp', 'PORTS': '80,443'}
+            nft_cmds = reader.execute('webserver', env)
+
+        # Iterate over all available rules
+        for name in reader.keys():
+            print(f"Available rule: {name}")
+
+    Note:
+        - Rules are cached at class level, not instance level
+        - Local.d files override rule.d files with same stem
+        - Syntax validation happens only on first instantiation
+        - All shell scripts execute with demoted privileges
+
+    Raises:
+        RulesReaderError: If any rule script has syntax errors during init
     """
 
-    # The rules that are read need to be shared across all versions of
-    # this class, they are stored in this static Class variable, and
-    # then can be accessed using the property rules
-    rules_store = None
-    # maps keys to files
-    rules_dir = None
+    # Class-level storage for shared rule content (singleton pattern)
+    # Populated on first instantiation, then shared across all instances
+    rules_store: dict[str, str] | None = None
+    rules_dir: dict[str, Path] | None = None
 
-    def __init__(self, cf):
-        """ Initialise Rules
-        Parameters
-        ----------
-        cf : Config
+    def __init__(self, cf: Config) -> None:
+        """Initialize RulesReader and load rules on first instantiation.
+
+        On first call, this method:
+            1. Loads all *.sh files from rule.d and local.d
+            2. Merges them (local.d overrides rule.d)
+            3. Reads file contents into class-level cache
+            4. Validates syntax of all rules
+
+        On subsequent calls, uses cached rules from class-level storage.
+
+        Args:
+            cf: Config instance providing directory paths and execution UIDs
+
+        Raises:
+            RulesReaderError: If any rule script fails syntax validation
+
+        Example:
+            # First instance loads and validates
+            cf = Config()
+            reader1 = RulesReader(cf)  # Loads from disk, validates
+
+            # Second instance uses cached rules
+            reader2 = RulesReader(cf)  # Uses class-level cache
+
+        Note:
+            - Syntax validation uses demoted privileges (cf.execuid/execgid)
+            - Empty rules (files with no content) are skipped
+            - rules_store and rules_dir are shared across all instances
         """
-
-        self.cf = cf
+        self.cf: Config = cf
         if RulesReader.rules_store is None:
             localpath = cf.etcpath('local')
             rulepath = cf.etcpath('rule')
@@ -67,41 +172,154 @@ class RulesReader:
             self.checksyntax()
 
     @property
-    def rules(self):
-        """ property to access the rules """
-        return RulesReader.rules_store
+    def rules(self) -> dict[str, str]:
+        """Access class-level rules cache.
+
+        Returns:
+            Dictionary mapping rule names to their shell script content.
+
+        Example:
+            reader = RulesReader(cf)
+            all_rules = reader.rules
+            print(f"Loaded {len(all_rules)} rules")
+
+        Note:
+            - Returns class-level storage (shared across all instances)
+            - Never returns None after successful initialisation
+        """
+        return RulesReader.rules_store  # type: ignore[return-value]
 
     @property
-    def rulesdir(self):
-        """ property to access the rulesdir """
-        return RulesReader.rules_dir
+    def rulesdir(self) -> dict[str, Path]:
+        """Access class-level rules directory mapping.
 
-    def items(self):
-        """ Return iterable items """
+        Returns:
+            Dictionary mapping rule names to their file paths.
+
+        Example:
+            reader = RulesReader(cf)
+            for name, path in reader.rulesdir.items():
+                print(f"Rule {name} from {path}")
+
+        Note:
+            - Used primarily for error reporting and testing
+            - Returns class-level storage (shared across all instances)
+        """
+        return RulesReader.rules_dir  # type: ignore[return-value]
+
+    def items(self) -> Iterator[tuple[str, str]]:
+        """Iterate over rule name and content pairs.
+
+        Yields:
+            Tuple of (rule_name, script_content) for each rule.
+
+        Example:
+            reader = RulesReader(cf)
+            for name, content in reader.items():
+                print(f"{name}: {len(content)} bytes")
+                if 'tcp' in content:
+                    print(f"  Rule {name} uses TCP")
+
+        Note:
+            - Yields in arbitrary order (dict iteration order)
+            - Content is the raw shell script as string
+        """
         for k, v in self.rules.items():
             yield (k, v)
 
-    def exists(self, key):
-        """ Check if a rule exists """
-        return key in self.rules
+    def exists(self, key: str) -> bool:
+        """Check if a rule exists in the cache.
 
-    def contents(self, key):
-        """ Return contents of a rule """
-        return self.rules[key]
+        Args:
+            key: Rule name (stem of the .sh file)
 
-    def keys(self):
-        """ Return key list """
-        for k in self.rules.keys():
-            yield k
+        Returns:
+            True if rule exists, False otherwise.
 
-    def checksyntax(self):
-        """ Run all commands through shell
-        Abandon and raise error if this fails
-        Run on first instanciation of the class
+        Example:
+            reader = RulesReader(cf)
+            if reader.exists('ssh'):
+                result = reader.execute('ssh', env)
+            else:
+                print("SSH rule not found")
+
+        Note:
+            - Always check exists() before calling execute() or contents()
+            - Case-sensitive match on rule name
         """
+        return key in self.rules  # pylint: disable=unsupported-membership-test
 
-        env = {}
-        errorkeys = []
+    def contents(self, key: str) -> str:
+        """Get shell script content for a rule.
+
+        Args:
+            key: Rule name (stem of the .sh file)
+
+        Returns:
+            Shell script content as string.
+
+        Raises:
+            KeyError: If rule doesn't exist (should check with exists() first)
+
+        Example:
+            reader = RulesReader(cf)
+            if reader.exists('webserver'):
+                script = reader.contents('webserver')
+                print(script)
+
+        Note:
+            - Returns raw shell script content
+            - Prefer execute() to get actual nftables commands
+        """
+        return self.rules[key]  # pylint: disable=unsubscriptable-object
+
+    def keys(self) -> Iterator[str]:
+        """Iterate over all rule names.
+
+        Yields:
+            Rule name (stem of each .sh file).
+
+        Example:
+            reader = RulesReader(cf)
+            print("Available rules:")
+            for name in reader.keys():
+                print(f"  - {name}")
+
+        Note:
+            - Yields in arbitrary order (dict iteration order)
+            - Use exists() to check for a specific rule
+        """
+        yield from self.rules.keys()
+
+    def checksyntax(self) -> None:
+        """Validate syntax of all loaded rules by executing them.
+
+        This method executes each rule with an empty environment to check for
+        shell syntax errors. If any rule fails, it raises RulesReaderError with
+        a list of problematic files. Called automatically during first __init__.
+
+        Raises:
+            RulesReaderError: If any rule has syntax errors. The error message
+                             lists all failing rules in format "dir/file.sh".
+
+        Example:
+            # Usually called automatically during __init__
+            reader = RulesReader(cf)  # checksyntax() runs here
+
+            # Can be called manually for testing
+            try:
+                reader.checksyntax()
+            except RulesReaderError as e:
+                print(f"Syntax errors: {e}")
+
+        Note:
+            - Executes each rule with empty environment dict
+            - Collects all errors before raising (not fail-fast)
+            - Error messages include parent directory name for clarity
+            - Uses demoted privileges during validation
+        """
+        env: dict[str, str] = {}
+        errorkeys: list[str] = []
         for key in self.keys():
             try:
                 self.execute(key, env)
@@ -109,9 +327,9 @@ class RulesReader:
                 errorkeys.append(key)
 
         if any(errorkeys):
-            errorfiles = []
+            errorfiles: list[str] = []
             for key in errorkeys:
-                errpath = self.rulesdir[key]
+                errpath = self.rulesdir[key]  # pylint: disable=unsubscriptable-object
                 filename = errpath.name
                 parentname = errpath.parent.name
                 shortname = f'{parentname}/{filename}'
@@ -120,42 +338,82 @@ class RulesReader:
             errstr = f'Syntax problems with {errors}. Run /bin/sh on files to check for errors.'
             raise RulesReaderError(errstr)
 
-    def demote(self):
-        """ Demote owner of shell scripts
+    def demote(self) -> None:
+        """Demote privileges for shell script execution (preexec_fn callback).
 
-            In 3.9, subprocess.run has user and group arguments
-            but they are not there in 3.7, so this technique has
-            to be used
+        This method is called by subprocess.run via preexec_fn to drop root
+        privileges before executing shell scripts. It sets the effective GID
+        and UID to cf.execgid and cf.execuid (typically 'nobody' user).
+
+        Only demotes if currently running as root (UID 0). If not root, this
+        is a no-op to allow testing without root privileges.
+
+        Example:
+            # Used internally by execute() via preexec_fn
+            subprocess.run('/bin/sh', preexec_fn=self.demote, ...)
+
+        Note:
+            - Called in child process before script execution
+            - GID must be set before UID (security requirement)
+            - Required for Python 3.6/3.7 (3.9+ has user/group params)
+            - No-op if not running as root (for testing)
+
+        Security:
+            - Prevents shell scripts from running with root privileges
+            - Uses 'nobody' user (or configured execuid/execgid)
+            - Combined with start_new_session for isolation
         """
-
         if os.getuid() == 0:
             os.setgid(self.cf.execgid)
             os.setuid(self.cf.execuid)
 
-    def execute(self, key, env):
-        """ Execute a rule
+    def execute(self, key: str, env: dict[str, str]) -> str:
+        """Execute a rule script with environment variables.
 
-        Parameters
-        ----------
-        key : str
-        env : Dict
+        This method executes a shell script rule by:
+            1. Validating the rule exists
+            2. Running /bin/sh with script content as stdin
+            3. Passing environment variables to the script
+            4. Demoting to cf.execuid/execgid before execution
+            5. Capturing stdout as the result
 
-        Returns
-        -------
-        str - result of shell script
+        Args:
+            key: Rule name (stem of the .sh file)
+            env: Environment variables to pass to the script (e.g., {'PROTO': 'tcp'})
 
-        raises exceptions on errors
+        Returns:
+            Shell script stdout as string (typically nftables commands).
 
-        key should be checked for validity before calling execute
+        Raises:
+            RulesReaderError: If rule doesn't exist, returns non-zero exit code,
+                             or writes to stderr.
 
-        Demote running to a mortal user - if that user is available
+        Example:
+            reader = RulesReader(cf)
 
-        This is codes much more easily in 3.7, but has been coded
-        with 3.6 API to support subprocess
+            # Execute SSH rule with TCP protocol
+            env = {'PROTO': 'tcp', 'PORT': '22'}
+            nft_cmds = reader.execute('ssh', env)
+            print(nft_cmds)  # nftables add rule commands
+
+            # Execute with multiple ports
+            env = {'PROTO': 'tcp', 'PORTS': '80,443'}
+            result = reader.execute('webserver', env)
+
+        Security:
+            - Script runs with demoted privileges (cf.execuid/execgid)
+            - Starts new session (start_new_session=True) for isolation
+            - Only provided environment variables are available
+            - stderr output causes failure (prevents warning leakage)
+
+        Note:
+            - Check exists() before calling to avoid RulesReaderError
+            - Scripts receive content via stdin, not as file
+            - Both returncode != 0 and stderr != '' cause errors
+            - Compatible with Python 3.6+ (uses preexec_fn, not user/group)
         """
-
         if key not in self.rules.keys():
-            err = 'Attempted to use unknown rule {key}'
+            err = f'Attempted to use unknown rule {key}'
             raise RulesReaderError(err)
 
         compl = subprocess.run('/bin/sh',
@@ -164,9 +422,9 @@ class RulesReader:
                                stderr=subprocess.PIPE,
                                env=env,
                                check=False,
-                               preexec_fn = self.demote,
-                               # user=self.cf.execuid,
-                               # group=self.cf.execgid,
+                               preexec_fn=self.demote,
+                               # user=self.cf.execuid,  # Python 3.9+
+                               # group=self.cf.execgid,  # Python 3.9+
                                start_new_session=True)
 
         if compl.returncode != 0:

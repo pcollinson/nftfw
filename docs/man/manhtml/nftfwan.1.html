@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NFTFWAN(1) | Nftfw documentation</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="pandoc.css" />
+  <link rel="stylesheet" href="nftfw.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">NFTFWAN(1) | Nftfw documentation</h1>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>nftfwan</strong> — command line tool to analyse the counters
+installed by <strong>nftfw</strong> into <strong>nftables</strong></p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<div class="line-block"><strong>nftfwan</strong> [<strong>-h</strong>]
+[<strong>-f</strong> <em>FILE</em>] [<strong>-4 |-6 | -u | -p | -r | -n
+</strong>]</div>
+<h1 id="description">DESCRIPTION</h1>
+<p><strong>nftfwan</strong> is a command line tool that reads the some
+of counters from the <strong>nftfw</strong> firewall running in
+<strong>nftables</strong>. This data is provided by
+<strong>nftfables</strong> in JSON format and requires parsing to obtain
+the counters. <strong>nftfwan</strong> needs to be run by the super user
+to have the necessary permission to read the data.</p>
+<p>The aim of <strong>nftfwan</strong> is to get a measure of what is
+happening to the inbound connections to the system. It gives an overall
+view of the type of traffic a system is subjected to, how much of that
+traffic is blocked by the firewall systems, how much is filtered into
+the applications with open ports, and how much is simply ignored. The
+script is not ‘general purpose’, it uses knowledge of the flow of
+packets through the firewall provided with the <strong>nftfw</strong>
+system and may not provide correct numbers if this flow is changed.</p>
+<p>The script reads the data from the kernel and outputs two tables,
+that are ‘pretty printed’. The first shows ‘Usage’, the general flow
+through the firewall, the numbers are computed from the counts of
+packets entering a particular filter. The rows named in the first column
+and are:</p>
+<ul>
+<li>IP Connects - the number of external IP connects</li>
+<li>Whitelist - the number of connects that have been accepted for
+whitelisting</li>
+<li>Blacknets - the number of connects that have been rejected by the
+<em>blacknets</em> system</li>
+<li>Blacklist - the number of connects that have been rejected by the
+<em>blacklist</em> system</li>
+<li>To firewall - the number of connects that have been passed into the
+<em>incoming</em> chain, looking for matches with specified ports</li>
+<li><em>Firewall processing</em> - a separator to mark that the rows
+below are taken from the <em>incoming</em> chain and the total used for
+percentages changes</li>
+<li>Accepted packets - how many connections have been accepted for
+processing by the filter in <em>incoming</em></li>
+<li>Dropped packets - how may connections didn’t find a destination in
+<em>incoming</em></li>
+</ul>
+<p>The second table ‘Service’ breaks down accepted connections in
+<em>incoming</em> by service type. The first column shows the service
+name if it is shown if the port number appears in the standard
+<em>/etc/services</em> file on the system., otherwise the port number is
+displayed.</p>
+<p>Both tables show numbers for IPv4, IPv6 and a total in subsequent
+columns. Arguments to the script can reduce the columns that are
+displayed.</p>
+<h2 id="options">Options</h2>
+<dl>
+<dt><strong>-h</strong>, <strong>--help</strong></dt>
+<dd>
+<p>Prints brief usage information.</p>
+</dd>
+<dt><strong>-4</strong>, <strong>--ip</strong></dt>
+<dd>
+<p>Restrict output to IPv4</p>
+</dd>
+<dt><strong>-6</strong>, <strong>--ip6</strong></dt>
+<dd>
+<p>Restrict output to IPv6</p>
+</dd>
+<dt><strong>-u </strong>, <strong>--usage</strong></dt>
+<dd>
+<p>Only output usage information</p>
+</dd>
+<dt><strong>-p </strong>, <strong>--ports</strong></dt>
+<dd>
+<p>Only output port information</p>
+</dd>
+<dt><strong>-n</strong>, <strong>--noborders</strong></dt>
+<dd>
+<p>Don’t print borders to the tables</p>
+</dd>
+<dt><strong>-r</strong>, <strong>--raw</strong></dt>
+<dd>
+<p>Print decoded data from the kernel and exit. Prints IPv4 and IPv6
+unless -4 or -6 is included. This is a debugging aid.</p>
+</dd>
+<dt><strong>-f </strong>, <strong>--file</strong> FILE</dt>
+<dd>
+<p>Read data from the file. This is a debugging aid.</p>
+</dd>
+</dl>
+<h1 id="files">FILES</h1>
+<dl>
+<dt><em>/etc/nftfw</em> or <em>/usr/local/etc/nftfw</em></dt>
+<dd>
+<p>Location of control files</p>
+</dd>
+<dt><em>/var/lib/nftfw/</em> or <em>/usr/local/var/lib/nftfw</em></dt>
+<dd>
+<p>Location of <em>build</em>, <em>install</em>, lock file and sqlite3
+database storing file positions and blacklist information</p>
+</dd>
+</dl>
+<h1 id="bugs">BUGS</h1>
+<p>See GitHub Issues: <a
+href="https://github.com/pcollinson/nftfw/issues"
+class="uri">https://github.com/pcollinson/nftfw/issues</a></p>
+<h1 id="author">AUTHOR</h1>
+<p>Peter Collinson</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p><strong>nft(1)</strong>, <strong>nftfwls(1)</strong>,
+<strong>nftfwedit(1)</strong>, <strong>nftnetchk(1)</strong>,
+<strong>nftfwadm(1)</strong>, <strong>nftfw-config(5)</strong>,
+<strong>nftfw-files(5)</strong></p>
+</body>
+</html>

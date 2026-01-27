@@ -40,9 +40,9 @@ $ ls
 10-http        30-imap         50-smtp   99-drop
 ```
 
-Some of the filenames in the directory access 'rules' in the _rule.d_ directory. There's more information on the manual page in [_nftfw_files_](man/nftfw-files.5.md) in man section 5.
+Some of the filenames in the directory access 'rules' in the _rule.d_ directory. For example, _99_drop_ uses a shell script called _drop.sh_ in the _rule.d_ directory that generate the _nftables_ text that's needed at this point in the firewall. There's more information on the manual page in [_nftfw_files_](man/nftfw-files.5.md) in man section 5.
 
-Each file makes a rule for the firewall, and starts with a two digit number that supplies the ordering of the rules. A new entry needs to be adding before the _99-reject_ rule. So let's pick '70' for that.
+Each filename makes a rule for the firewall, and starts with a two digit number that supplies the ordering of the rules. A new entry needs to be adding before the _99-drop_ rule. So let's pick '70' for that.
 
 The rest of the filename can be a port number or the service name, but that must be in _/etc/services_. Let's say we want to add access to our name server, and that's on port 53, called _domain_ in _/etc/services_. We can either add _70-domain_ or _70-53_. The easiest way to do this is to use the _touch_ command (you may have to use _sudo_):
 
@@ -50,7 +50,7 @@ The rest of the filename can be a port number or the service name, but that must
 $ touch 70-domain
 ```
 
-because the file is empty, connections from any IP address may access this service.
+because the file is empty, connections from any IP address may access this service. These service rules use the _accept.sh_ script in _rule.d_ to generate the necessary content.
 
 The command:
 ``` sh
@@ -93,10 +93,10 @@ $ touch '203.0.113.0|24'
 
 If you put the full address from the _host_ command into the directory, *nftfw* will 'normalise' the address to replace the 134 by zero.
 
-For IPv6 addresses we always match the first 64 bits of the address. IPv6 addresses are abbreviated by writing '::' for any sequences of  zeros in the address, so to allow their IPv6 address you can write:
+For IPv6 addresses we always match the first 112 bits of the address. IPv6 addresses are abbreviated by writing '::' for any sequences of  zeros in the address, so to allow their IPv6 address you can write:
 
 ``` sh
-$ touch '2001:db8::|64'
+$ touch '2001:db8::|112'
 ```
 
 You may find some files ending with _.auto_ in the directory, the whitelist scanner has installed these when it's found that a user has logged in from the address. The scanner will look after these, and will expire them automatically after 90 days.
@@ -113,7 +113,14 @@ $ echo 22 >> '203.0.113.0|24'
 
 The _blacklist.d_ directory uses the same convention for files used for the whitelist. Simply create a file named for the IP address in the directory.
 
-The blacklist scanner will automatically create files in the directory ending in _.auto_ when it finds sites that are misbehaving. The scanner uses files in the _patterns.d_ directory to find log files to scan, and how to interpret lines in the log files as bad.
+The blacklist scanner will automatically create files in the directory ending in _.auto_ when it finds sites that are misbehaving. The scanner uses files in the _patterns.d_ directory to find log files to scan, and how to interpret lines in the log files as bad. By default, _nftfw_ will log repeated accesses from a blocked site by writing a line in the _syslog_ file. In this case, a pattern _blacklist_update.patterns_ is used to detect the event and will update the internal database, so this particular address does not time out and eventually be removed from the firewall.
+
+If you want to make your known bad address behave as if it had been detected and installed by the blacklist scanner then you should use the _nftfwedit_ command to add it to the database and the _blacklist.d_ directory. For example:
+
+``` sh
+$ sudo nftfwedit -b -p 80,443 -n local BAD.IP.AD.DR
+```
+you need to give a port that should be blocked, in this case a set of ports; a name that's used when displaying the record in _nftfwls_, in this case 'local'; and the IP address to block. This also allows _nftfw_ to time out the address if it doesn't re-appear.
 
 ## How do I: Block access to countries?
 
@@ -145,7 +152,7 @@ You'll see that most rules have counters, so you can see what has happened in th
 
 ## How do I: Check what the blacklist scanner is doing?
 
-The blacklist scanner uses files in the _patterns.d_ directory. Each file here supplies a file (or files) processed  by the scanner, a port number (or a comma-separated list) used for blocking and a set of regular expressions that match the lines in the log files indicating bad behaviour.
+The blacklist scanner uses files in the _patterns.d_ directory. Each file here supplies a file (or files) processed by the scanner, a port number (or a comma-separated list) used for blocking and a set of regular expressions that match the lines in the log files indicating bad behaviour.
 
 You can find out what's blocked on your system by using:
 
@@ -190,7 +197,7 @@ and add your regular expression. Now say:
 ``` sh
 $ sudo nftfw -x -p PATTERN blacklist
 ```
-and this will print a table showing the number of matches that the expression has detected. The PATTERN is the name of your file but without the _.pattern_ appended. The _-x_ option makes the program print a table, and also starts scanning the file from the beginning and doesn't record where it found the end of the file, so using this command will not interfere with normal processing.
+and this will print a table showing the number of matches that the expression has detected. The PATTERN is the name of your file but without the _.patterns_ appended. The _-x_ option makes the program print a table, and also starts scanning the file from the beginning and doesn't record where it found the end of the file, so using this command will not interfere with normal processing.
 
 The blacklist scanner normally ignores pattern files with _ports=test_, so it's safe to leave these files in place.
 

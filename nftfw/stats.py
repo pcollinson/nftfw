@@ -1,19 +1,66 @@
-""" nftfw - statistics """
+"""Statistics and time formatting utilities for nftfw.
 
-def duration(first, last):
-    """Evaluate duration
+This module provides utility functions for formatting time durations and
+calculating event frequencies. Used primarily by the database listing
+utilities (nftfwls, nftnetchk) to display human-readable time statistics
+about blacklist entries and network blocks.
 
-    Parameters
-    ----------
-    first : int
-        First timestamp
-    last : int
-        Last timestamp
+Functions:
+    duration: Format time span between two timestamps
+    frequency: Calculate event rate (per day/hour/minute)
 
-    Returns
-    -------
-    str
-        Formatted string
+Example:
+    Displaying database entry statistics::
+
+        from nftfw.stats import duration, frequency
+        import time
+
+        first_seen = 1636000000
+        last_seen = 1636090000
+        match_count = 150
+
+        # Show how long the activity lasted
+        dur = duration(first_seen, last_seen)
+        print(f"Duration: {dur}")  # "1d 01h"
+
+        # Show event frequency
+        freq = frequency(first_seen, last_seen, match_count)
+        print(f"Frequency: {freq}")  # "6/hr"
+
+See Also:
+    - nftfwls: Uses these functions for blacklist database display
+    - nftnetchk: Uses these functions for network blacklist display
+"""
+
+from __future__ import annotations
+
+
+def duration(first: int, last: int) -> str:
+    """Format duration between two timestamps.
+
+    Calculates the time span between two Unix timestamps and returns a
+    human-readable formatted string. Only displays durations of 1 minute
+    or longer. Uses compact format: days+hours, hours+minutes, or minutes only.
+
+    Args:
+        first: Unix timestamp of start time
+        last: Unix timestamp of end time
+
+    Returns:
+        Formatted duration string:
+        - "DDd HHh" for durations over 24 hours (e.g., " 5d 03h")
+        - "HHh MMm" for durations over 1 hour (e.g., " 3h 45m")
+        - "MMm" for durations over 1 minute (e.g., "15m")
+        - Empty string for durations under 1 minute or if last <= first
+
+    Example:
+        Format various durations::
+
+            duration(1000000, 1000060)   # ""        (1 minute, minimum threshold)
+            duration(1000000, 1000120)   # "02m"     (2 minutes)
+            duration(1000000, 1007200)   # " 2h 00m" (2 hours)
+            duration(1000000, 1090800)   # " 1d 01h" (25 hours)
+            duration(1090800, 1000000)   # ""        (negative, returns empty)
     """
 
     ret = ''
@@ -29,33 +76,51 @@ def duration(first, last):
     hh, mm = divmod(mm, 60)
     if hh > 24:
         dd, hh = divmod(hh, 24)
-        #ret = "%2dd %02dh" % (dd, hh)
         ret = f"{dd:2d}d {hh:02d}h"
     elif hh > 0:
-        #ret = "%2dh %02dm" % (hh, mm)
         ret = f"{hh:2d}h {mm:02d}m"
     else:
-        #ret = "%02dm" % (mm)
         ret = f"{mm:02d}m"
     return ret
 
-def frequency(first, last, count):
-    """Evaluate frequency
 
-    Parameters
-    ----------
-    first : int
-        First timestamp
-    last : int
-        Last timestamp
-    count : int
-        Count we are looking at
+def frequency(first: int, last: int, count: int) -> str:
+    """Calculate event frequency between two timestamps.
 
-    Returns
-    -------
-    str
-        Frequency or ''
+    Computes the rate of events (per day, hour, or minute) based on the
+    time span and event count. Automatically selects appropriate units
+    and may show multiple scales for high-frequency events.
 
+    Args:
+        first: Unix timestamp of first event
+        last: Unix timestamp of last event
+        count: Number of events in the time span
+
+    Returns:
+        Formatted frequency string:
+        - "N/day" for spans over 24 hours
+        - "N/hr" for spans over 1 hour
+        - "N/min" for spans over 1 minute
+        - Multiple scales for high rates (e.g., "150/day 6/hr")
+        - Empty string for spans under 1 minute or if last <= first
+
+    Example:
+        Calculate various frequencies::
+
+            # 100 events over ~1 day
+            frequency(1000000, 1086400, 100)   # "1/day"
+
+            # 1000 events over ~1 day
+            frequency(1000000, 1086400, 1000)  # "11/day"
+
+            # 2000 events over ~1 day (high frequency, multiple scales)
+            frequency(1000000, 1086400, 2000)  # "23/day"
+
+            # 500 events over 2 hours
+            frequency(1000000, 1007200, 500)   # "250/hr 4/min"
+
+            # 100 events over 30 minutes
+            frequency(1000000, 1001800, 100)   # "3/min"
     """
 
     ret = ''

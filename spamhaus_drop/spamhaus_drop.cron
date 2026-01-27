@@ -1,0 +1,1 @@
+45 03 * * * root /etc/nftfw/spamhaus_drop.d/getdrop

@@ -14,7 +14,10 @@ Manual Section 1
 
 [**nftchkbin** — command line to check if ips in the firewall database are present in blacknets.d files](./nftfwedit.1.md)
 
+[**nftfwan** — analyse _nftables_ counts](./nftfwan.1.md)
+
 [**nftfwadm** — support for installation of **nftfw**](./nftfwadm.1.md)
+
 
 Manual Section 5
 ----------------

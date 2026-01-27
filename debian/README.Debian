@@ -12,8 +12,8 @@ The Debian binary package unpacks into the root of the file system using:
 
 /etc/nftfw         - for control files
 /usr/var/lib/nftfw - for working files and data storage
-/usr/bin           - for the four commands: nftfw, nftfwls, nftfwedit and
-		     nftfwadm.
+/usr/bin           - for the five commands: nftfw, nftfwls, nftfwedit,
+		     nftfwadm and nftnetchk
 /etc/cron.d        - regularly calling the nftfw to perform various tasks
 /usr/lib/systemd/system - making the /etc/nftfw directory structure
 		     active, so a change there causes nftfw to
@@ -40,8 +40,10 @@ import_tool          - import Symbiosis/Sympl setup from /usr/local
 nftfw_router_example - Sample nftfw_init.nft file for use with a
                        router system with multiple interfaces
 nftfwls_web	     - Sample webpage for displaying nftfwls output
-
-
+spamhaus_drop	     - Support for the Spamhaus 'Do not route  or Peer' (DROP)
+		       files that provide lists of networks and IP addresses
+		       that should be completely blocked. The lists are provided
+		       free for all.
 Installation
 ------------
 For full installation instructions see

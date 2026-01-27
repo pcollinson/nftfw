@@ -1,44 +1,24 @@
 # Nftfw - Nftables firewall builder for Debian
 
-The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package and also for Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
+The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was orginally created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package, and was inherited by Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
 
-_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any Debian Buster system or later. It should also work on other Linux distributions derived from Debian. The package is written in Python 3 (version 3.6). These days it's being maintained using Python 3.11, and it now requires at least Python 3.9.
+_nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any current Debian System.  It should also work on other Linux distributions derived from Debian. The package is written in Python and needs at least Python 3.9. This release has been tested using Python 3.11.
 
-_nftfw_ can be installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md) for a how-to guide.
+_nftfw_ is installed from a Debian binary package, there is a zip file called _nftfw_current.zip_ in the [package directory](https://github.com/pcollinson/nftfw/blob/master/package) containing the most recent version. Click on the entries on the README section of this page to automatically download the binary files. For safety, _nftfw_ needs some configuration after installation. See the installation document [Install _nftfw_ from Debian package](docs/Debian_package_install.md) for a how-to guide.
 
 ## New in current release
 
-For full update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog). The current release moves from v0.9.16 to v0.9.20.
+For full update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog).
 
-The v0.9.20 release depends on the Debian version of the Python _nftables_ module. Before running ```dpkg -i``` on the package, do execute:
-``` sh
-apt install python3-nftables
-```
-to make the update of _nftfw_ painless. If you don't, dpkg will stop, and you will need to take remedial action to install things. See above (and below) for a link to the Installation document that explains how to extract yourself from this problem.
+* Every code file for _nftfw_ and the testing suite has been updated (with help from Claude Code) to include full documentation and include modern Python type information. The system now requires a minimum of Python 3.9. Each file has been validated by _pylint_ and _mypy_. There have been no substantial changes to the code in the files. However, it was felt that this change justified the increase in major version number to 1.0.1.
 
-In addition, there is a change to the default settings for the _nftfw_ file in _cron.d_. When installing _dpkg_ will query whether you want to keep your value or take the released one - use the 'D' option to see the differences. You probably want to keep your version, but make the suggested change by hand.
+* The _geoipcountry.py_ code included the removal of two digit CIDR mask values, this has been fixed to support masks from /0 to /999 which assists with IPv6 addresses.
 
-Main changes:
+* Simple support for the Spamhaus 'Do not route or Peer' (DROP)  files that provide lists of networks and IP addresses that should be completely blocked. The lists are provided free for all. See [the Spamhaus webpage](https://www.spamhaus.org/blocklists/do-not-route-or-peer/).  Installers of the _nftfw_ package can find the script and instructions on how to install the result into _blacknets.d_ in _/usr/share/doc/nftfw/spamhaus_drop_.
 
-v0.9.17: The _systemd_ path and service have been told not to worry about ratelimiting starts and restarts. This can happen if _nftfwedit_ is used in a loop to remove or add several ips. _nftfw_ will manage and delay multiple starts.
+* A new command _nftfwan_ has been included. This reads the packet count numbers from the running _nftables_ and prints a summary of where incoming packets have been rejected or processed by the system. This has been useful for tracking the efficacy of _blacknets_ on blocking the waves of botnet attacks in the last year.
 
-v0.9.18: Add a flag (-g) to _nftfwls_ to remove GeoIP output. Previously GeoIP information was always shown if the geoip package was installed.
-
-The packaging system for building the debian package has been changed to use the more up-to-date _pyproject.toml_ configuration file.
-
-v0.9.19: Add additional technique for cleaning firewall database of old values. The existing system expires IP addresses after some longish period if they haven't been back to annoy the system. The idea here is to continue to block active sites, but slowly delete ones that have stopped. This system is retained.
-
-However, we now have the rise of botnets, cloud computing and the presence of many hosting companies who simply don't care about what their customers do. The firewall database can get filled with IP addresses that have triggered a pattern match a few times but have never been back to do it again. _nftfw_ counts 'incidents' and 'matchcounts'. Incidents are the number of times an ipaddress has triggered a match in one scan of the log files, and matchcounts record how many abuse patterns have appeared during that scan. It seems sensible to delete these addresses rather sooner than the normal long timeout period.
-
-The new feature is run before the extant removal system. By default, it's not activated and can be turned on from _config.ini_. The new default settings can be found in the default _config.ini_ file under the [Blacklist] section.
-
-v0.9.19: I've removed my version of nftables.py from the distribution. When I started _nftfw_ the standard library was unable to access the full capabilities of _nftables_ so I added some code and included it in the distribution.  The version supplied with python3-nftables now does what was missing and more. I've included this as a requirement for the package, but you may need to use ```apt install python3-nftables```.
-
-v0.9.19: Finally, I've updated documentation and done a pylint sweep using pylint for python 3.11.2, which has changed some minor bits of coding.
-
-v0.9.20: The default time to run the database tidy code in _/etc/cron.d/nftfw_ was incorrectly specified. It was always the intention to run it overnight. The 'doh' moment was to put the time into cron as hh mm, when it should be mm hh. This is now changed.
-
-Add a new tool _nftnetchk_ that compares the current firewall database IPs with the networks found in _blacknets.d_. If any of the IPs are part of a network that's blocked in _blacknets.d_ , then they are not needed in the database. The manual page for _nftnetchk_ supplies a recipe for deleting the IPs.
+* Many documents have been updated to reflect the code changes, and make the information more current.
 
 ## Features
 
@@ -72,10 +52,6 @@ See documents in the _docs_ directory:
 
 - [Install _nftfw_ from Debian package](docs/Debian_package_install.md)
   - Installation from the Debian package found in the package directory.
-- [Installing _nftfw manually_](docs/Installation.md)
-  - Full installation of the system for Debian Buster or later.
-- [Manual Installation Instructions](docs/Installation-Instructions.md)
-  - For those who want a bare bones list of tasks.
 - [Installing Geolocation](docs/Installing-GeoLocation.md)
   - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
 - [Getting CIDR lists](docs/Getting-cidr-lists.md)
@@ -92,10 +68,3 @@ See documents in the _docs_ directory:
   - Answers a bunch of questions about the system.
 - [Manual Page index](docs/man/index.md)
   - Manual Page index
-
-
-## Request for help
-
-I wanted to do this because I like the simplicity and ease of controlling the firewall. The control system lacks danger,  messing with complex tables isn't needed to add or remove a rule, you just create or delete a file.  Controlling things using the file system is very much part of the UNIX ethos that I embraced willingly many years ago. The user interface to this system is entirely down to the efforts of Patrick Cherry who ran Bytemark, a hosting company in the UK who I used for many years.
-
-Most of what I understand about firewalls has been picked up over the years, largely from folklore. Mine seem to work. However, there may be glaring errors in what this system delivers, helpful suggestions are always welcomed.

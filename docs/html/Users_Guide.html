@@ -8,12 +8,22 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -24,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -75,7 +85,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
@@ -92,8 +101,7 @@ for the latest flavour of packet filtering for Linux, known as
 supports a whitelist for ‘friends’ and a blacklist for miscreants.
 <em>nftfw</em> glues these rules together and loads them into the
 system’s kernel to act as your firewall.</p>
-<p>There are five control directories in <em>/etc/nftfw</em> (or it may
-be <em>/usr/local/etc/nftfw</em> on your machine). You tell
+<p>There are five control directories in <em>/etc/nftfw</em>. You tell
 <em>nftfw</em> to make a rule by adding a file, that’s often empty, to
 one of these directories. <em>nftfw</em> uses the file name to
 understand what you are asking, and if needed, will use the file
@@ -114,8 +122,8 @@ addresses as content to the file modifies the rule.</p></li>
 <li><p><em>whitelist.d</em> The whitelist directory contains files named
 for IP addresses, it makes rules to inspect inbound connections to the
 system. Packets from these addresses can always access the machine.
-Adding port numbers as contents to the a file modifies the rules
-allowing the IP address to only access certain services. There’s also an
+Adding port numbers as contents to a file modifies the rules allowing
+the IP address to only access certain services. There’s also an
 automatic scanner looking for successful logins into your machine that
 will create files in this directory.</p></li>
 <li><p><em>blacklist.d</em> The blacklist directory has similar contents
@@ -249,8 +257,9 @@ address given by the name. Adding port numbers into the file, one per
 line, will restrict access to only those port numbers. The word ‘all’
 can also be added, blocking all incoming ports. If a file contains
 ‘all’, other port numbers are ignored.</p>
-<p>?If your system doesn’t have <em>systemd</em> active directory
-installed, you will need to run</p>
+<p>If your system doesn’t have <em>systemd</em> active directory (the
+service is <em>nftfw.service</em> that’s automatically run by
+<em>nftfw.path</em>) installed, you will need to run</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw load</span></code></pre></div>
 <p>after you’ve changed the directory contents, or wait for the next
 automatic update.</p>
@@ -262,7 +271,7 @@ allow access to specific services.</p>
 <p>The whitelist scanner will create files ending in <em>.auto</em>. See
 below.</p>
 <p>If your system doesn’t have <em>systemd</em> active directory
-installed, you will need to run</p>
+installed (see above), you will need to run</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw load</span></code></pre></div>
 <p>after you’ve changed the directory contents, or wait for the next
 automatic update.</p>
@@ -280,7 +289,7 @@ them. However, there’s nothing to stop you creating your own lists.</p>
 <p>The root user runs_nftfw_ from the command line to create the
 firewall:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo nftfw load</span></code></pre></div>
-<p>It can be run from the <em>systemd</em> daemon whose
+<p>It can be run from the <em>systemd</em> active directory daemon whose
 <em>nftfw.path</em> service (when installed) triggers a call to
 <em>nftfw</em> when files change in one of the action directories. As a
 catch-all, <em>cron</em> will run the command once an hour.</p>
@@ -475,8 +484,8 @@ the same idea is there, a shell file allows easy additions by users. The
 files do not run any commands, they output <em>nftables</em> statements
 to <em>nftfw</em> which stores them and passes the completed file into
 the <em>nft</em> command.</p>
-<p><strong>nftfw</strong> runs the scripts though the shell and captures
-the output text, appending it to a file holding nftables commands. The
+<p><em>nftfw</em> runs the scripts though the shell and captures the
+output text, appending it to a file holding nftables commands. The
 system calls each action file twice, once for IPv4 and again for IPv6.
 The processing script uses environment variables to pass parameters into
 the shell. The parameters are:</p>
@@ -533,15 +542,12 @@ feature..</li>
 </ul></li>
 <li><a
 href="https://github.com/pcollinson/sympl-email-changes">sympl-email-changes
-- changes to Sympl buster/bullseye email installation</a>
+- changes to Sympl email installation</a>
 <ul>
 <li>I’ve added a repository that steps through the changes I make to the
 standard <em>exim4</em>/<em>dovecot</em> systems on Sympl to improve
-feedback and detection of bad IPs.</li>
-</ul></li>
-<li><a href="Updating-nftfw.html">Updating <em>nftfw</em></a>
-<ul>
-<li>How to update <em>nftfw</em>.</li>
+feedback and detection of bad IPs. Check to find out which Debian
+systems this package applies to.</li>
 </ul></li>
 <li><a href="How_do_I.html">How do I.. or Quick User’s Guide</a>
 <ul>

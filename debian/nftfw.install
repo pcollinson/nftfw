@@ -16,6 +16,9 @@ fail2ban/* usr/share/doc/nftfw/fail2ban
 # Symbiosis/Sympl import tool
 import_tool/* usr/share/doc/nftfw/import_tool
 
+# Spamhaus DROP acquisition code
+spamhaus_drop/* usr/share/doc/nftfw/spamhaus_drop
+
 # Documentation
 # omit manual installation documents
 docs/Debian_package_install.md usr/share/doc/nftfw/docs_md
@@ -41,6 +44,7 @@ docs/man/manhtml/nftfw-config.5.html usr/share/doc/nftfw/docs_html/man
 docs/man/manhtml/nftfw-files.5.html usr/share/doc/nftfw/docs_html/man
 docs/man/manhtml/nftfw.1.html usr/share/doc/nftfw/docs_html/man
 docs/man/manhtml/nftfwadm.1.html usr/share/doc/nftfw/docs_html/man
+docs/man/manhtml/nftfwan.1.html usr/share/doc/nftfw/docs_html/man
 docs/man/manhtml/nftfwedit.1.html usr/share/doc/nftfw/docs_html/man
 docs/man/manhtml/nftfwls.1.html usr/share/doc/nftfw/docs_html/man
 docs/man/manhtml/nftfw.css usr/share/doc/nftfw/docs_html/man

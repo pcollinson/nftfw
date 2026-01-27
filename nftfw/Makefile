@@ -1,31 +1,37 @@
-
-41;2500;0c# Makefile for pylint
+# Makefile for pylint
 # NB Now needs gnumake
+# Distinct files are taken from PackageIndex.py
+# Called with no arguments, runs pylint on all files,
+# 	then mypy on the package
+# make lint - runs pylint on all files
+# make filename.lint - runs lint on that file
+# make mypy - runs mypy on all files
+# make filename.mypy - runs mypy on named file
+
 SRC = $(sort $(filter-out PackageIndex.py,$(wildcard *.py)))
 OUT = $(sort $(SRC:.py=.lint))
-# bullseye loses pylint3, replacing it by pylint
-PYL = $(shell if [ -x /usr/bin/pylint ]; then echo pylint; else echo ""; fi)
-PYL3 = $(shell if [ -x /usr/bin/pylint3 ]; then echo pylint3; else echo ""; fi)
-PYLINT =
-ifneq (${PYL3},)
-	PYLINT = pylint3
-else ifneq (${PYL},)
-	PYLINT = pylint
-endif
+OUTM = $(sort $(SRC:.py=.mypy))
 
-all:
-	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye) or pylint3(buster)'; exit 1; fi
-	@echo 'Use the command "make lint" to run lint'
+# Assume that this machine only has python3
+PYLINT = pylint
+MYPY = mypy
+
+phony: lint
+
+all: $(SRC)
+	cd ..; $(PYLINT) --rcfile nftfw/pylintrc --exit-zero -s n nftfw/$<
+	cd ..; $(MYPY) nftfw
 
 lint: ${OUT}
 
-
 %.lint: %.py
-	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye) or pylint3(buster)'; exit 1; fi
-	cd ..; ${PYLINT} --rcfile nftfw/pylintrc --exit-zero -s n nftfw/$<
+	cd ..; $(PYLINT) --rcfile nftfw/pylintrc --exit-zero -s n nftfw/$<
+
+mypy: $(OUTM)
+	cd ..; $(MYPY) nftfw
+
+%.mypy: %.py
+	cd ..; $(MYPY) nftfw/$<
 
 # pylintrc now ignores 'import-outside-toplevel'. Some nftfw modules selectively import code depending on use.
 # and will trigger this on bullseye and later
-# However, the error is not present in buster's pylint3 and it complains about the disable code because it
-# doesn't understand it. So the solution is to remove the inline disable code and make a global option.
-#

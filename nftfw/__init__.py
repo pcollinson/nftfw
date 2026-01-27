@@ -1,56 +1,106 @@
-"""nftfw main module
-usage: nftfw [-h] [-v] [-c CONFIG] [-q] [-d] [-x] [-f] [-p PATTERN] [-i]
-             [-o OPTION]
-             [action]
+"""nftfw - Firewall management system for nftables.
 
-nftfw - firewall management system for nftables based on the Symbiosis firewall
+This package provides automated firewall management for Linux nftables,
+based on the Symbiosis firewall. It offers pattern-based log scanning,
+automatic IP blacklisting/whitelisting, and flexible rule management.
 
-positional arguments:
-  action                load|whitelist|blacklist|tidy
+Main Features:
+    - Automated blacklisting from log file pattern matching
+    - Whitelist management from successful login tracking (wtmp)
+    - Flexible firewall rule configuration via declarative files
+    - Database-backed IP tracking with automatic expiry
+    - Support for both IPv4 and IPv6
+    - Network blacklist integration (CIDR blocks)
+    - GeoIP and DNS blocklist support (optional)
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -v, --version         Show version
-  -c CONFIG, --config CONFIG
-                        Supply a configuration file overriding the built-in
-                        file
-  -q, --quiet           Suppress printing of errors, syslog output remains
-                        active
-  -d, --debug           Show information messages
-  -x, --no-exec         Create and test rules, but don't install. Also applies
-                        to blacklist
-  -f, --full            Perform a full install, don't just update sets
-  -p PATTERN, --pattern PATTERN
-                        For blacklist, run using one pattern name
-  -i, --info            Display current config settings and exit
-  -o OPTION, --option OPTION
-                        Specify comma separated list of option=value.
-                        Overrides values from compiled values and config file.
-                        Can be used several times
+Command-Line Usage:
+    Basic commands::
 
-Optional commands:
-    load       load firewall
-    whitelist  load whitelist by scanning the system wtmp file, setting
-               entries in the whitelist directory
-    blacklist  load blacklist using files in the patterns directory
-               to scan log files, automatically expire entries
-               use -x to scan and print matches without storing any information
-               use -p patternname to only process a specific pattern file
-                usually for testing
-    tidy       Tidy firewall database by removing entries that are older than
-               a set number of days. Intended to be run from cron daily
+        nftfw load       # Load firewall rules
+        nftfw whitelist  # Update whitelist from wtmp
+        nftfw blacklist  # Scan logs and update blacklist
+        nftfw tidy       # Clean old database entries
 
+    Common options::
+
+        -x, --no-exec     # Test mode, don't install rules
+        -f, --full        # Force full install (not just sets)
+        -p PATTERN        # Process specific pattern only
+        -v, --verbose     # Show information messages
+        -q, --quiet       # Suppress console errors
+        -o OPTION         # Override config: -o key=value
+
+Actions:
+    load:
+        Load firewall rules from configuration directories (incoming.d,
+        outgoing.d, whitelist.d, blacklist.d). Builds nftables rules,
+        tests them, and installs if valid. Uses intelligent set updates
+        when only IP lists change.
+
+    whitelist:
+        Scan system wtmp file for successful logins and create whitelist
+        entries. Helps prevent locking out legitimate users who may
+        trigger blacklist rules.
+
+    blacklist:
+        Scan log files using patterns from patterns.d directory. Match
+        IP addresses against regex patterns, track in database, and
+        create blacklist files when thresholds are met. Automatically
+        expires old entries.
+
+    tidy:
+        Remove database entries older than configured expiry times.
+        Typically run daily from cron to maintain database size.
+
+Configuration:
+    System files are in /etc/nftfw (configurable via [Locations] sysetc)
+    Working files are in /var/lib/nftfw (configurable via [Locations] sysvar)
+
+    Key directories:
+        - incoming.d/    Inbound firewall rules
+        - outgoing.d/    Outbound firewall rules
+        - whitelist.d/   Whitelisted IPs (manual + auto)
+        - blacklist.d/   Blacklisted IPs (generated)
+        - patterns.d/    Log scanning patterns
+        - rule.d/        Shell scripts for rule generation
+        - build.d/       Working directory for rule builds
+
+Example:
+    Typical workflow::
+
+        # Test firewall configuration
+        nftfw -x load
+
+        # Install firewall rules
+        nftfw load
+
+        # Update blacklist from logs
+        nftfw blacklist
+
+        # Update whitelist from logins
+        nftfw whitelist
+
+        # Clean old entries (run from cron)
+        nftfw tidy
+
+See Also:
+    - config: Configuration management
+    - scheduler: Command orchestration
+    - blacklist: Blacklist management
+    - whitelist: Whitelist management
+    - fwmanage: Firewall rule loading
+
+Package Version: 0.9.8
+Python Requirement: 3.9+
 """
-# Ini file for nftfw
-#
-# I want the modules here to appear in a package at some point
-# so it will be in the search path for the world.
-#
-# It seems that the only way NOT to have to change the import code in every file
-# is to meddle with the sys.path variable here
-#
+
+from __future__ import annotations
+
 import sys
-# check version of python
-# this code has been tested on 3.6 and is really
-# aimed at running on 3.7
-assert sys.version_info >= (3, 6)
+
+# Version check: nftfw requires Python 3.9+
+# Modern type hints and syntax require 3.9 or later
+if sys.version_info < (3, 9):
+    sys.exit("nftfw requires Python 3.9 or later")
+
+__version__ = "0.9.8"

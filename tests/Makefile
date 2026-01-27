@@ -1,22 +1,22 @@
 # Makefile for tests
+# make will run all tests
+# make filename.test will run one test
+# make lint will run pylint on all files
+# make filename.lint runs pylint on the file
+
 SRC = $(sort $(wildcard *.py))
 OUT = $(sort $(SRC:.py=.lint))
+OUTM = $(sort $(SRC:.py=.mypy))
 
-# bullseye loses pylint3, replacing it by pylint
-PYL = $(shell if [ -x /usr/bin/pylint ]; then echo pylint; else echo ""; fi)
-PYL3 = $(shell if [ -x /usr/bin/pylint3 ]; then echo pylint3; else echo ""; fi)
-PYLINT =
-ifneq (${PYL3},)
-	PYLINT = pylint3
-else ifneq (${PYL},)
-	PYLINT = pylint
-endif
+# Assume that this machine only has python3
+PYLINT = pylint
+PYTEST = pytest
+MYPY = mypy
 
-.PHONY: lint
+.PHONY: lint test
 
 all:
-	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye or later) or pylint3(buster)'; exit 1; fi
-	PYTHONPATH="../nftfw" pytest-3 -x
+	PYTHONPATH="../nftfw" ${PYTEST} -x
 
 # create reference files
 init:
@@ -25,8 +25,16 @@ init:
 lint: $(OUT)
 
 %.lint: %.py
-	@if /bin/test '${PYLINT}' = '' ; then echo 'Please install pylint(bullseye or later) or pylint3(buster)'; exit 1; fi
 	cd ..; ${PYLINT} --exit-zero --rcfile tests/pylintrc -s n --disable=redefined-outer-name tests/$<
+
+%.test: %.py
+	PYTHONPATH="../nftfw" ${PYTEST} -x $<
+
+mypy: $(OUTM)
+	cd ..; $(MYPY) tests
+
+%.mypy: %.py
+	cd ..; $(MYPY) tests/$<
 
 clean:
 	rm -rf srcdata newdata sys

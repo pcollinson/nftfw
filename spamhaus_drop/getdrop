@@ -1,0 +1,20 @@
+#!/bin/sh
+# Spamhaus now support block files under the name of 'Do not route or peer'
+# https://www.spamhaus.org/blocklists/do-not-route-or-peer/
+# This generates a file of ipv4 and ipv6 addresses
+# This script gets those files, and copies the data to
+# spamhaus_drop.nets in blacknets.d.
+# A copy is created here, and compared with any existing
+# set to ensure that nftables are only updated when needed.
+# getdrop is called from cron, /etc/cron.d/spamhaus-drop
+# I run this once a day
+cd /etc/nftfw/spamhaus_drop.d
+(
+curl -s https://www.spamhaus.org/drop/drop_v4.json | jq -r '.cidr'
+curl -s https://www.spamhaus.org/drop/drop_v6.json | jq -r '.cidr'
+) | grep -v 'null' | sed -e '/^$/d'> spamhaus_drop.nets
+if [ ! -f ../blacknets.d/spamhaus_drop.nets ]; then
+    cp spamhaus_drop.nets ../blacknets.d
+elif ! cmp -s spamhaus_drop.nets ../blacknets.d/spamhaus_drop.nets; then
+    cp spamhaus_drop.nets ../blacknets.d
+fi    

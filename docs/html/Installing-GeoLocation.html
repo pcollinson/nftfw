@@ -8,12 +8,22 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -24,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -75,7 +85,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
@@ -86,85 +95,79 @@
 </header>
 <h1 id="installing-maxmind-geolocation">Installing Maxmind
 Geolocation</h1>
-<p>This page was originally written for Debian buster, in the lines
-below replace ‘buster’ by the name of your system.</p>
+<p><em>nftfw</em> can optionally use geolocation in <em>nftfwls</em> and
+<em>nftfwadm</em> to display the two-letter country code that is
+believed to be the location of that address. The code in these programs
+looks for the installation of the appropriate libraries and will work
+without them. In addition, it can be used to generate files for
+<em>blacknets.d</em>, where lists of IP addresses and address ranges can
+be used to block access to your system from named countries - see <a
+href="Getting-cidr-lists.html">Getting CIDR lists</a>.</p>
+<p>Debian comes with an older version of the MaxMind data, using a now
+unused MaxMind data format. The files for this system are stored in
+<em>/usr/share/GeoIP</em>. <em>nftfw</em> doesn’t use this legacy system
+and opted for the current data formats provided on a weekly basis by
+Maxmind.</p>
+<p>Maxmind wants you to have free access to their files, you just need
+to sign up. The data files will be stored in
+<em>/var/lib/GeoIP/</em>.</p>
 <h2 id="install-the-python-modules">Install the python modules</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt install python3-geoip2</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo apt install geoipupdate</span></code></pre></div>
-<h4 id="geoipupdate-is-not-found---debian"><code>geoipupdate</code> is
-not found - Debian</h4>
-<p>If <code>geoipupdate</code> is not found, you need to change
-<code>/etc/apt/sources.list</code> to include contributed packages.</p>
-<p>Edit <code>/etc/apt/sources.list</code> and look for:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">deb</span> URL/debian buster main</span></code></pre></div>
+<h4 id="geoipupdate-is-not-found---debian"><em>geoipupdate</em> is not
+found - Debian</h4>
+<p>If <em>geoipupdate</em> is not found, you need to change
+<em>/etc/apt/sources.list</em> to include contributed packages.</p>
+<p>Edit <em>/etc/apt/sources.list</em> and look for</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">deb</span> URL/debian YOURVERSION main</span></code></pre></div>
 <p>and change to:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">deb</span> URL/debian buster main contrib</span></code></pre></div>
-<p>Now try the <code>apt install geoipupdate</code> again, it should
-work now.</p>
-<p>Debian should have installed at least the 3.1.1 version of
-<code>geoipupdate</code>. You’ll see the version when it installed, this
-becomes important later. To check it:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> apt show geoipupdate</span></code></pre></div>
-<h4
-id="geoipupdate-is-not-found---raspberry-pi-os"><code>geoipupdate</code>
-is not found - Raspberry Pi OS</h4>
-<p>It seems that this package is not available on RPi servers. However,
-compiled versions for the 32-bit armhf architecture exists on the
-internet. Visit</p>
-<pre class="text"><code>https://packages.debian.org/buster/armhf/geoipupdate/download</code></pre>
-<p>Clicking on a link on that page should download a Debian package that
-can be installed; you should get a file called
-<code>geoipupdate_3.1.1-1_armhf.deb</code>. Then</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo dpkg <span class="at">-i</span> ./geoipupdate_3.1.1-1_armhf.deb</span></code></pre></div>
-<p>will install the package for you.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">deb</span> URL/debian YOURVERSION main contrib</span></code></pre></div>
+<p>Now try the <em>apt install geoipupdate</em> again, it should work
+now.</p>
 <p>You have all the bits we need, we’ll set them up later.</p>
 <h2 id="getting-a-maxmind-account">Getting a MaxMind Account</h2>
 <p>Visit the <a
 href="https://dev.maxmind.com/geoip/geoip2/geolite2/">Maxmind web
 site</a>.</p>
-<p>Read down the page and click on ‘SIGN UP FOR GEOLITE2’. Create your
+<p>Read down the page and click on ‘Sign Up For Geolite2’. Create your
 account, I selected ‘Internet Security’ for ‘Intended Use’.</p>
 <p>Once you have the account, go to <a
-href="https://www.maxmind.com/en/account/login">Maxmind’s Account
+href="https://www.maxmind.com/en/account/sign-in">Maxmind’s Account
 portal</a> and login. You can also get there from the head and shoulders
 icon in the menu bar on their site.</p>
-<p>Once logged in, you land on a page that appears to have nothing apart
-from frightening messages. However, scroll down, looking In the menu on
-the left-hand side and click on ‘My License Key’ under Services.</p>
-<p>Once there, copy and store your Account/User ID, you’ll need it
-later.</p>
-<p>Click on ‘Generate new license key’.</p>
+<p>The site is considerably more friendly than it used to be. Take a
+note of your Account/User ID, that appears at the top of the menu,
+you’ll need it later.</p>
+<p>Click on ‘Manage license keys’ and follow the prompts..</p>
 <p>Enter a name for the key, I’m using a machine name.</p>
-<p>TIck the radio button to select use with geoipupdate version
-3.1.1.</p>
-<p>Click on ‘Confirm’.</p>
 <p>This is the only time you will see the full version of the key, so
 copy and paste it somewhere safe. There’s an icon next to the key that
 will copy it to your clipboard. If the next step fails, you can edit the
-<code>geoipupdate</code> config file from the information you have.</p>
+<em>geoipupdate</em> config file from the information you have.</p>
 <p>Now click on ‘Download Config’ - this will create a local file called
 <em>GeoIP.conf</em>.</p>
 <h2 id="installing-the-key">Installing the key</h2>
-<p>The Debian installation will have created
-<code>/etc/GeoIP.conf</code> for you. The file pre-dates the Maxmind
-decision to ask you to sign up for a free license, ignore the comment
-above the <em>AccountID</em> line. You need to set the:</p>
+<p>The Debian installation will have created <em>/etc/GeoIP.conf</em>
+for you. The file pre-dates the Maxmind decision to ask you to sign up
+for a free license, ignore the comment above the <em>AccountID</em>
+line. You need to set the:</p>
 <ul>
 <li>AccountID <em>to your account id</em></li>
 <li>LicenseKey <em>to your License Key</em></li>
-<li>EditionIDs <em>to</em>
-<code>GeoLite2-ASN GeoLite2-City GeoLite2-Country</code></li>
+<li>EditionIDs <em>to</em> <em>GeoLite2-ASN GeoLite2-City
+GeoLite2-Country</em></li>
 </ul>
 <p>you can do this by copying the downloaded file into place, or by
-editing the file. You’ll need to <em>sudo</em> your edit or
-<em>cp</em>.</p>
+editing the file. You’ll need to <em>sudo</em> your edit or <em>cp</em>.
+The <em>nftfw</em> commands use GeoLite2-Country.</p>
 <p>Now run:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo geoipupdate <span class="at">-v</span></span></code></pre></div>
-<p>and it should download a new set of files. These will be put in
-<code>/var/lib/GeoIP</code> and an <code>ls</code> will show them.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo geoipupdate <span class="at">-v</span></span></code></pre></div>
+<p>and it should download a new set of files ending in <em>.mmdb</em>.
+These will be put in <em>/var/lib/GeoIP</em> and an <em>ls</em> will
+show them.</p>
 <h2 id="finally-check-on-cron">Finally check on cron</h2>
 <p>The Debian installer will have installed a cron file</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/etc/cron.d/geoipupdate</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/etc/cron.d/geoipupdate</span></span></code></pre></div>
 <p>that updates the files automatically once a week. I suggest that you
 change the time of day somewhat so that you are not clashing with other
 Debian systems in your timezone.</p>

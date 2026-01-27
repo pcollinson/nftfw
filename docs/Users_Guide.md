@@ -5,7 +5,7 @@
 
 _nftfw_ provides a simple-to-use framework generating rules for the latest flavour of packet filtering for Linux, known as _nftables_. It generates a set of incoming rules, outgoing rules, supports a whitelist for 'friends' and a blacklist for miscreants. _nftfw_  glues these rules together and loads them into the system's kernel to act as your firewall.
 
-There are five control directories in _/etc/nftfw_ (or it may be _/usr/local/etc/nftfw_ on your machine). You tell _nftfw_ to make a rule by adding a file, that's often empty, to one of these directories. _nftfw_ uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.
+There are five control directories in _/etc/nftfw_. You tell _nftfw_ to make a rule by adding a file, that's often empty, to one of these directories. _nftfw_ uses the file name to understand what you are asking, and if needed, will use the file contents to configure the rules it makes.
 
 Here are the directories:
 
@@ -16,7 +16,7 @@ The incoming directory provides information to permit selected inbound connectio
 The outgoing directory behaves in the same way as the incoming rule set except that it's designed to filter outbound connections. When a file has no content, its rule applies to all destination IP addresses. If needed, adding specific destination addresses as content to the file modifies the rule.
 
 - _whitelist.d_
-The whitelist directory contains files named for IP addresses, it makes rules to inspect inbound connections to the system. Packets from these addresses can always access the machine. Adding port numbers as contents to the a file modifies the rules allowing the IP address to only access certain services. There's also an automatic scanner looking for successful logins into your machine that will create files in this directory.
+The whitelist directory contains files named for IP addresses, it makes rules to inspect inbound connections to the system. Packets from these addresses can always access the machine. Adding port numbers as contents to a file modifies the rules allowing the IP address to only access certain services. There's also an automatic scanner looking for successful logins into your machine that will create files in this directory.
 
 - _blacklist.d_
 The blacklist directory has similar contents to the whitelist but will block any attempt to access the system from the IP address. Adding port numbers as contents to the files modifies the rules to only block access to those services. There's an automatic system that looks in log files for people doing bad things and adds their IP address into this directory.
@@ -101,7 +101,7 @@ The first IP address is a version 4 address, and the second a version
 
 An empty blacklist file will block access to all ports to the IP address given by the name. Adding port numbers into the file, one per line, will restrict access to only those port numbers. The word 'all' can also be added, blocking all incoming ports. If a file contains 'all', other port numbers are ignored.
 
-?If your system doesn't have _systemd_ active directory installed, you will need to run
+If your system doesn't have _systemd_ active directory (the service is _nftfw.service_ that's automatically run by _nftfw.path_) installed, you will need to run
 
 ``` sh
 $ sudo nftfw load
@@ -114,7 +114,7 @@ The whitelist directory follows the same basic pattern used to manage the blackl
 
 The whitelist scanner will create files ending in _.auto_. See below.
 
-If your system doesn't have _systemd_ active directory installed, you will need to run
+If your system doesn't have _systemd_ active directory installed (see above), you will need to run
 
 ``` sh
 $ sudo nftfw load
@@ -135,7 +135,7 @@ The root user runs_nftfw_ from the command line to create the firewall:
 $ sudo nftfw load
 ```
 
-It can be run from the _systemd_ daemon whose _nftfw.path_ service (when installed) triggers a call to _nftfw_ when files change in one of the action directories. As a catch-all, _cron_ will run the command once an hour.
+It can be run from the _systemd_ active directory daemon whose _nftfw.path_ service (when installed) triggers a call to _nftfw_ when files change in one of the action directories. As a catch-all, _cron_ will run the command once an hour.
 
 The _load_ command tries not to make changes to the kernel's tables unless it has to. It creates a set of files that are needed for the complete ruleset and then compares those files with the set that was made on the last run. If the files are identical, no change is needed. The blacklist and whitelist rule sets can be replaced without changing the whole ruleset. The blacklist rules change most frequently, and an update to the blacklist is done without disturbing the remainder of the firewall. In general, all the rules maintain counts of matches, and these counts are reloaded when the complete firewall is replaced. By updating only parts of the firewall, these counts become a good indicator of activity on your system.
 
@@ -275,7 +275,7 @@ The whitelist command looks in the system's _wtmp_ file that records all user lo
 
 The _rule_ directory contains small shell scripts that translate firewall actions named in the _incoming.d_ and _outgoing.d_ directories into nftables command lines. Default rules are also used for the whitelist and blacklist generation. Note the coding and management of these files are different from Symbiosis, but the same idea is there, a shell file allows easy additions by users. The files do not run any commands, they output _nftables_ statements to _nftfw_ which stores them and passes the completed file into the _nft_ command.
 
-**nftfw** runs the scripts though the shell and captures the output text, appending it to a file holding  nftables commands. The system calls each action file twice, once for IPv4 and again for IPv6. The processing script uses environment variables to pass parameters into the shell. The parameters are:
+_nftfw_ runs the scripts though the shell and captures the output text, appending it to a file holding  nftables commands. The system calls each action file twice, once for IPv4 and again for IPv6. The processing script uses environment variables to pass parameters into the shell. The parameters are:
 
 - DIRECTION - is set to either 'incoming' or 'outgoing'. The value is most often used to select whether the rule should apply to source or destination IP addresses.
 - PROTO - is set to either 'ip' or 'ip6'. These names not only supply the protocol type, but also are the names of the two main tables that form the basic framework, one for each protocol type.
@@ -305,10 +305,8 @@ See documents in the _docs_ directory:
   - Installing Geolocation, adding country detection to _nftfwls_, which is optional but desirable.
 - [Getting CIDR lists](Getting-cidr-lists.md)
   - How to get CIDR files for use with the _blacknet_ feature..
-- [sympl-email-changes - changes to Sympl buster/bullseye email installation](https://github.com/pcollinson/sympl-email-changes)
-  - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs.
-- [Updating _nftfw_](Updating-nftfw.md)
-  - How to update _nftfw_.
+- [sympl-email-changes - changes to Sympl email installation](https://github.com/pcollinson/sympl-email-changes)
+  - I've added a repository that steps through the changes I make to the standard _exim4_/_dovecot_ systems on Sympl to improve feedback and detection of bad IPs. Check to find out which Debian systems this package applies to.
 - [How do I.. or Quick User's Guide](How_do_I.md)
   - Answers a bunch of questions about the system.
 - [Manual Page index](man/index.md)

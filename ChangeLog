@@ -1,3 +1,21 @@
+v1.0.0  * Fix code in geoipcountry.py that removes CIDR extensions
+	from all addresses to include ipv6 support.
+	* Github used to allow you to download binary files, this
+	no longer works. Changed the README file for the package
+	directory providing direct download links for downloading.
+	* Add installation code used to make a blacknets.d file
+	from Spamhaus DROP files, will appear in
+	/usr/share/doc/nftfw/spamhaus_drop
+	* Major Code change and hence the renumbering: Used
+	claude code to add full typing, and fuller comments to the code.
+	The change is completely cosmetic. The actual working code
+	didn't change much and it's fully tested with pylint and mypy.
+	Updated documentation to update dependency on Python 3.9+
+	and update for changes in systems.
+	* Add new script nftfwan which prints packet counts from the
+	running nftables instance.
+	* Documentation update
+
 v0.9.20 The default time to run the database tidy code in
 	/etc/cron.d/nftfw_ was incorrectly specified. It was always
 	the intention to run it overnight. The 'doh' moment was to

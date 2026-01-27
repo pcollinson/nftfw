@@ -1,6 +1,9 @@
 % Updating nftfw manual installations
 # Updating nftfw manual installations
 
+## Deprecation
+This document has not been updated since 2021, and is considerably out of date. It is no longer being linked to actively from other more recent documentation, but stays here just in case.
+
 ## Get current version
 
 If you've installed _nftfw_ from a zip or tar file, then revisit the github pages and pull the current version. Unpack and install the files.

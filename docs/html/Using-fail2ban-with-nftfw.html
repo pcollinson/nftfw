@@ -8,12 +8,22 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -24,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -75,7 +85,6 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="pandoc.css" />
   <link rel="stylesheet" href="nftfw-doc.css" />
@@ -91,8 +100,8 @@ The directory contains two action files for <em>fail2ban</em> allowing
 the system to use <em>nftfw</em> as its firewall. The ban action
 interface for <em>fail2ban</em> uses expanded editing functions in the
 <em>nftfwedit</em> command to add an IP address into <em>nftfw</em>. It
-will create a file in <code>/etc/nftfw/blacklist.d</code> and add the IP
-to <em>nftfw</em>’s database. The unban action will remove the file but
+will create a file in <em>/etc/nftfw/blacklist.d</em> and add the IP to
+<em>nftfw</em>’s database. The unban action will remove the file but
 will leave the IP address information in the database.</p>
 <h2 id="installation">Installation</h2>
 <p>Install the action files:</p>
@@ -102,19 +111,18 @@ will leave the IP address information in the database.</p>
 files. It’s probably wise to stop <em>fail2ban</em> while doing
 this.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo systemctl stop fail2ban</span></code></pre></div>
-<p>We need to make a change to <code>fail2ban</code>’s main
-configuration file, as distributed it’s in
-<code>/etc/fail2ban/jail.conf</code>. The file should not be edited,
-instead it’s conventional to make a copy called <code>jail.local</code>
-and edit that.</p>
-<p>If you don’t have <code>/etc/jail.local</code>:</p>
+<p>We need to make a change to <em>fail2ban</em>’s main configuration
+file, as distributed it’s in <em>/etc/fail2ban/jail.conf</em>. The file
+should not be edited, instead it’s conventional to make a copy called
+<em>jail.local</em> and edit that.</p>
+<p>If you don’t have <em>/etc/jail.local</em>:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd /etc/fail2ban</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo cp jail.conf jail.local</span></code></pre></div>
 <p>If you do:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd /etc/fail2ban</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> sudo cp jail.local jail.local.bak</span></code></pre></div>
 <p>Then edit (use <em>sudo</em> before your edit command) the
-<code>jail.local</code> file changing these lines to read:</p>
+<em>jail.local</em> file changing these lines to read:</p>
 <pre class="text"><code>banaction = nftfw-multiport
 banaction_allports = nftfw-allports</code></pre>
 <p>You are now set. Restart <em>fail2ban</em>:</p>
@@ -127,10 +135,10 @@ banaction_allports = nftfw-allports</code></pre>
 <p>The results should be:</p>
 <ul>
 <li><p>Look in <em>/etc/nftfw/blacklist.d</em> and see that a file named
-<code>IP.auto</code> has been created.</p></li>
-<li><p>The <code>nftfwls</code> command will show you that the IP is in
+<em>IP.auto</em> has been created.</p></li>
+<li><p>The <em>nftfwls</em> command will show you that the IP is in
 <em>nftfw</em>’s database. The pattern used to identify the reason of
-the ban will be <code>f2b-JAIL</code> where JAIL is the name of the jail
+the ban will be <em>f2b-JAIL</em> where JAIL is the name of the jail
 used in the test.</p></li>
 <li><p>The nftables firewall will have been reloaded, assuming that you
 have actioned <em>nftfw.path</em> in <em>systemd</em> running
@@ -144,34 +152,32 @@ directories’ in <a href="Debian_package_install.html">Install
 <h2 id="is-it-working">Is it working?</h2>
 <p><em>fail2ban</em> logs the ban action and the IP that it used but
 says nothing about the action that is executed. The action will create a
-file named <code>ipaddress.auto</code> in
-<code>/etc/nftfw/blacklist.d</code> and the IP address will be entered
-into <em>nftfw</em>’s database. Database entries are accompanied by a
-‘pattern’ which indicates the source of the ban. The <em>fail2ban</em>
-actions for <em>nftfw</em> set the pattern to be <code>f2b-</code>
-followed by the name of the Jail.</p>
+file named <em>ipaddress.auto</em> in <em>/etc/nftfw/blacklist.d</em>
+and the IP address will be entered into <em>nftfw</em>’s database.
+Database entries are accompanied by a ‘pattern’ which indicates the
+source of the ban. The <em>fail2ban</em> actions for <em>nftfw</em> set
+the pattern to be <em>f2b-</em> followed by the name of the Jail.</p>
 <p>Use the <em>nftfwls</em> command to see the current state of
-<em>nftfw</em>. It uses the contents of
-<code>/etc/nftfw/blacklist.d</code> to select only active blacklisted
-IPs. To show all the entries in the database use
-<code>nftfwls -a</code>. You should see some <code>f2b</code> entries in
-the database.</p>
+<em>nftfw</em>. It uses the contents of <em>/etc/nftfw/blacklist.d</em>
+to select only active blacklisted IPs. To show all the entries in the
+database use <em>nftfwls -a</em>. You should see some <em>f2b</em>
+entries in the database.</p>
 <p>Alternatively you can use the <em>nftfwedit</em> command to look at
 one of the IP’s that <em>fail2ban</em> has logged.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> nftfwedit IPADDRESS</span></code></pre></div>
 <p>Will tell you if the IP is in the database, and if so, whether it’s
-active (i.e. in <code>/etc/nftfw/blacklist.d</code>).</p>
+active (i.e. in <em>/etc/nftfw/blacklist.d</em>).</p>
 <h2 id="what-to-do-for-fail2ban-unban">What to do for <em>fail2ban</em>
 unban</h2>
 <p>As distributed, the two <em>fail2ban</em> action files will act on
 <em>fail2ban</em> unban actions by removing the IP from the
-<code>/etc/nftfw/blacklist.d</code> directory but not from the
+<em>/etc/nftfw/blacklist.d</em> directory but not from the
 <em>nftfw</em> database. It’s not clear whether this is the right thing
 to do, it may be better to just ignore the unban instruction and let
 <em>nftfw</em> time out the IP address. If you would like to try this,
-cd to <code>/etc/fail2ban/action.d</code> and use sudo with your editor
-to modify each of <code>nftfw-allports.conf</code> and
-<code>nftfw-multiport.conf</code>. Change</p>
+cd to <em>/etc/fail2ban/action.d</em> and use sudo with your editor to
+modify each of <em>nftfw-allports.conf</em> and
+<em>nftfw-multiport.conf</em>. Change</p>
 <pre class="text"><code>actionunban = /usr/bin/nftfwedit -r &lt;ip&gt;
 </code></pre>
 <p>to</p>

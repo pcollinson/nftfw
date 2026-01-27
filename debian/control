@@ -29,7 +29,7 @@ Depends: nftables,
 	 ${python3:Depends},
 	 ${misc:Depends}
 Recommends: python3-geoip2, geoipupdate, sqlite3
-Suggests: python3-pytest, pylint3
+Suggests: python3-pytest, pylint, mypy
 Description: nftables firewall builder for Debian
  The nftfw package builds firewalls for nftables. Configuration is
  based on files stored in directories in /etc/nftfw. For example,
@@ -55,5 +55,4 @@ Description: nftables firewall builder for Debian
  After installation, some configuration is needed to make the system active,
  see /usr/share/doc/nftfw/README.Debian
  .
- The package was written in Python 3.6/3.7. It's now being maintained in
- 3.11, so it seems safer to require at least 3.9.
+ The package requires at least python 3.9.

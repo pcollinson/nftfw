@@ -1,111 +1,205 @@
-""" nftfw pattern_reader
+"""Pattern file reader for blacklist log scanning rules.
 
-Used by the blacklist operation
+This module reads and parses pattern files that define rules for scanning log
+files to detect malicious activity. Pattern files specify which log files to
+scan, what ports to block, and regex patterns to match IP addresses.
 
-Patterns are text files specifying rules to be applied to log files.
+Pattern files are text files with a simple command-based syntax that support:
+- File path specification (with glob wildcards)
+- Port lists for blocking (or special values like 'all', 'test', 'update')
+- Regex patterns with __IP__ placeholder for IP address matching
+- Comments starting with #
 
-Main idea is to create a data structure indexed by filename of log
-file, which has list of regexes to be applied to each line and other
-information to process the pattern generating firewall entries.
+Key Features
+------------
+- Pattern file parsing with file=, ports=, and regex statements
+- Glob wildcard expansion for scanning multiple log files
+- Test pattern support (ports=test) for validation
+- Selective pattern execution via -p command-line flag
+- IPv4 and IPv6 address matching (including ::ffff: prefix)
+- Duplicate file detection via canonical path resolution
 
-Returns
--------
-Dict[file : List[Dict]]
-file : str
-    Main index is file name of log file to scan
-The value is a list of dicts:
-    pattern : str
-         pattern name for reference
-    ports : str
-        comma separated ports to match (may be 'all')
-    file : str
-        logfile to scan
-    regex : List[compiled regex]
-        List of regexes to scan each line of the log file with
+Pattern File Format
+-------------------
+Pattern files (*.patterns) in the patterns.d directory have this format::
+
+    # Comment lines start with #
+    file = /var/log/auth.log    # Log file to scan (supports globs)
+    ports = 22                  # Ports to block (or 'all', 'test', 'update')
+
+    # Regex patterns with __IP__ placeholder
+    Failed password for .* from __IP__
+    authentication failure.*rhost=__IP__
+
+Special port values:
+- **all**: Block all ports for matching IPs
+- **test**: Test-only pattern (ignored unless -p flag used)
+- **update**: Update firewall database incident count only, no blocking
+- **numeric list**: Comma-separated port numbers (e.g., "22,80,443")
+
+Data Structure
+--------------
+The returned data structure maps log file paths to pattern information::
+
+    {
+        '/var/log/auth.log': [
+            {
+                'pattern': 'ssh-brute',
+                'ports': '22',
+                'file': '/var/log/auth.log',
+                'regex': [compiled_regex1, compiled_regex2, ...]
+            }
+        ],
+        '/var/log/apache2/error.log': [...]
+    }
+
+Usage Example
+-------------
+    from .config import Config
+    from .patternreader import pattern_reader
+
+    # Initialize configuration
+    cf = Config()
+    cf.readini()
+    cf.setup()
+
+    # Read all pattern files
+    patterns = pattern_reader(cf)
+
+    # Iterate over log files and their patterns
+    for logfile, pattern_list in patterns.items():
+        print(f"Scanning {logfile}")
+        for pat in pattern_list:
+            print(f"  Pattern: {pat['pattern']}, Ports: {pat['ports']}")
+            print(f"  Regexes: {len(pat['regex'])}")
+
+    # Test a specific pattern
+    cf.selected_pattern_file = 'ssh-brute'
+    test_patterns = pattern_reader(cf)
+
+See Also
+--------
+logreader : Module that uses pattern_reader for log scanning
+blacklist : Module that orchestrates pattern reading and log scanning
 """
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 import os
 import re
 from pathlib import Path
 from collections import defaultdict
 import logging
+
+if TYPE_CHECKING:
+    from .config import Config
+
 log = logging.getLogger('nftfw')
 
-def pattern_reader(cf):
-    """Read pattern files
+# Type alias for pattern info dictionary
+PatternDict = dict[str, Any]  # {'pattern': str, 'ports': str, 'file': str, 'regex': list}
 
-    Files have commands:
 
-    file = logfile path
+def pattern_reader(cf: Config) -> dict[str, list[PatternDict]]:
+    """Read and parse all pattern files from the patterns directory.
 
-    Symbiosis doesn't include wildcards in paths, adding
-    this allows /srv log files to be processed by a single
-    set of patterns.
+    Reads all *.patterns files from the configured patterns directory,
+    parses them, and returns a dictionary mapping log file paths to
+    their associated pattern rules.
 
-    ports = port list.
+    Args:
+        cf: Config instance with etcpath for patterns directory and
+            optional selected_pattern_file for testing
 
-    Comma separated list of numeric ports to be denied if this match
-    succeeds.
-    Can be 'all' to mean block all ports.
-    Can be the word 'update' to allow filewall database incident
-    update only from the IP.
-    Can be the word 'test' to indicate that this is a test
-    pattern and will only be used when requested by
-    the -p argument to the program, otherwise the
-    pattern file will be ignored
+    Returns:
+        Dictionary mapping log file paths to lists of pattern info dicts::
 
-    The file has comments - # followed by text.
+            {
+                '/var/log/auth.log': [
+                    {
+                        'pattern': 'ssh-brute',
+                        'ports': '22',
+                        'file': '/var/log/auth.log',
+                        'regex': [compiled_regex1, ...]
+                    }
+                ]
+            }
 
-    Finally there's a list of regex patterns including
-    __IP__ which are used to find an ip address in the line.
+        Returns empty dict if no valid patterns found.
 
+    Example:
+        >>> cf = Config()
+        >>> patterns = pattern_reader(cf)
+        >>> for logfile, pats in patterns.items():
+        ...     print(f"{logfile}: {len(pats)} patterns")
+
+        Test a specific pattern::
+
+            >>> cf.selected_pattern_file = 'ssh-brute'
+            >>> test_patterns = pattern_reader(cf)
+
+    Note:
+        - Only reads *.patterns files from patterns directory
+        - Skips files with ports=test unless selected via cf.selected_pattern_file
+        - Glob wildcards in file= statements are expanded
+        - Non-existent log files are automatically filtered out
     """
-
     path = cf.etcpath('patterns')
     files = (f for f in path.glob('*.patterns') if f.is_file())
-    patterns = ((f.stem, f.read_text()) for f in files)
+    patterns = ((f.stem, f.read_text(encoding='utf-8')) for f in files)
     recordlist = (parsefile(cf, f, c) for f, c in patterns)
     # remove empty values
     recordlist = (l for l in recordlist if l)
     return filelist(recordlist)
 
-def parsefile(cf, filename, contents):
-    """Parse a single pattern file into record value
 
-    Ignore any files with ports=test unless we have a
-    cf.selected_pattern_file when we ignore all but the
-    selected_pattern_file pattern
+def parsefile(cf: Config, filename: str,
+              contents: str) -> PatternDict | None:
+    """Parse a single pattern file into a pattern dictionary.
 
-    if we have a cf.selected_pattern_file and the file
-    contains ports=test set global flag
-    selected_pattern_is_test
-    so we can take special action when reading files
+    Parses file contents extracting file=, ports=, and regex statements.
+    Validates syntax and handles test pattern filtering based on
+    cf.selected_pattern_file settings.
 
-    Parameters
-    ----------
-    filename : str
-        Source file name
-    contents : str
-        File contents
+    Args:
+        cf: Config instance with optional selected_pattern_file
+        filename: Pattern file name (stem, without .patterns extension)
+        contents: Complete file contents as string
 
-    Returns
-    -------
-    Dict[file : List[Dict]]
-    file : str
-        Main index is file name of log file to scan
-    The value is a list of dicts:
-        pattern : str
-             pattern name for reference
-        ports : str
-            comma separated ports to match (may be 'all')
-            numeric values are checked here, but multiple
-            values and order is checked and normalised
-            in blacklist.py
-        file : str
-            logfile to scan
-        regex : List[compiled regex]
-            List of regexes to scan each line of the log file with
+    Returns:
+        Pattern dictionary with keys::
+
+            {
+                'pattern': str,  # Pattern name (filename)
+                'ports': str,    # Port list or 'all'/'test'/'update'
+                'file': str,     # Log file path
+                'regex': list    # Compiled regex patterns
+            }
+
+        Returns None if:
+        - File is empty
+        - Missing required file= statement
+        - Invalid port specification
+        - No regex patterns found
+        - Pattern is test-only and not selected
+        - Pattern not selected when cf.selected_pattern_file set
+
+    Example:
+        >>> contents = '''
+        ... file = /var/log/auth.log
+        ... ports = 22
+        ... Failed password from __IP__
+        ... '''
+        >>> result = parsefile(cf, 'ssh-brute', contents)
+        >>> print(result['ports'])
+        22
+
+    Note:
+        - Sets cf.selected_pattern_is_test = True if selected pattern has ports=test
+        - Validates port values: 'all', 'test', 'update', or comma-separated numbers
+        - File paths must be absolute (start with /) unless TESTING mode
+        - __IP__ placeholder is replaced with IPv4/IPv6 regex pattern
     """
-
     # pylint: disable=too-many-return-statements
 
     # should always have contents
@@ -157,42 +251,58 @@ def parsefile(cf, filename, contents):
         return None
 
     # generate output
-    res = {'pattern':filename,
-           'ports':ports,
-           'file':file,
-           'regex':regex
-           }
+    res: PatternDict = {'pattern': filename,
+                        'ports': ports,
+                        'file': file,
+                        'regex': regex}
     return res
 
-def _pattern_scan(contents, filename):
-    """Scan a file
 
-    Parameters
-    ----------
-    contents : str
-        File contents
-    filename : str
-        Filename for error messages
+def _pattern_scan(contents: str,
+                  filename: str) -> tuple[str | None, str | None, list[re.Pattern[str]]]:
+    """Scan pattern file contents extracting file, ports, and regex patterns.
 
-    Returns
-    -------
-    tuple
-    file : str
-        file name
-    ports : str
-        comma separated ports list
-    regex : List[]
-        List of compiled regexes
+    Internal function that parses the raw file contents line by line,
+    extracting file= and ports= commands and compiling regex patterns.
 
+    Args:
+        contents: Complete file contents as string
+        filename: Filename for error messages
+
+    Returns:
+        Tuple of (file, ports, regex)::
+
+            (
+                '/var/log/auth.log',  # file path or None
+                '22',                  # ports string or None
+                [compiled_regex1, ...]  # list of compiled regexes
+            )
+
+    Example:
+        >>> contents = '''
+        ... file = /var/log/auth.log
+        ... ports = 22,80
+        ... Failed from __IP__
+        ... '''
+        >>> file, ports, regexes = _pattern_scan(contents, 'test')
+        >>> print(file, ports, len(regexes))
+        /var/log/auth.log 22,80 1
+
+    Note:
+        - Lines starting with # are comments
+        - Accepts file= and ports= commands (only first occurrence counts)
+        - __IP__ is replaced with: (?:::ffff:)?([0-9a-fA-F:.]+(?:/[0-9]+)?)
+        - Validates regex has exactly 1 capture group (for IP)
+        - Invalid regexes are logged and skipped
+        - Lines without __IP__ are logged as unknown and skipped
     """
-
     # pylint: disable=too-many-branches
 
     # re used to pick out value setting lines
     commandre = re.compile(r'^([a-z]*)\s*=\s*(.*)(:?#.*)?')
     ports = None
     file = None
-    regex = []
+    regex: list[re.Pattern[str]] = []
     lineno = 0
 
     # scan file
@@ -234,15 +344,16 @@ def _pattern_scan(contents, filename):
         # make this a little more robust
         # the line must contain __IP__
         if '__IP__' in line:
-            linere = line.replace(r'__IP__', r'(?:::ffff:)?([0-9a-fA-F:\.]+(?:/[0-9]+)?)', 1)
+            linere = line.replace(r'__IP__',
+                                  r'(?:::ffff:)?([0-9a-fA-F:\.]+(?:/[0-9]+)?)', 1)
             try:
-                cm = re.compile(linere, re.IGNORECASE)
-                if cm.groups != 1:
+                compiled_pattern = re.compile(linere, re.IGNORECASE)
+                if compiled_pattern.groups != 1:
                     fmt = '%s, Line %s ignored ' \
                             + ' - extra regex match groups found - use \\ before ( and )'
                     log.error(fmt, filename, lineno)
                 else:
-                    regex.append(cm)
+                    regex.append(compiled_pattern)
             except re.error:
                 log.error('Pattern: invalid regex in %s: Line %s - line ignored',
                           filename, lineno)
@@ -251,25 +362,44 @@ def _pattern_scan(contents, filename):
                       filename, lineno)
     return file, ports, regex
 
-def filelist(recordlist):
-    """Create dict From the raw data obtained from files
 
-    recordlist is an array of information from parsed files
+def filelist(recordlist: Any) -> dict[str, list[PatternDict]]:
+    """Create dictionary mapping log files to their pattern definitions.
 
-    Output a dict indexed by the files to scan, where the contents of each
-    entry is an array of the records from record list
+    Takes parsed pattern records and organises them by the log files they
+    should scan. Performs glob expansion on file paths and filters out
+    non-existent or empty files.
 
-    If the files don't exist, they will be omitted from the final list.
+    Args:
+        recordlist: Iterable of pattern dictionaries from parsefile()
 
-    Expanding on symbiosis, we'll do a glob on the files so HTML logs in
-    the srv tree can be scanned by a single ruleset. Doing this uses
-    pathlib to expand the glob.
+    Returns:
+        Dictionary mapping log file paths to lists of pattern info::
 
-    Files that don't exist are removed from the set of actions so it's
-    possible to have no actions.
+            {
+                '/var/log/auth.log': [pattern_dict1, pattern_dict2, ...],
+                '/var/log/apache2/error.log': [pattern_dict3, ...]
+            }
+
+        Returns empty defaultdict if no valid log files found.
+
+    Example:
+        >>> records = [
+        ...     {'pattern': 'ssh', 'file': '/var/log/auth.log', ...},
+        ...     {'pattern': 'http', 'file': '/var/log/*.log', ...}
+        ... ]
+        >>> result = filelist(iter(records))
+        >>> for logfile in result.keys():
+        ...     print(logfile)
+
+    Note:
+        - Glob wildcards (*, [, ?) in file paths are expanded
+        - Symlinks are resolved to canonical paths to avoid duplicates
+        - Only existing, non-empty files are included
+        - Same pattern can apply to multiple files via glob expansion
+        - Files that don't exist are silently omitted
     """
-
-    action = defaultdict(list)
+    action: dict[str, list[PatternDict]] = defaultdict(list)
     for record in recordlist:
         if not record['file']:
             continue
@@ -278,7 +408,7 @@ def filelist(recordlist):
         # glob glob characters
         globchars = set('*[?')
         if any((c in globchars) for c in fname):
-            pathlist = []
+            pathlist: list[Path] = []
             # for a glob there may be symlinks which will
             # generate several paths to the same file
             # build up a list using
@@ -299,7 +429,7 @@ def filelist(recordlist):
 
         files = (str(f) for f in pathlist \
                  if f.is_file() and f.stat().st_size > 0)
-        for file in files:
-            action[file].append(record)
+        for filepath in files:
+            action[filepath].append(record)
 
     return action
