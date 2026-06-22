@@ -1,3 +1,13 @@
+v1.0.1  * Improvements in logging pattern names in blacklist scanning
+	The code now acurately maintains lists of pattern names when
+	different rules are triggered for the same ip.
+	* Examination of rate limiting http/https connects has
+	yielded a new incoming rule for this, www_limit, which has been
+	tested in a live system. The old rules have been removed,
+	but will persist in local installations.
+	Delete: http-meter.sh, load-http-meter.sh and pre-http-meter.sh
+	in etc/nftfw/rule.d
+
 v1.0.0  * Fix code in geoipcountry.py that removes CIDR extensions
 	from all addresses to include ipv6 support.
 	* Github used to allow you to download binary files, this

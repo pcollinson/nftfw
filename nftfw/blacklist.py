@@ -75,7 +75,7 @@ from typing import TYPE_CHECKING, Any
 from pathlib import Path
 import time
 import logging
-from .logreader import log_reader
+from .logreader import log_reader, patternmerge
 from .listreader import ListReader
 from .fwdb import FwDb
 from .whitelistcheck import WhiteListCheck
@@ -442,13 +442,17 @@ class BlackList:
 
             # check on patterns
             # maintain comma separated list
-            if patinfo['pattern'] \
-               and patinfo['pattern'] != '':
-                patlist = current['pattern'].split(',')
-                if patinfo['pattern'] not in patlist:
-                    patlist.append(patinfo['pattern'])
-                    update['pattern'] = ",".join(patlist)
-                    current['pattern'] = update['pattern']
+            # logreader can now generate comma separated lists
+            update['pattern'] = patternmerge(current['pattern'], patinfo['pattern'])
+
+            # old code replaced
+            #if patinfo['pattern'] \
+            #   and patinfo['pattern'] != '':
+            #    patlist = current['pattern'].split(',')
+            #    if patinfo['pattern'] not in patlist:
+            #        patlist.append(patinfo['pattern'])
+            #        update['pattern'] = ",".join(patlist)
+            #        current['pattern'] = update['pattern']
 
             # now look at ports
             ports = current['ports']

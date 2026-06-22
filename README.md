@@ -1,6 +1,6 @@
 # Nftfw - Nftables firewall builder for Debian
 
-The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was orginally created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package, and was inherited by Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
+The _nftfw_ package builds firewalls for _nftables_. The system creates a simple and easy-to-use configuration model for firewall management. The model was originally created for the _iptables_ based firewall package supplied as part of Bytemark's Symbiosis hosting package, and was inherited by Sympl, a fork of Symbiosis. The firewall is controlled using files in a directory structure that maps onto the parts of the firewall. To add a rule, you just add a file. To block an IP address with a specific set of ports, you just add a file.
 
 _nftfw_ doesn't need Sympl or Symbiosis, it's stand-alone and will run on any current Debian System.  It should also work on other Linux distributions derived from Debian. The package is written in Python and needs at least Python 3.9. This release has been tested using Python 3.11.
 
@@ -9,6 +9,12 @@ _nftfw_ is installed from a Debian binary package, there is a zip file called _n
 ## New in current release
 
 For full update information see the [Changelog](https://github.com/pcollinson/nftfw/blob/master/ChangeLog).
+
+* Improvements in the logging of pattern names when blacklist scanning. The code now acurately maintains lists of pattern names when different rules are triggered for the same ip.
+
+* Examination of rate limiting http/https connects has yielded a new incoming rule, www_limit, which has been needed because people who use bots don't seem to understand that flooding web sites with requests is generally a bad idea. The old rules have been removed, but will persist in local installations.
+
+## New in Release 1.0.0
 
 * Every code file for _nftfw_ and the testing suite has been updated (with help from Claude Code) to include full documentation and include modern Python type information. The system now requires a minimum of Python 3.9. Each file has been validated by _pylint_ and _mypy_. There have been no substantial changes to the code in the files. However, it was felt that this change justified the increase in major version number to 1.0.1.
 

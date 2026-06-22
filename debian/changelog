@@ -1,5 +1,5 @@
-nftfw (1.0.0-1) unstable; urgency=medium
+nftfw (1.0.1-1) unstable; urgency=medium
 
   * Initial release (Closes: #990291)
 
- -- Peter Collinson <support@nftfw.uk>  Tue, 27 Jan 2026 14:31:32 +0000
+ -- Peter Collinson <support@nftfw.uk>  Mon, 22 Jun 2026 06:50:32 +0100

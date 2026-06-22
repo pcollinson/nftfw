@@ -37,18 +37,9 @@ ftp-passive.sh	       - Add Passive inbound ports needed for pure-ftpd
 		         If not using pure-ftp edit the script to provide ports
 			 NB this script does nothing unless it's edited to
 			 supply a port range or pure-ftp is installed.
-http-meter.sh          - Pass all 80,443 connects into the http limit check
-                         needs load-http-meter or pre-http-meter
-		       	 to provide the check. See comments on these
-			 files to see the difference
 icmp.sh		       - allow ICMP for ipv4 only
 icmpv6.sh	       - allow ICMP for ipv6 only
-load-http-meter.sh     - establish chain for http(s) metering
-		         accept packets if the limit is not reached
 ping.sh                - allow pings, editable to add limit
-pre-http-meter.sh      - establish chain for http(s) metering,
-                         this version returns if the limit is not
-			 reached.
 reject-www-data.sh     - for outbound use, prevent packets from
 		         the webserver which is user "www-data"
 			 from sending anything other than domain requests
@@ -59,3 +50,11 @@ related.sh             - accept related connections
 syn-ack-flood-protection.sh
                        - Symbiosis compatibility, rules to do this
 		       - are in nftfw_init.nft
+www_limit.sh	       - 2026 revision for limiting http/https connects
+		       - from robots and scripts. Until recently its
+		       - been hard to test limiting http/https, but
+		       - with the explosion in malicious calls from
+		       - non-humans, this code is known to work
+		       - The actual limits in this file are reasonably
+		       - conservative, but depends on your environment
+		       - see comments in the file

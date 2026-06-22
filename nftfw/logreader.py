@@ -166,6 +166,8 @@ def log_reader(cf: Config, update_position: bool = True) -> dict[str, IpMatchDic
                 out[ip]['incidents'] += 1
                 out[ip]['matchcount'] += info['matchcount']
                 out[ip]['ports'] = portmerge(out[ip]['ports'], info['ports'])
+                # preserve different pattern names
+                out[ip]['pattern'] = patternmerge(out[ip]['pattern'], info['pattern'])
 
     # extra logging for test files
     if have_pattern \
@@ -174,6 +176,31 @@ def log_reader(cf: Config, update_position: bool = True) -> dict[str, IpMatchDic
         log.error('No matches found in %s', cf.selected_pattern_file)
 
     return out
+
+def patternmerge(arga:str, argb:str)->str:
+    """ Concatenate two comma separated strings
+        removing any duplicate value,
+        args may be single entries
+        return a comma separated string
+    """
+
+    if arga == argb:
+        return arga
+    if arga == '':
+        return argb
+    if argb == '':
+        return arga
+
+    sa = set(arga.split(","))
+    sb = set(argb.split(","))
+
+    # don't want spaces
+    # there shouldn't be any, but just in case
+    sac = {el.strip() for el in sa}
+    sbc = {el.strip() for el in sb}
+
+    # use union to remove duplicate entries
+    return ",".join(sorted(sac | sbc))
 
 
 def one_log_reader(
@@ -342,6 +369,9 @@ def scanlog(allpatinfo: list[PatternInfo], lines: TextIO) -> dict[str, IpMatchDi
         else:
             out[ip]['matchcount'] += 1
             out[ip]['ports'] = portmerge(out[ip]['ports'], ports)
+            # preserve different pattern names
+            out[ip]['pattern'] = patternmerge(out[ip]['pattern'], patinfo['pattern'])
+
     return out
 
 
