@@ -15,6 +15,7 @@ Click on these links to automatically download the file.
 
 [Most recent](https://github.com/pcollinson/nftfw/raw/master/package/nftfw_current.zip)    
 
+[nftfw_1.0.1-1_all.deb](https://github.com/pcollinson/nftfw/raw/master/package/nftfw_1.0.1-1_all.deb)  
 [nftfw_1.0.0-1_all.deb](https://github.com/pcollinson/nftfw/raw/master/package/nftfw_1.0.0-1_all.deb)  
 [nftfw_0.9.20-1_all.deb](https://github.com/pcollinson/nftfw/raw/master/package/nftfw_0.9.20-1_all.deb)  
 [nftfw_0.9.16-1_all.deb](https://github.com/pcollinson/nftfw/raw/master/package/nftfw_0.9.16-1_all.deb)  
